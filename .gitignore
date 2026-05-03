@@ -1,0 +1,89 @@
+# IDEs
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Go
+bin/
+dist/
+*.exe
+*.test
+*.out
+coverage.out
+go.work
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+*.egg-info/
+
+# JavaScript
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm/
+.yarn/
+.pnpm-store/
+.next/
+.nuxt/
+.svelte-kit/
+coverage/
+vite.config.*.timestamp-*
+*.tsbuildinfo
+
+# Flutter / Dart mobile
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.pub-cache/
+**/.pub/
+**/doc/api/
+**/build/
+**/coverage/
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+**/android/local.properties
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+*.symbols
+app.*.symbols
+app.*.map.json
+
+# Apple / Xcode
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Android / Gradle
+.gradle/
+**/.gradle/
+captures/
+*.apk
+*.aab
+
+# Environment files
+.env
+.env.*
+!.env.example
+!infra/.env-dev
