@@ -1,0 +1,19 @@
+{{ define "base_start" }}
+<!doctype html>
+<html lang="en">
+<head>
+    {{ template "meta-tags" . }}
+    <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body class="min-h-screen bg-slate-950 text-white antialiased">
+    {{ template "navbar" . }}
+    <main>
+{{ end }}
+
+{{ define "base_end" }}
+    </main>
+    {{ template "footer" . }}
+    {{ template "scripts" . }}
+</body>
+</html>
+{{ end }}

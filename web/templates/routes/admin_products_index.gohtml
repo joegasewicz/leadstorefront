@@ -1,0 +1,58 @@
+{{ define "admin_products_index" }}
+{{ template "base_start" . }}
+<section class="min-h-[calc(100vh-8rem)] bg-slate-950">
+    <div class="mx-auto max-w-6xl px-6 py-10">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm font-semibold uppercase tracking-wide text-cyan-300">Admin</p>
+                <h1 class="mt-2 text-4xl font-bold tracking-normal text-white">Products</h1>
+            </div>
+            <a href="/admin/products/create" class="inline-flex items-center justify-center rounded-md bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950">Create product</a>
+        </div>
+
+        {{ if .Flash }}
+        <div class="mt-6 rounded-md border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">{{ .Flash }}</div>
+        {{ end }}
+
+        <div class="mt-8 overflow-hidden rounded-lg border border-white/10">
+            <table class="min-w-full divide-y divide-white/10 text-left text-sm">
+                <thead class="bg-white/5 text-slate-300">
+                    <tr>
+                        <th class="px-4 py-3 font-semibold">Product</th>
+                        <th class="px-4 py-3 font-semibold">Country</th>
+                        <th class="px-4 py-3 font-semibold">Category</th>
+                        <th class="px-4 py-3 font-semibold">Retailer</th>
+                        <th class="px-4 py-3 font-semibold">Price</th>
+                        <th class="px-4 py-3 text-right font-semibold">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/10 bg-slate-950">
+                    {{ range .Products }}
+                    <tr>
+                        <td class="px-4 py-4 text-white">{{ .Name }}</td>
+                        <td class="px-4 py-4 text-slate-300">{{ .Country.Code }}</td>
+                        <td class="px-4 py-4 text-slate-300">{{ .Category.Name }}</td>
+                        <td class="px-4 py-4 text-slate-300">{{ .RetailerName }}</td>
+                        <td class="px-4 py-4 text-slate-300">{{ .Currency }} {{ .CurrentPriceCents }}</td>
+                        <td class="px-4 py-4">
+                            <div class="flex justify-end gap-2">
+                                <a href="/{{ .Country.Code }}/products/{{ .Slug }}" target="_blank" rel="noopener noreferrer" class="rounded-md border border-white/10 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">View</a>
+                                <a href="/admin/products/{{ .ID }}/edit" class="rounded-md border border-white/10 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">Edit</a>
+                                <form method="post" action="/admin/products/{{ .ID }}/delete">
+                                    <button type="submit" class="rounded-md border border-red-400/30 px-3 py-2 text-xs font-semibold text-red-200 hover:bg-red-500/10">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {{ else }}
+                    <tr>
+                        <td colspan="6" class="px-4 py-8 text-center text-slate-400">No products yet.</td>
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{{ template "base_end" . }}
+{{ end }}

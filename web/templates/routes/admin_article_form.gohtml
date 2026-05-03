@@ -1,0 +1,107 @@
+{{ define "admin_article_form" }}
+{{ template "base_start" . }}
+<section class="min-h-[calc(100vh-8rem)] bg-slate-950">
+    <div class="mx-auto max-w-5xl px-6 py-10">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-semibold uppercase tracking-wide text-cyan-300">Admin</p>
+                <h1 class="mt-2 text-4xl font-bold tracking-normal text-white">{{ .Title }}</h1>
+            </div>
+            <a href="/admin/articles" class="rounded-md border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200">Back</a>
+        </div>
+
+        {{ if .Error }}
+        <div class="mt-6 rounded-md border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{{ .Error }}</div>
+        {{ end }}
+
+        <form method="post" action="{{ .Action }}" enctype="multipart/form-data" class="mt-8 grid gap-6 rounded-lg border border-white/10 bg-white/5 p-6">
+            <div class="grid gap-6 md:grid-cols-2">
+                <div>
+                    <label class="block text-sm font-medium text-slate-200" for="title">Title</label>
+                    <input id="title" name="title" value="{{ .Article.Title }}" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-200" for="author">Author</label>
+                    <input id="author" name="author" value="{{ .Article.Author }}" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-200" for="subtitle">Subtitle</label>
+                <input id="subtitle" name="subtitle" value="{{ .Article.Subtitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-200" for="body">Body</label>
+                <textarea id="body" name="body" rows="12" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">{{ .Article.Body }}</textarea>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-2">
+                <div>
+                    <label class="block text-sm font-medium text-slate-200" for="article_category_id">Article category</label>
+                    <select id="article_category_id" name="article_category_id" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                        <option value="">Select category</option>
+                        {{ range .Categories }}
+                        <option value="{{ .ID }}" {{ if eq $.Article.ArticleCategoryID .ID }}selected{{ end }}>{{ .Name }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-200" for="product_id">Referenced product</label>
+                    <select id="product_id" name="product_id" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                        <option value="">None</option>
+                        {{ range .Products }}
+                        <option value="{{ .ID }}" {{ if eq $.ProductID .ID }}selected{{ end }}>{{ .Name }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-2">
+                <div>
+                    <label class="block text-sm font-medium text-slate-200" for="main_image">Main image upload</label>
+                    <input id="main_image" name="main_image" type="file" accept="image/png,image/jpeg,image/webp" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-sm text-slate-200 file:mr-4 file:rounded-md file:border-0 file:bg-cyan-300 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-slate-950 outline-none focus:border-cyan-300">
+                    {{ if .MainImageURL }}
+                    <img src="{{ .MainImageURL }}" alt="" class="mt-4 h-40 w-full rounded-md object-cover">
+                    {{ end }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-200" for="image_url">Fallback image URL</label>
+                    <input id="image_url" name="image_url" value="{{ .Article.ImageURL }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                </div>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-2">
+                <div>
+                    <label class="block text-sm font-medium text-slate-200" for="meta_title">Meta title</label>
+                    <input id="meta_title" name="meta_title" value="{{ .Article.MetaTitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-200" for="canonical_url">Canonical URL</label>
+                    <input id="canonical_url" name="canonical_url" value="{{ .Article.CanonicalURL }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-200" for="meta_description">Meta description</label>
+                <textarea id="meta_description" name="meta_description" rows="3" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">{{ .Article.MetaDescription }}</textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-200" for="meta_keywords">Meta keywords</label>
+                <input id="meta_keywords" name="meta_keywords" value="{{ .Article.MetaKeywords }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </div>
+
+            <label class="flex items-center gap-3 text-sm font-medium text-slate-200">
+                <input name="is_published" type="checkbox" {{ if .Article.IsPublished }}checked{{ end }} class="h-4 w-4 rounded border-white/10 bg-slate-900 text-cyan-300">
+                Published
+            </label>
+
+            <div class="flex justify-end">
+                <button type="submit" class="rounded-md bg-cyan-300 px-5 py-2 font-semibold text-slate-950">Save article</button>
+            </div>
+        </form>
+    </div>
+</section>
+{{ template "base_end" . }}
+{{ end }}
