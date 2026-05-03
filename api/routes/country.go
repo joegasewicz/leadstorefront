@@ -25,7 +25,15 @@ func (country *Country) Get(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not load latest deals"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"latest_deals": products})
+
+	var articles []models.Article
+	if err := publishedArticlesQuery(country.DB).Limit(6).Find(&articles).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not load latest articles"})
+		return
+	}
+	withArticleImageURLs(articles)
+
+	c.JSON(http.StatusOK, gin.H{"latest_deals": products, "latest_articles": articles})
 }
 
 func (country *Country) Post(c *gin.Context) {
