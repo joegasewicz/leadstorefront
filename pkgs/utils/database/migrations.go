@@ -21,6 +21,8 @@ func (m *Migrate) Run() error {
 		&models.Country{},
 		&models.ProductCategory{},
 		&models.Product{},
+		&models.ArticleCategory{},
+		&models.Article{},
 		&models.Role{},
 		&models.User{},
 	); err != nil {

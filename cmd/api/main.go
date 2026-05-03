@@ -25,7 +25,7 @@ func main() {
 	}
 
 	app := gin.Default()
-	routes.Register(app)
+	routes.Register(app, db)
 
 	log.Printf("api serving at http://%s%s", cfg.Domain, cfg.Addr)
 	if err := app.Run(cfg.Addr); err != nil {

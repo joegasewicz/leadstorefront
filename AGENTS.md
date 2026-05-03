@@ -40,6 +40,8 @@ The default country is `uk`. If the visitor country cannot be detected, redirect
 - Web templates: `web/templates`
 - Web template partials: `web/templates/partials`
 - Web route templates: `web/templates/routes`
+- Web source assets: `web/src`
+- Web built assets: `web/static/assets`
 - Runtime config: `pkgs/config.go`
 - Shared models: `pkgs/models`
 - Shared middleware: `pkgs/middleware`
@@ -68,6 +70,7 @@ POSTGRES_DB=gadgetscout
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 POSTGRES_SSLMODE=disable
+SESSION_SECRET=local-dev-session-secret-change-me
 ```
 
 ## Database Code
@@ -75,9 +78,20 @@ POSTGRES_SSLMODE=disable
 - Use `pkgs.Config` for runtime configuration. It is initialized once with `pkgs.Load()`.
 - `pkgs/utils/database.NewPostgres()` creates the GORM Postgres connection.
 - `pkgs/utils/database.NewMigrate(db)` creates a migration runner.
-- `Migrate.Run()` auto-migrates the `Country`, `ProductCategory`, `Product`, `Role`, and `User` models, then calls `Seed(db)`.
-- `pkgs/utils/database/seeds.go` seeds supported countries.
+- `Migrate.Run()` auto-migrates the `Country`, `ProductCategory`, `Product`, `ArticleCategory`, `Article`, `Role`, and `User` models, then calls `Seed(db)`.
+- `pkgs/utils/database/seeds.go` seeds supported countries, roles (`admin`, `editor`, `user`), a local admin user, article categories, and broad tech product categories.
 - `cmd/api/main.go` creates the Postgres connection, logs connection success, logs migration start, and runs migrations.
+- All database access must stay inside the API service. The web service must not import `pkgs/utils/database`, accept `*gorm.DB`, call GORM query methods, or otherwise connect/query Postgres directly.
+- Web handlers must call the API over HTTP for application data and admin mutations, then marshal/unmarshal JSON into the structs needed by templates.
+- Always use `github.com/joegasewicz/identity-client` v0.4.0 or newer where possible for web-to-API JSON requests, including `Get`, `Post`, `Put`, and `Delete`.
+- Always use `github.com/joegasewicz/multipart-requests` where possible for web-to-API file uploads.
+- Always use `github.com/joegasewicz/form-validator` where possible for incoming web/admin form validation and typed form value extraction. API handlers that accept multipart form submissions should also validate them with `form-validator`.
+- Always use `github.com/joegasewicz/entity-file-uploader` where possible for API-owned file persistence and retrieval.
+- When a dependency, configuration, or repeated value is used across multiple route methods, prefer storing it as a struct member instead of recreating a local variable in every method.
+- API routes must be versioned with `pkgs/utils.GetVersion`, which prepends `/api/v1`. For example: `app.GET(utils.GetVersion("/health"), health)`.
+- `api/routes.Register(app, db)` must declare routes directly. Do not hide route declarations behind `registerX(app, db)` helper functions.
+- When creating a new API request handler, always create or use `api/routes/name-of-model.go`. In that file, define a struct named after the model, then implement four pointer receiver methods on that struct: `Get`, `Post`, `Put`, and `Delete`. This is the required pattern for every model route.
+- Web route files must follow the same object pattern: each `web/routes/name-of-route.go` file creates a struct named after the route, and that struct implements pointer receiver methods `Get`, `Post`, `Put`, and `Delete`. Web methods must call the API for every operation involving database-backed data.
 
 ## HTTP Apps
 
@@ -85,12 +99,44 @@ POSTGRES_SSLMODE=disable
 - `cmd/api/main.go` starts the Gin JSON API on `API_ADDR`, default `:8001`.
 - Web routes are registered in `web/routes.Register(app)`.
 - Web templates are loaded in `cmd/web/main.go`.
-- API routes are registered in `api/routes.Register(app)`.
-- Both services expose `GET /health`.
+- API routes are registered in `api/routes.Register(app, db)`.
+- Web exposes `GET /health`; API exposes `GET /api/v1/health` through `pkgs/utils.GetVersion("/health")`.
+- Admin web routes live under `/admin`, not country paths.
+- Admin routes:
+  - `GET /admin/login`
+  - `POST /admin/login`
+  - `GET /admin/register`
+  - `POST /admin/register`
+  - `GET /admin`
+  - `GET /admin/articles`
+  - `GET /admin/articles/create`
+  - `POST /admin/articles/create`
+  - `GET /admin/articles/:id/edit`
+  - `POST /admin/articles/:id/edit`
+  - `POST /admin/articles/:id/delete`
+- `/admin` requires a server-side session and a user role of `admin` or `editor`.
+- Admin article delete uses a POST form and shows a flash message after redirect.
 - The web root route `/` redirects to the detected country homepage such as `/uk` or `/us`.
 - Country homepages are served by `GET /:country`.
+- API routes should reflect the web route surface under `/api/v1`, for example web `GET /uk/products` maps to API `GET /api/v1/uk/products`.
 - Location detection lives in `pkgs/middleware/locations.go`. It checks common CDN/proxy country headers first (`CF-IPCountry`, `X-Vercel-IP-Country`, `X-Country-Code`, `X-AppEngine-Country`), then `Accept-Language`, then defaults to `uk`.
-- The web frontend should use Tailwind and call the API for application data.
+- The web frontend should use Tailwind and call the API for application data. The API is the only HTTP app allowed to connect to the database.
+
+## Middleware
+
+- Prefer middleware for cross-cutting request behavior such as sessions, authentication, authorization, localization, redirects, and request context.
+- Use utility functions for non-request-specific helpers.
+- Server-side web sessions use `github.com/gin-contrib/sessions` with the memstore backend in `pkgs/middleware/sessions.go`.
+- Role-based admin authorization lives in `pkgs/middleware/admin_auth.go`.
+
+## Frontend Assets
+
+- Web custom TypeScript and Sass live in `web/src`.
+- Vite builds `web/src/main.ts` to `web/static/assets/app.js` and `web/static/assets/app.css`.
+- Build frontend assets from `web` with `npm run build`.
+- `cmd/web/main.go` serves built assets at `/assets`.
+- `web/templates/base.gohtml` renders `/assets/app.css` in the head.
+- `web/templates/partials/scripts.gohtml` renders `/assets/app.js` in the footer.
 
 ## Model Conventions
 
@@ -138,6 +184,27 @@ Current models:
   - `Country Country`
   - `CategoryID uint`
   - `Category ProductCategory`
+- `ArticleCategory`
+  - `gorm.Model`
+  - `Name string`
+- `Article`
+  - `gorm.Model`
+  - `Author string`
+  - `Title string`
+  - `Slug string`
+  - `Subtitle string`
+  - `Body string`
+  - `ImageURL string`
+  - `MetaTitle string`
+  - `MetaDescription string`
+  - `MetaKeywords string`
+  - `CanonicalURL string`
+  - `IsPublished bool`
+  - `PublishedAt *time.Time`
+  - `ArticleCategoryID uint`
+  - `ArticleCategory ArticleCategory`
+  - `ProductID *uint`
+  - `Product *Product`
 - `Role`
   - `gorm.Model`
   - `Name string`

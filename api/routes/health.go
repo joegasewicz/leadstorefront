@@ -6,10 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func registerHealth(app *gin.Engine) {
-	app.GET("/health", health)
-}
-
 func health(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"service": "api",

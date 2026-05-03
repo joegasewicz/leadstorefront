@@ -8,6 +8,7 @@ type AppConfig struct {
 	Postgres Postgres
 	Web      Service
 	API      Service
+	Session  Session
 }
 
 type Postgres struct {
@@ -22,6 +23,10 @@ type Postgres struct {
 type Service struct {
 	Domain string
 	Addr   string
+}
+
+type Session struct {
+	Secret string
 }
 
 func Load() AppConfig {
@@ -41,6 +46,9 @@ func Load() AppConfig {
 		API: Service{
 			Domain: envOrDefault("API_DOMAIN", "localhost"),
 			Addr:   envOrDefault("API_ADDR", ":8001"),
+		},
+		Session: Session{
+			Secret: envOrDefault("SESSION_SECRET", "local-dev-session-secret-change-me"),
 		},
 	}
 }

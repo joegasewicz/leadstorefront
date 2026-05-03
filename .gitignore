@@ -87,3 +87,6 @@ captures/
 .env.*
 !.env.example
 !infra/.env-dev
+
+# Local uploads
+uploads/
