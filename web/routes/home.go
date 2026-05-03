@@ -24,7 +24,8 @@ func (home *Home) Get(c *gin.Context) {
 	}
 
 	var response struct {
-		LatestDeals []models.Product `json:"latest_deals"`
+		LatestDeals    []models.Product `json:"latest_deals"`
+		LatestArticles []models.Article `json:"latest_articles"`
 	}
 	if err := home.API.Get(c, "/"+countryCode, &response); err != nil {
 		c.String(http.StatusInternalServerError, "could not load latest deals")
@@ -32,9 +33,10 @@ func (home *Home) Get(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "home", gin.H{
-		"Title":       "Gadget Scout",
-		"Country":     countryCode,
-		"LatestDeals": response.LatestDeals,
+		"Title":          "Gadget Scout",
+		"Country":        countryCode,
+		"LatestDeals":    response.LatestDeals,
+		"LatestArticles": response.LatestArticles,
 	})
 }
 

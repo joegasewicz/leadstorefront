@@ -3,6 +3,7 @@ package routes
 import (
 	"gadgetscout/pkgs/middleware"
 	"gadgetscout/pkgs/models"
+	"gadgetscout/pkgs/utils"
 	"net/http"
 	"strconv"
 	"strings"
@@ -30,9 +31,11 @@ func (articles *AdminArticles) Get(c *gin.Context) {
 
 func (articles *AdminArticles) Index(c *gin.Context) {
 	var response struct {
-		Articles []models.Article `json:"articles"`
+		Articles   []models.Article `json:"articles"`
+		Pagination utils.Pagination `json:"pagination"`
 	}
-	if err := articles.API.Get(c, "/admin/articles", &response); err != nil {
+	page, limit := utils.GetPaginationQuery(c)
+	if err := articles.API.Get(c, "/admin/articles?page="+page+"&limit="+limit, &response); err != nil {
 		c.String(http.StatusInternalServerError, "could not load articles")
 		return
 	}
@@ -40,6 +43,8 @@ func (articles *AdminArticles) Index(c *gin.Context) {
 	c.HTML(http.StatusOK, "admin_articles_index", gin.H{
 		"Title":          "Articles",
 		"Articles":       response.Articles,
+		"Pagination":     response.Pagination,
+		"Limit":          limit,
 		"DefaultCountry": middleware.DefaultCountryCode,
 		"Flash":          middleware.PopFlash(c),
 		"IsAdmin":        true,

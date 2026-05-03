@@ -3,6 +3,7 @@ package routes
 import (
 	"gadgetscout/pkgs/middleware"
 	"gadgetscout/pkgs/models"
+	"gadgetscout/pkgs/utils"
 	"net/http"
 	"strconv"
 	"strings"
@@ -30,9 +31,11 @@ func (products *AdminProducts) Get(c *gin.Context) {
 
 func (products *AdminProducts) Index(c *gin.Context) {
 	var response struct {
-		Products []models.Product `json:"products"`
+		Products   []models.Product `json:"products"`
+		Pagination utils.Pagination `json:"pagination"`
 	}
-	if err := products.API.Get(c, "/admin/products", &response); err != nil {
+	page, limit := utils.GetPaginationQuery(c)
+	if err := products.API.Get(c, "/admin/products?page="+page+"&limit="+limit, &response); err != nil {
 		c.String(http.StatusInternalServerError, "could not load products")
 		return
 	}
@@ -40,6 +43,8 @@ func (products *AdminProducts) Index(c *gin.Context) {
 	c.HTML(http.StatusOK, "admin_products_index", gin.H{
 		"Title":        "Products",
 		"Products":     response.Products,
+		"Pagination":   response.Pagination,
+		"Limit":        limit,
 		"Flash":        middleware.PopFlash(c),
 		"IsAdmin":      true,
 		"IsAdminRoute": true,
