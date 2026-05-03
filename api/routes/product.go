@@ -93,11 +93,18 @@ func (product *Product) getByCountrySlug(c *gin.Context) {
 
 func (product *Product) getAdminList(c *gin.Context) {
 	var products []models.Product
-	if err := product.DB.Preload("Country").Preload("Category").Order("created_at desc").Find(&products).Error; err != nil {
+	var total int64
+	page, limit, offset := utils.GetPagination(c)
+	query := product.DB.Model(&models.Product{})
+	if err := query.Count(&total).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not count products"})
+		return
+	}
+	if err := product.DB.Preload("Country").Preload("Category").Order("created_at desc").Limit(limit).Offset(offset).Find(&products).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not load products"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"products": products})
+	c.JSON(http.StatusOK, gin.H{"products": products, "pagination": utils.NewPagination(page, limit, total)})
 }
 
 func (product *Product) getByID(c *gin.Context) {

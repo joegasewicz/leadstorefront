@@ -117,12 +117,19 @@ func (article *Article) getPublishedBySlug(c *gin.Context) {
 
 func (article *Article) getAdminList(c *gin.Context) {
 	var articles []models.Article
-	if err := article.DB.Preload("ArticleCategory").Preload("Product").Order("created_at desc").Find(&articles).Error; err != nil {
+	var total int64
+	page, limit, offset := utils.GetPagination(c)
+	query := article.DB.Model(&models.Article{})
+	if err := query.Count(&total).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not count articles"})
+		return
+	}
+	if err := article.DB.Preload("ArticleCategory").Preload("Product").Order("created_at desc").Limit(limit).Offset(offset).Find(&articles).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not load articles"})
 		return
 	}
 	withArticleImageURLs(articles)
-	c.JSON(http.StatusOK, gin.H{"articles": articles})
+	c.JSON(http.StatusOK, gin.H{"articles": articles, "pagination": utils.NewPagination(page, limit, total)})
 }
 
 func (article *Article) getByID(c *gin.Context) {

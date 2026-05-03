@@ -92,6 +92,8 @@ SESSION_SECRET=local-dev-session-secret-change-me
 - `api/routes.Register(app, db)` must declare routes directly. Do not hide route declarations behind `registerX(app, db)` helper functions.
 - When creating a new API request handler, always create or use `api/routes/name-of-model.go`. In that file, define a struct named after the model, then implement four pointer receiver methods on that struct: `Get`, `Post`, `Put`, and `Delete`. This is the required pattern for every model route.
 - Web route files must follow the same object pattern: each `web/routes/name-of-route.go` file creates a struct named after the route, and that struct implements pointer receiver methods `Get`, `Post`, `Put`, and `Delete`. Web methods must call the API for every operation involving database-backed data.
+- Keep route files REST-oriented and table-backed. API route files should represent database models/tables, not random feature names or generic function buckets.
+- Do not put cross-cutting business logic in route files. Shared concerns such as pagination, route versioning, URL parsing, and common route helpers belong in `pkgs/utils/routes.go` unless they are model-specific behavior inside that model's route file.
 
 ## HTTP Apps
 

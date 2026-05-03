@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -11,6 +12,16 @@ import (
 )
 
 const APIVersion = "/api/v1"
+
+type Pagination struct {
+	Page     int   `json:"page"`
+	Limit    int   `json:"limit"`
+	Total    int64 `json:"total"`
+	NextPage int   `json:"next_page"`
+	PrevPage int   `json:"prev_page"`
+	HasNext  bool  `json:"has_next"`
+	HasPrev  bool  `json:"has_prev"`
+}
 
 func GetVersion(path string) string {
 	if path == "" || path == "/" {
@@ -77,4 +88,63 @@ func Slugify(value string) string {
 	}
 
 	return strings.Trim(builder.String(), "-")
+}
+
+func GetPagination(c *gin.Context) (int, int, int) {
+	page := queryInt(c, "page", 1)
+	limit := queryInt(c, "limit", 10)
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 10
+	}
+	if limit > 100 {
+		limit = 100
+	}
+	return page, limit, (page - 1) * limit
+}
+
+func GetPaginationQuery(c *gin.Context) (string, string) {
+	page := queryInt(c, "page", 1)
+	limit := queryInt(c, "limit", 10)
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 10
+	}
+	if limit > 100 {
+		limit = 100
+	}
+	return strconv.Itoa(page), strconv.Itoa(limit)
+}
+
+func NewPagination(page int, limit int, total int64) Pagination {
+	pagination := Pagination{
+		Page:  page,
+		Limit: limit,
+		Total: total,
+	}
+	if int64(page*limit) < total {
+		pagination.NextPage = page + 1
+		pagination.HasNext = true
+	}
+	if page > 1 {
+		pagination.PrevPage = page - 1
+		pagination.HasPrev = true
+	}
+	return pagination
+}
+
+func queryInt(c *gin.Context, key string, fallback int) int {
+	value := strings.TrimSpace(c.Query(key))
+	if value == "" {
+		return fallback
+	}
+	parsed, err := strconv.Atoi(value)
+	if err != nil {
+		return fallback
+	}
+	return parsed
 }
