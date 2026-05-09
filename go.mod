@@ -1,4 +1,4 @@
-module gadgetscout
+module leadstorefront
 
 go 1.26
 

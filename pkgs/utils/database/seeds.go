@@ -1,7 +1,7 @@
 package database
 
 import (
-	"gadgetscout/pkgs/models"
+	"leadstorefront/pkgs/models"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"

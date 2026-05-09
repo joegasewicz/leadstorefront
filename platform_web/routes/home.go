@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"gadgetscout/pkgs/middleware"
-	"gadgetscout/pkgs/models"
+	"leadstorefront/pkgs/middleware"
+	"leadstorefront/pkgs/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,7 +33,7 @@ func (home *Home) Get(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "home", gin.H{
-		"Title":          "Gadget Scout",
+		"Title":          "LeadStorefront",
 		"Country":        countryCode,
 		"LatestDeals":    response.LatestDeals,
 		"LatestArticles": response.LatestArticles,

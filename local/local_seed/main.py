@@ -56,32 +56,32 @@ PRODUCTS = [
 
 
 ARTICLE_TITLES = [
-    "How to spot a real gadget deal before checkout",
+    "How to spot a real storefront offer before checkout",
     "The best headphone deals to watch this month",
     "What makes a smartphone discount worth buying",
     "Laptop deal checks that save money in the long run",
-    "Smart home gadgets that usually drop below retail",
+    "Smart home products that usually drop below retail",
     "Why retailer history matters when comparing deals",
-    "The quick guide to deal scores on Gadget Scout",
+    "The quick guide to deal scores on LeadStorefront",
     "When to buy earbuds instead of full-size headphones",
     "How shipping costs change the real deal price",
-    "The safest way to compare marketplace gadget offers",
+    "The safest way to compare marketplace storefront offers",
     "What to check before buying refurbished tech",
     "The tablet features worth paying extra for",
     "Gaming laptop discounts that are actually useful",
     "How to compare smartwatch offers across countries",
     "The hidden costs in smart home starter kits",
     "Why product timing matters for seasonal tech deals",
-    "How to read review counts on discounted gadgets",
+    "How to read review counts on discounted products",
     "When coupon codes beat headline discounts",
     "How to choose between retailer and affiliate links",
-    "The best categories for quick gadget savings",
+    "The best categories for quick storefront conversions",
     "How Amazon deal pages can hide the real price",
     "Why accessories often produce the strongest savings",
     "How to compare battery life claims on sale items",
     "When last year's flagship is the better deal",
     "How to check warranty details before buying tech",
-    "The fast checklist for travel gadget deals",
+    "The fast checklist for travel storefront offers",
     "How to avoid overpaying for storage upgrades",
     "Why bundle deals need extra scrutiny",
     "The smart way to compare WiFi router offers",
@@ -136,13 +136,13 @@ def build_products(country_id: int, category_ids: dict[str, int]) -> list[dict]:
                 "name": seed_name,
                 "description": (
                     f"API-only local seed deal for {name}. This item uses Amazon as the retailer "
-                    "and is intended for testing Gadget Scout product pages."
+                    "and is intended for testing LeadStorefront product pages."
                 ),
                 "brand": brand,
-                "model_number": f"GS-{RUN_ID}-{index:02d}",
+                "model_number": f"LS-{RUN_ID}-{index:02d}",
                 "image_url": amazon_image_url(index),
                 "product_url": amazon_url,
-                "affiliate_url": f"{amazon_url}&tag=gadgetscout-local",
+                "affiliate_url": f"{amazon_url}&tag=leadstorefront-local",
                 "retailer_name": "Amazon UK",
                 "retailer_url": "https://www.amazon.co.uk",
                 "source": "local_seed_api",
@@ -174,7 +174,7 @@ def build_articles(category_ids: dict[str, int], products: list[dict]) -> list[d
         seed_title = f"{title} {RUN_ID}"
         body = "\n\n".join(
             [
-                f"{title} is an API-only local seed article for testing Gadget Scout editorial pages.",
+                f"{title} is an API-only local seed article for testing LeadStorefront editorial pages.",
                 (
                     f"It references {product['name']} so product-linked article views can be tested "
                     "with realistic deal content."
@@ -187,14 +187,14 @@ def build_articles(category_ids: dict[str, int], products: list[dict]) -> list[d
         )
         articles.append(
             {
-                "author": "Gadget Scout Editors",
+                "author": "LeadStorefront Editors",
                 "title": seed_title,
-                "subtitle": f"API-created mock article {index} for local Gadget Scout testing.",
+                "subtitle": f"API-created mock article {index} for local LeadStorefront testing.",
                 "body": body,
                 "image_url": "",
-                "meta_title": f"{title} | Gadget Scout",
+                "meta_title": f"{title} | LeadStorefront",
                 "meta_description": f"API-only local seed article about {title.lower()}.",
-                "meta_keywords": "gadgets,deals,local seed,technology",
+                "meta_keywords": "products,deals,local seed,technology",
                 "canonical_url": "",
                 "is_published": True,
                 "article_category_id": category_ids[category],
@@ -221,7 +221,7 @@ def post_json(path: str, payload: dict) -> dict:
 
 
 def upload_file(path: str, file_path: Path, field_name: str) -> None:
-    boundary = f"----gadgetscout-local-seed-{uuid.uuid4().hex}"
+    boundary = f"----leadstorefront-local-seed-{uuid.uuid4().hex}"
     content_type = mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
     file_bytes = file_path.read_bytes()
     body = b"".join(

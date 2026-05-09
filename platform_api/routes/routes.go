@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"gadgetscout/pkgs/utils"
+	"leadstorefront/pkgs/utils"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
