@@ -1,10 +1,14 @@
-# Gadget Scout Agent Context
+# LeadStorefront Agent Context
 
 ## Product Purpose
 
-Gadget Scout lists the best gadget deals in the world. The product should help English-speaking shoppers discover strong-value deals on consumer technology and compare them across supported countries.
+LeadStorefront is a storefront platform for hosting branded storefronts, affiliate-link pages, lead-capture experiences, offer pages, product recommendations, and conversion-focused commerce content. The product should help users create and operate storefronts on their own domains while LeadStorefront provides the hosted frontend, admin tooling, routing, and infrastructure needed to run them.
 
-Initial market coverage:
+Production domain: `leadstorefront.com`
+
+The platform is no longer gadget-specific. Avoid new user-facing copy, models, or workflows that assume the product is only about gadgets, gadget deals, or consumer technology. Existing deal, product, article, affiliate, country, and admin capabilities should be treated as reusable storefront platform features that can be scoped to each user-owned storefront.
+
+Initial market coverage for country-aware storefront content:
 
 - United States
 - United Kingdom
@@ -15,7 +19,7 @@ Initial market coverage:
 - Ireland
 - Singapore
 
-When adding product, content, pricing, scraping, or localization features, keep country-specific retailers, currencies, availability, shipping, and deal quality in mind. The web frontend should be clear, fast, and deal-focused rather than a marketing landing page.
+When adding product, content, pricing, scraping, lead capture, affiliate, domain, routing, or localization features, keep storefront ownership, country-specific retailers, currencies, availability, shipping, conversion quality, and lead quality in mind. The web frontend should be clear, fast, storefront-focused, and conversion-oriented rather than a generic marketing landing page.
 
 Country-specific pages use lowercase two-letter URL codes:
 
