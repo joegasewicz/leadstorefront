@@ -1,12 +1,12 @@
 services:
-  postgres-gadgetscout:
+  postgres-platformdb:
     image: postgres:16-alpine
     env_file:
       - .env-dev
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - postgres-gadgetscout_data:/var/lib/postgresql/data
+      - postgres-platformdb_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
@@ -14,4 +14,4 @@ services:
       retries: 5
 
 volumes:
-  postgres-gadgetscout_data:
+  postgres-platformdb_data:

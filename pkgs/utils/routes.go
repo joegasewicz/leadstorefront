@@ -34,7 +34,7 @@ func GetVersion(path string) string {
 }
 
 func APIRoot(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"service": "api", "route": "/"})
+	c.JSON(http.StatusOK, gin.H{"service": "platform_api", "route": "/"})
 }
 
 func PtrTime(value time.Time) *time.Time {

@@ -7,7 +7,7 @@ Prerequisites:
 ```sh
 cd infra
 make docker-compose-local
-go run ./cmd/api
+go run ./cmd/platform_api
 ```
 
 Run:
