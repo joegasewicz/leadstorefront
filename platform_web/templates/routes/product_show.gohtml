@@ -1,0 +1,62 @@
+{{ define "product_show" }}
+{{ template "base_start" . }}
+<section class="bg-slate-950">
+    <div class="mx-auto grid max-w-6xl gap-10 px-6 py-12 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+        <div>
+            <a href="/{{ .Country }}/products" class="text-sm font-semibold text-cyan-300 hover:text-cyan-200">Products</a>
+            <div class="mt-6 flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <span>{{ .Product.Category.Name }}</span>
+                <span>{{ .Product.RetailerName }}</span>
+                <span>{{ .Product.Country.Code }}</span>
+            </div>
+            <h1 class="mt-4 text-4xl font-bold tracking-normal text-white sm:text-5xl">{{ .Product.Name }}</h1>
+            {{ if .Product.Description }}
+            <p class="mt-5 text-lg leading-8 text-slate-300">{{ .Product.Description }}</p>
+            {{ end }}
+
+            <div class="mt-8 grid gap-4 rounded-lg border border-white/10 bg-white/5 p-5 sm:grid-cols-2">
+                <div>
+                    <p class="text-sm text-slate-400">Current price</p>
+                    <p class="mt-1 text-2xl font-semibold text-cyan-200">{{ .Product.Currency }} {{ .Product.CurrentPriceCents }}</p>
+                </div>
+                {{ if .Product.OriginalPriceCents }}
+                <div>
+                    <p class="text-sm text-slate-400">Original price</p>
+                    <p class="mt-1 text-xl font-semibold text-slate-200">{{ .Product.Currency }} {{ .Product.OriginalPriceCents }}</p>
+                </div>
+                {{ end }}
+                {{ if .Product.DiscountPercent }}
+                <div>
+                    <p class="text-sm text-slate-400">Discount</p>
+                    <p class="mt-1 text-xl font-semibold text-slate-200">{{ .Product.DiscountPercent }}%</p>
+                </div>
+                {{ end }}
+                {{ if .Product.DealScore }}
+                <div>
+                    <p class="text-sm text-slate-400">Deal score</p>
+                    <p class="mt-1 text-xl font-semibold text-slate-200">{{ .Product.DealScore }}</p>
+                </div>
+                {{ end }}
+            </div>
+
+            <div class="mt-8 flex flex-wrap gap-3">
+                {{ if .Product.AffiliateURL }}
+                <a href="{{ .Product.AffiliateURL }}" class="rounded-md bg-cyan-300 px-5 py-3 font-semibold text-slate-950">View deal</a>
+                {{ else }}
+                <a href="{{ .Product.ProductURL }}" class="rounded-md bg-cyan-300 px-5 py-3 font-semibold text-slate-950">View deal</a>
+                {{ end }}
+                <a href="/{{ .Country }}/products" class="rounded-md border border-white/10 px-5 py-3 font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">Back to products</a>
+            </div>
+        </div>
+
+        <div class="overflow-hidden rounded-lg border border-white/10 bg-slate-900">
+            {{ if .Product.ImageURL }}
+            <img src="{{ .Product.ImageURL }}" alt="" class="w-full object-cover">
+            {{ else }}
+            <div class="flex aspect-[4/3] items-center justify-center px-6 text-center text-slate-400">No product image</div>
+            {{ end }}
+        </div>
+    </div>
+</section>
+{{ template "base_end" . }}
+{{ end }}

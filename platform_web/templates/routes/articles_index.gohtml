@@ -1,0 +1,42 @@
+{{ define "articles_index" }}
+{{ template "base_start" . }}
+<section class="bg-slate-950">
+    <div class="mx-auto max-w-6xl px-6 py-12">
+        <div class="max-w-3xl">
+            <p class="text-sm font-semibold uppercase tracking-wide text-cyan-300">{{ .Country }} guides</p>
+            <h1 class="mt-2 text-4xl font-bold tracking-normal text-white sm:text-5xl">Articles</h1>
+            <p class="mt-4 text-lg leading-8 text-slate-300">Buying advice, deal explainers, and practical gadget guides for shoppers comparing value.</p>
+        </div>
+
+        <div class="mt-10 grid gap-5 md:grid-cols-2">
+            {{ range .Articles }}
+            <article class="overflow-hidden rounded-lg border border-white/10 bg-slate-900">
+                {{ if .ImageURL }}
+                <a href="/{{ $.Country }}/articles/{{ .Slug }}">
+                    <img src="{{ .ImageURL }}" alt="" class="h-52 w-full object-cover">
+                </a>
+                {{ end }}
+                <div class="p-5">
+                    <div class="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        <span>{{ .ArticleCategory.Name }}</span>
+                        {{ if .PublishedAt }}
+                        <time datetime="{{ .PublishedAt.Format "2006-01-02" }}">{{ .PublishedAt.Format "2 Jan 2006" }}</time>
+                        {{ end }}
+                    </div>
+                    <h2 class="mt-3 text-2xl font-semibold tracking-normal text-white">
+                        <a href="/{{ $.Country }}/articles/{{ .Slug }}" class="hover:text-cyan-200">{{ .Title }}</a>
+                    </h2>
+                    {{ if .Subtitle }}
+                    <p class="mt-3 line-clamp-3 text-sm leading-6 text-slate-300">{{ .Subtitle }}</p>
+                    {{ end }}
+                    <a href="/{{ $.Country }}/articles/{{ .Slug }}" class="mt-5 inline-flex rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-slate-100 hover:border-cyan-300 hover:text-cyan-200">Read article</a>
+                </div>
+            </article>
+            {{ else }}
+            <div class="rounded-lg border border-white/10 bg-slate-900 p-6 text-slate-300">No published articles yet.</div>
+            {{ end }}
+        </div>
+    </div>
+</section>
+{{ template "base_end" . }}
+{{ end }}
