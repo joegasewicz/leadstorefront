@@ -2,7 +2,6 @@ package routes
 
 import (
 	"leadstorefront/pkgs/middleware"
-	"leadstorefront/pkgs/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,20 +22,9 @@ func (home *Home) Get(c *gin.Context) {
 		return
 	}
 
-	var response struct {
-		LatestDeals    []models.Product `json:"latest_deals"`
-		LatestArticles []models.Article `json:"latest_articles"`
-	}
-	if err := home.API.Get(c, "/"+countryCode, &response); err != nil {
-		c.String(http.StatusInternalServerError, "could not load latest deals")
-		return
-	}
-
 	c.HTML(http.StatusOK, "home", gin.H{
-		"Title":          "LeadStorefront",
-		"Country":        countryCode,
-		"LatestDeals":    response.LatestDeals,
-		"LatestArticles": response.LatestArticles,
+		"Title":   "LeadStorefront",
+		"Country": countryCode,
 	})
 }
 

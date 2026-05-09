@@ -1,84 +1,203 @@
 {{ define "home" }}
 {{ template "base_start" . }}
-<section class="bg-slate-950">
-    <div class="mx-auto flex max-w-6xl flex-col justify-center px-6 py-20">
-        <div class="max-w-3xl">
-            <h1 class="text-5xl font-bold tracking-normal text-white sm:text-6xl">Welcome</h1>
-            <h2 class="mt-6 text-2xl font-medium leading-9 text-slate-300">
-                Launch hosted storefronts for {{ .Country }}, promote affiliate offers, and capture leads from branded product pages.
-            </h2>
+<section class="home-page">
+    <div class="home-glow home-glow-purple"></div>
+    <div class="home-glow home-glow-green"></div>
+
+    <section class="home-hero">
+        <div class="home-hero-copy">
+            <h1>Hosted storefront infrastructure</h1>
+            <h2>Launch branded storefronts that turn content, offers, and leads into revenue.</h2>
+            <p class="home-hero-text">
+                LeadStorefront gives teams the hosted frontend, country-aware routing, admin tooling, lead capture, affiliate links, and conversion pages needed to operate storefronts on their own domains.
+            </p>
+            <div class="home-actions">
+                <a class="home-button home-button-primary" href="/admin/register">Start building</a>
+                <a class="home-button home-button-secondary" href="/{{ .Country }}/products">View storefront pages</a>
+            </div>
         </div>
 
-        <section class="mt-14">
-            <div class="flex items-center justify-between gap-4">
-                <h2 class="text-2xl font-semibold tracking-normal text-white">Latest deals</h2>
-                <a href="/{{ .Country }}/products" class="text-sm font-semibold text-cyan-300 hover:text-cyan-200">View all</a>
+        <div class="home-hero-panel" aria-label="LeadStorefront platform preview">
+            <div class="home-panel-header">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
+            <div class="home-panel-grid">
+                <div class="home-metric home-metric-large">
+                    <span>Conversion quality</span>
+                    <strong>92</strong>
+                    <small>Storefront score</small>
+                </div>
+                <div class="home-metric">
+                    <span>Market</span>
+                    <strong>{{ .Country }}</strong>
+                    <small>Localized routing</small>
+                </div>
+                <div class="home-metric">
+                    <span>Lead capture</span>
+                    <strong>Live</strong>
+                    <small>Owned forms</small>
+                </div>
+            </div>
+            <div class="home-preview-list">
+                <div>
+                    <span>Affiliate offer page</span>
+                    <strong>Retailer links, pricing, availability</strong>
+                </div>
+                <div>
+                    <span>Lead capture flow</span>
+                    <strong>Branded forms with quality signals</strong>
+                </div>
+                <div>
+                    <span>Content storefront</span>
+                    <strong>Recommendations, articles, products</strong>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            <div class="mt-6 flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
-                {{ range .LatestDeals }}
-                <article class="w-72 shrink-0 snap-start overflow-hidden rounded-lg border border-white/10 bg-slate-900">
-                    <a href="/{{ $.Country }}/products/{{ .Slug }}" class="block">
-                        {{ if .ImageURL }}
-                        <img src="{{ .ImageURL }}" alt="" class="h-40 w-full object-cover">
-                        {{ else }}
-                        <div class="flex h-40 items-center justify-center bg-white/5 px-4 text-center text-sm text-slate-400">No image</div>
-                        {{ end }}
-                    </a>
-                    <div class="p-4">
-                        <div class="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                            <span>{{ .Category.Name }}</span>
-                            <span>{{ .RetailerName }}</span>
-                        </div>
-                        <h3 class="mt-3 line-clamp-2 text-base font-semibold leading-6 text-white">
-                            <a href="/{{ $.Country }}/products/{{ .Slug }}" class="hover:text-cyan-200">{{ .Name }}</a>
-                        </h3>
-                        <p class="mt-3 text-lg font-semibold text-cyan-200">{{ .Currency }} {{ .CurrentPriceCents }}</p>
-                    </div>
-                </article>
-                {{ else }}
-                <div class="min-w-full rounded-lg border border-white/10 bg-slate-900 p-6 text-slate-300">No deals yet.</div>
-                {{ end }}
-            </div>
-        </section>
+    <section class="home-section home-capabilities">
+        <div>
+            <p class="home-kicker">What LeadStorefront does</p>
+            <h2>Everything needed to run conversion-focused storefronts.</h2>
+            <p class="home-section-copy">
+                Build storefronts for affiliate offers, lead capture, content commerce, product recommendation hubs, and partner campaigns without wiring together hosting, routing, admin workflows, and market logic from scratch.
+            </p>
+        </div>
+        <div class="home-feature-grid">
+            <article class="home-feature">
+                <span>01</span>
+                <h3>Branded hosted frontends</h3>
+                <p>Publish fast storefront pages, offer pages, affiliate-link destinations, product recommendations, and lead-capture experiences under user-owned domains.</p>
+            </article>
+            <article class="home-feature">
+                <span>02</span>
+                <h3>Country-aware commerce content</h3>
+                <p>Route visitors to localized storefront pages with market-specific retailers, currencies, availability, shipping expectations, and conversion copy.</p>
+            </article>
+            <article class="home-feature">
+                <span>03</span>
+                <h3>Admin tooling for operators</h3>
+                <p>Manage products, articles, categories, publishing status, affiliate URLs, and storefront content without connecting the public web app directly to the database.</p>
+            </article>
+            <article class="home-feature">
+                <span>04</span>
+                <h3>Lead and revenue workflows</h3>
+                <p>Capture qualified intent, promote offers, score conversion opportunities, and keep storefront content aligned with each market and audience.</p>
+            </article>
+        </div>
+    </section>
 
-        <section class="mt-14">
-            <div class="flex items-center justify-between gap-4">
-                <h2 class="text-2xl font-semibold tracking-normal text-white">Latest articles</h2>
-                <a href="/{{ .Country }}/articles" class="text-sm font-semibold text-cyan-300 hover:text-cyan-200">View all</a>
-            </div>
+    <section class="home-section home-operations">
+        <div>
+            <p class="home-kicker">Storefront operations</p>
+            <h2>Built for the details that decide whether a storefront converts.</h2>
+        </div>
+        <div class="home-detail-grid">
+            <article class="home-detail">
+                <h3>Market-aware routing</h3>
+                <p>Send visitors to the right country storefront, then tailor retailers, currencies, availability, shipping context, and calls to action for that market.</p>
+            </article>
+            <article class="home-detail">
+                <h3>Offer and content control</h3>
+                <p>Operate products, articles, categories, affiliate URLs, publishing state, and storefront messaging from an admin layer designed for repeatable updates.</p>
+            </article>
+            <article class="home-detail">
+                <h3>Lead quality focus</h3>
+                <p>Use dedicated lead-capture experiences and conversion pages to qualify intent before it reaches sales, partners, or campaign follow-up workflows.</p>
+            </article>
+            <article class="home-detail">
+                <h3>Reusable storefront patterns</h3>
+                <p>Launch offer pages, comparison hubs, article-led storefronts, affiliate destinations, and campaign microsites from one platform foundation.</p>
+            </article>
+            <article class="home-detail">
+                <h3>API-owned data access</h3>
+                <p>Keep application data behind the API service while the public web frontend stays fast, clear, and focused on conversion.</p>
+            </article>
+            <article class="home-detail">
+                <h3>Conversion-ready design</h3>
+                <p>Structure storefront pages around clear actions, trust signals, localized context, and content that helps visitors decide what to do next.</p>
+            </article>
+        </div>
+    </section>
 
-            <div class="mt-6 flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
-                {{ range .LatestArticles }}
-                <article class="w-72 shrink-0 snap-start overflow-hidden rounded-lg border border-white/10 bg-slate-900">
-                    <a href="/{{ $.Country }}/articles/{{ .Slug }}" class="block">
-                        {{ if .ImageURL }}
-                        <img src="{{ .ImageURL }}" alt="" class="h-40 w-full object-cover">
-                        {{ else }}
-                        <div class="flex h-40 items-center justify-center bg-white/5 px-4 text-center text-sm text-slate-400">No image</div>
-                        {{ end }}
-                    </a>
-                    <div class="p-4">
-                        <div class="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                            <span>{{ .ArticleCategory.Name }}</span>
-                            {{ if .PublishedAt }}
-                            <time datetime="{{ .PublishedAt.Format "2006-01-02" }}">{{ .PublishedAt.Format "2 Jan 2006" }}</time>
-                            {{ end }}
-                        </div>
-                        <h3 class="mt-3 line-clamp-2 text-base font-semibold leading-6 text-white">
-                            <a href="/{{ $.Country }}/articles/{{ .Slug }}" class="hover:text-cyan-200">{{ .Title }}</a>
-                        </h3>
-                        {{ if .Subtitle }}
-                        <p class="mt-3 line-clamp-2 text-sm leading-6 text-slate-300">{{ .Subtitle }}</p>
-                        {{ end }}
-                    </div>
-                </article>
-                {{ else }}
-                <div class="min-w-full rounded-lg border border-white/10 bg-slate-900 p-6 text-slate-300">No articles yet.</div>
-                {{ end }}
-            </div>
-        </section>
-    </div>
+    <section class="home-section home-showcase">
+        <div class="home-showcase-copy">
+            <p class="home-kicker">Built for owned storefronts</p>
+            <h2>Use one platform for many storefront strategies.</h2>
+            <p>
+                Run affiliate destinations, campaign pages, product comparison hubs, lead-generation funnels, editorial commerce, and partner offer libraries without turning every storefront into a custom engineering project.
+            </p>
+        </div>
+        <div class="home-showcase-stack">
+            <div>Affiliate pages</div>
+            <div>Lead forms</div>
+            <div>Offer campaigns</div>
+            <div>Product recommendations</div>
+            <div>Localized content</div>
+        </div>
+    </section>
+
+    <section class="home-section home-pricing">
+        <div class="home-pricing-heading">
+            <p class="home-kicker">Pricing</p>
+            <h2>UK monthly plans for storefront teams.</h2>
+            <p class="home-section-copy">
+                Prices are shown for UK customers and exclude VAT. Each tier is priced for hosted storefront infrastructure, market-aware routing, affiliate and lead workflows, and operator tooling.
+            </p>
+        </div>
+        <div class="home-pricing-grid">
+            <article class="home-price-card">
+                <span>Starter</span>
+                <h3>Launch</h3>
+                <strong>£79<small>/mo</small></strong>
+                <p>For one focused storefront, affiliate destination, or lead-capture campaign.</p>
+                <ul>
+                    <li>One hosted storefront</li>
+                    <li>One UK market experience</li>
+                    <li>Product, article, and offer pages</li>
+                    <li>Affiliate link management</li>
+                    <li>Basic lead-capture pages</li>
+                    <li>Admin publishing tools</li>
+                    <li>Email support</li>
+                </ul>
+                <a class="home-button home-button-secondary" href="/admin/register">Start</a>
+            </article>
+            <article class="home-price-card home-price-card-featured">
+                <span>Growth</span>
+                <h3>Operate</h3>
+                <strong>£249<small>/mo</small></strong>
+                <p>For teams running active storefront campaigns with more content, offers, and lead workflows.</p>
+                <ul>
+                    <li>Up to five hosted storefronts</li>
+                    <li>UK plus two additional market paths</li>
+                    <li>Advanced lead-capture flows</li>
+                    <li>Affiliate and retailer workflows</li>
+                    <li>Featured offers and recommendations</li>
+                    <li>Editor and admin roles</li>
+                    <li>Priority support</li>
+                </ul>
+                <a class="home-button home-button-primary" href="/admin/register">Build with Growth</a>
+            </article>
+            <article class="home-price-card">
+                <span>Enterprise</span>
+                <h3>Scale</h3>
+                <strong>From £799<small>/mo</small></strong>
+                <p>For storefront networks, publishers, agencies, and teams with advanced operating requirements.</p>
+                <ul>
+                    <li>Unlimited storefront planning</li>
+                    <li>Multi-market localization strategy</li>
+                    <li>Custom domain and routing support</li>
+                    <li>Retailer and partner workflows</li>
+                    <li>Lead quality and conversion reporting</li>
+                    <li>Implementation support</li>
+                    <li>Dedicated account support</li>
+                </ul>
+                <a class="home-button home-button-secondary" href="/admin/register">Talk platform</a>
+            </article>
+        </div>
+    </section>
 </section>
 {{ template "base_end" . }}
 {{ end }}
