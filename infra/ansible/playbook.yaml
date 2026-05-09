@@ -1,0 +1,151 @@
+- hosts: all
+  become: true
+  vars_files:
+    - vars/docker.yml
+  tasks:
+    - name: Log in to Docker Hub
+      ansible.builtin.shell: echo "{{ docker_password }}" | docker login -u "{{ docker_username }}" --password-stdin
+      args:
+        executable: /bin/bash
+      when:
+        - docker_username | length > 0
+        - docker_password | length > 0
+
+    - name: Copy .env file
+      copy:
+        src: "{{ playbook_dir }}/../../.env.deploy"
+        dest: /root/.env
+        owner: root
+        mode: '0600'
+        force: true
+
+    - name: Install Docker via official script
+      ansible.builtin.shell: |
+        curl -fsSL https://get.docker.com -o get-docker.sh
+        sh get-docker.sh
+      args:
+        executable: /bin/bash
+
+    - name: Install Docker Compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+
+    - name: Add user to docker group (non-root users)
+      user:
+        name: "{{ ansible_user_id }}"
+        groups: docker
+        append: yes
+      when: ansible_user_id != 'root'
+
+- hosts: app
+  become: true
+  tasks:
+    - name: Ensure mount point exists
+      file:
+        path: /opt/caddy/data
+        state: directory
+        mode: "0755"
+
+    - name: Mount DO volume at /opt/caddy/data
+      mount:
+        path: /opt/caddy/data
+        src: /dev/disk/by-id/scsi-0DO_Volume_leadstorefront-caddy-data
+        fstype: ext4
+        opts: discard,defaults,nofail,noatime
+        state: mounted
+
+    - name: Ensure uploads directory exists inside mounted DO volume
+      file:
+        path: /opt/caddy/data/api-uploads
+        state: directory
+        owner: root
+        mode: "0755"
+
+    - name: Copy .env file to app
+      copy:
+        src: "{{ playbook_dir }}/../../.env.deploy"
+        dest: /root/.env
+        owner: root
+        mode: '0600'
+        force: true
+
+    - name: Copy docker-compose.app.yaml
+      copy:
+        src: ../docker-compose.app.yaml
+        dest: /root/docker-compose.app.yaml
+        owner: root
+        mode: '0644'
+
+    - name: Copy Caddyfile
+      copy:
+        src: ../Caddyfile
+        dest: /root/Caddyfile
+        owner: root
+        mode: '0644'
+
+    - name: Start App Stack
+      command: docker compose -f /root/docker-compose.app.yaml up -d
+      args:
+        chdir: /root
+
+- hosts: db
+  become: true
+  vars:
+    pg_data_path: /root/pgdata
+  tasks:
+    - name: Copy .env file
+      copy:
+        src: "{{ playbook_dir }}/../../.env.deploy"
+        dest: /root/.env
+        owner: root
+        mode: '0600'
+
+    - name: Copy docker-compose.db.yaml
+      copy:
+        src: "{{ playbook_dir }}/../docker-compose.db.yaml"
+        dest: /root/docker-compose.db.yaml
+        owner: root
+        mode: '0644'
+
+    - name: Ensure Postgres data directory exists
+      file:
+        path: "{{ pg_data_path }}"
+        state: directory
+        owner: 999
+        group: 999
+        mode: '0700'
+
+    - name: Start DB Stack
+      command: docker compose -f /root/docker-compose.db.yaml up -d
+      args:
+        chdir: /root
+
+    - name: Wait for Postgres to be ready
+      wait_for:
+        host: 0.0.0.0
+        port: 5432
+        timeout: 30
+        state: started
+
+    - name: Update Postgres to listen on all addresses
+      lineinfile:
+        path: "{{ pg_data_path }}/postgresql.conf"
+        regexp: '^#?listen_addresses'
+        line: "listen_addresses='*'"
+        create: yes
+      notify: Restart Postgres
+
+    - name: Allow external IPs in pg_hba.conf
+      lineinfile:
+        path: "{{ pg_data_path }}/pg_hba.conf"
+        line: "host all all 0.0.0.0/0 md5"
+        create: yes
+      notify: Restart Postgres
+
+  handlers:
+    - name: Restart Postgres
+      command: docker compose -f /root/docker-compose.db.yaml restart postgres
+      args:
+        chdir: /root

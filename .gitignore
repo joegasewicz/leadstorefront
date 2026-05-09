@@ -1,6 +1,8 @@
 # IDEs
 .idea/
 *.iml
+infra-josefdigital
+example-docker
 
 # OS files
 .DS_Store
@@ -87,6 +89,13 @@ captures/
 .env.*
 !.env.example
 !infra/.env-dev
+
+# Terraform
+**/.terraform/
+**/terraform.tfstate
+**/terraform.tfstate.*
+*.tfvars
+*.tfvars.json
 
 # Local uploads
 uploads/

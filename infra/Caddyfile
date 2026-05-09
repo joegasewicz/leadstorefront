@@ -1,0 +1,24 @@
+leadstorefront.com, www.leadstorefront.com {
+    reverse_proxy /api/* api:8001
+    reverse_proxy /assets/* web:8000
+    reverse_proxy /uploads/* web:8000
+    reverse_proxy web:8000
+
+    encode gzip
+
+    log {
+        output stdout
+        format console
+    }
+}
+
+ci.leadstorefront.com {
+    reverse_proxy woodpecker-server:8000
+
+    encode gzip
+
+    log {
+        output stdout
+        format console
+    }
+}
