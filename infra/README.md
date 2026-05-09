@@ -38,8 +38,8 @@ API_DOMAIN=leadstorefront.com
 API_ADDR=:8001
 SESSION_SECRET=
 
-API_IMAGE=joegasewicz/leadstorefront:api-latest
-WEB_IMAGE=joegasewicz/leadstorefront:web-latest
+API_IMAGE=josefdigital/platform:platform_api-v0.0.1
+WEB_IMAGE=josefdigital/platform:platform_web-v0.0.1
 ```
 
 ## Access Remote Postgres Via Tunnel

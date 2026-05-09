@@ -11,9 +11,8 @@ provider "digitalocean" {
   token = var.do_token
 }
 
-resource "digitalocean_ssh_key" "default" {
-  name       = "leadstorefront"
-  public_key = file(pathexpand(var.pub_key))
+data "digitalocean_ssh_key" "default" {
+  name = var.ssh_key_name
 }
 
 resource "digitalocean_project" "leadstorefront" {
@@ -29,7 +28,7 @@ resource "digitalocean_droplet" "db" {
   region     = var.region
   size       = "s-1vcpu-1gb"
   image      = "docker-20-04"
-  ssh_keys   = [digitalocean_ssh_key.default.id]
+  ssh_keys   = [data.digitalocean_ssh_key.default.id]
   monitoring = true
   tags       = ["leadstorefront-db"]
 
@@ -52,7 +51,7 @@ resource "digitalocean_droplet" "app" {
   region     = var.region
   size       = "s-1vcpu-1gb"
   image      = "docker-20-04"
-  ssh_keys   = [digitalocean_ssh_key.default.id]
+  ssh_keys   = [data.digitalocean_ssh_key.default.id]
   monitoring = true
   tags       = ["leadstorefront-app"]
 

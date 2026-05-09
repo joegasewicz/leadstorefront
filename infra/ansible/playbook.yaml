@@ -13,7 +13,7 @@
 
     - name: Copy .env file
       copy:
-        src: "{{ playbook_dir }}/../../.env"
+        src: "{{ playbook_dir }}/../../.env.deploy"
         dest: /root/.env
         owner: root
         mode: '0600'
@@ -65,7 +65,7 @@
 
     - name: Copy .env file to app
       copy:
-        src: "{{ playbook_dir }}/../../.env"
+        src: "{{ playbook_dir }}/../../.env.deploy"
         dest: /root/.env
         owner: root
         mode: '0600'
@@ -97,7 +97,7 @@
   tasks:
     - name: Copy .env file
       copy:
-        src: "{{ playbook_dir }}/../../.env"
+        src: "{{ playbook_dir }}/../../.env.deploy"
         dest: /root/.env
         owner: root
         mode: '0600'

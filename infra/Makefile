@@ -17,7 +17,7 @@ terraform-apply:
 generate-inventory:
 	cd $(TERRAFORM_DIR) && terraform output -json | jq -r '\
 	  "[db]\nleadstorefront-db ansible_host=\(.db_ip.value) ansible_user=root ansible_ssh_private_key_file=~/.ssh/leadstorefront\n\n\
-	   [app]\nleadstorefront-app ansible_host=\(.app_ip.value) ansible_user=root ansible_ssh_private_key_file=~/.ssh/leadstorefront"' \
+	  [app]\nleadstorefront-app ansible_host=\(.app_ip.value) ansible_user=root ansible_ssh_private_key_file=~/.ssh/leadstorefront"' \
 	  > ../$(ANSIBLE_DIR)/inventory.ini
 	@echo "Ansible inventory generated."
 

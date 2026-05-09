@@ -21,6 +21,12 @@ variable "pub_key" {
   default     = "~/.ssh/leadstorefront.pub"
 }
 
+variable "ssh_key_name" {
+  type        = string
+  description = "Existing DigitalOcean SSH key name"
+  default     = "Macbook Pro (Sumi account)"
+}
+
 variable "docker_username" {
   type        = string
   description = "DockerHub username"
