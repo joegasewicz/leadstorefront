@@ -30,6 +30,7 @@ WORKDIR /app
 
 COPY --from=builder /out/platform_web ./platform_web_server
 COPY --from=assets /src/platform_web/static/assets ./platform_web/static/assets
+COPY platform_web/static/imgs ./platform_web/static/imgs
 COPY platform_web/templates ./platform_web/templates
 
 RUN mkdir -p uploads

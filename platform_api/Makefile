@@ -1,4 +1,4 @@
-IMG_NAME=josefdigital/platform:platform_api-v0.0.1
+IMG_NAME=josefdigital/platform:platform_api-v0.0.2
 
 docker_build:
 	export DOCKER_DEFAULT_PLATFORM=linux/amd64 && docker build --no-cache --tag $(IMG_NAME) -f Dockerfile ..
