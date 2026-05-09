@@ -6,7 +6,7 @@ LeadStorefront is a storefront platform for hosting branded storefronts, affilia
 
 Production domain: `leadstorefront.com`
 
-The platform is no longer gadget-specific. Avoid new user-facing copy, models, or workflows that assume the product is only about gadgets, gadget deals, or consumer technology. Existing deal, product, article, affiliate, country, and admin capabilities should be treated as reusable storefront platform features that can be scoped to each user-owned storefront.
+The platform is no longer vertical-specific. Avoid new user-facing copy, models, or workflows that assume the product is only about products, storefront offers, or consumer technology. Existing deal, product, article, affiliate, country, and admin capabilities should be treated as reusable storefront platform features that can be scoped to each user-owned storefront.
 
 Initial market coverage for country-aware storefront content:
 
@@ -36,7 +36,7 @@ The default country is `uk`. If the visitor country cannot be detected, redirect
 
 ## Project Layout
 
-- Go module: `gadgetscout`
+- Go module: `leadstorefront`
 - Web entry point: `cmd/platform_web/main.go`
 - API entry point: `cmd/platform_api/main.go`
 - Web routes: `platform_web/routes`
@@ -53,6 +53,12 @@ The default country is `uk`. If the visitor country cannot be detected, redirect
 - Database utilities: `pkgs/utils/database`
 - Local infrastructure: `infra`
 - Flutter mobile app: `mobile`
+
+## Local Change Workflow
+
+- Do all implementation, verification, and review work locally in this repository.
+- Do not push code, tags, or branches to any remote. The user will inspect local changes and push them when ready.
+- Avoid commands that publish remote state, including `git push`, unless the user explicitly overrides this instruction in a later message.
 
 ## Local Postgres
 
@@ -228,8 +234,8 @@ Useful compile checks:
 ```sh
 go test ./pkgs/models
 go test ./pkgs/utils/database
-go test -c ./cmd/platform_web -o /tmp/gadgetscout-platform_web.test
-go test -c ./cmd/platform_api -o /tmp/gadgetscout-platform_api.test
+go test -c ./cmd/platform_web -o /tmp/leadstorefront-platform_web.test
+go test -c ./cmd/platform_api -o /tmp/leadstorefront-platform_api.test
 ```
 
 `go test ./cmd/platform_api` may execute database startup and attempt to connect to Postgres. Prefer `go test -c` for a compile-only check unless the database is intentionally running.

@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"gadgetscout/pkgs/models"
+	"leadstorefront/pkgs/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"gadgetscout/pkgs/middleware"
-	"gadgetscout/pkgs/models"
+	"leadstorefront/pkgs/middleware"
+	"leadstorefront/pkgs/models"
 	"net/http"
 	"net/url"
 
@@ -37,7 +37,7 @@ func (articles *Articles) Index(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "articles_index", gin.H{
-		"Title":    "Articles | Gadget Scout",
+		"Title":    "Articles | LeadStorefront",
 		"Country":  country,
 		"Articles": response.Articles,
 	})
@@ -59,7 +59,7 @@ func (articles *Articles) Show(c *gin.Context) {
 	}
 	article := response.Article
 
-	title := article.Title + " | Gadget Scout"
+	title := article.Title + " | LeadStorefront"
 	if article.MetaTitle != "" {
 		title = article.MetaTitle
 	}

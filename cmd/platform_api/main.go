@@ -1,9 +1,9 @@
 package main
 
 import (
-	"gadgetscout/pkgs"
-	"gadgetscout/pkgs/utils/database"
-	"gadgetscout/platform_api/routes"
+	"leadstorefront/pkgs"
+	"leadstorefront/pkgs/utils/database"
+	"leadstorefront/platform_api/routes"
 	"log"
 
 	"github.com/gin-gonic/gin"

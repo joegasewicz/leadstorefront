@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"gadgetscout/pkgs"
+	"leadstorefront/pkgs"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	SessionName = "gadgetscout_session"
+	SessionName = "leadstorefront_session"
 	UserIDKey   = "user_id"
 	FlashKey    = "flash"
 )

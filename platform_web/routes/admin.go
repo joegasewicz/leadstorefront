@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"gadgetscout/pkgs/middleware"
-	"gadgetscout/pkgs/models"
+	"leadstorefront/pkgs/middleware"
+	"leadstorefront/pkgs/models"
 	"net/http"
 	"strings"
 

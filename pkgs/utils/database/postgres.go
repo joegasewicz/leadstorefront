@@ -2,7 +2,7 @@ package database
 
 import (
 	"fmt"
-	"gadgetscout/pkgs"
+	"leadstorefront/pkgs"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

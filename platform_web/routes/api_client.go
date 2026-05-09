@@ -3,8 +3,8 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
-	"gadgetscout/pkgs"
-	"gadgetscout/pkgs/utils"
+	"leadstorefront/pkgs"
+	"leadstorefront/pkgs/utils"
 	"net/http"
 	"strconv"
 

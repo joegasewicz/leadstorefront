@@ -3,9 +3,9 @@ package middleware
 import (
 	"encoding/json"
 	"fmt"
-	"gadgetscout/pkgs"
-	"gadgetscout/pkgs/models"
-	"gadgetscout/pkgs/utils"
+	"leadstorefront/pkgs"
+	"leadstorefront/pkgs/models"
+	"leadstorefront/pkgs/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

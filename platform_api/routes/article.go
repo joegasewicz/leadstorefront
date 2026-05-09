@@ -2,8 +2,8 @@ package routes
 
 import (
 	"errors"
-	"gadgetscout/pkgs/models"
-	"gadgetscout/pkgs/utils"
+	"leadstorefront/pkgs/models"
+	"leadstorefront/pkgs/utils"
 	"net/http"
 	"path/filepath"
 	"strconv"

@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"gadgetscout/pkgs/middleware"
-	"gadgetscout/pkgs/models"
+	"leadstorefront/pkgs/middleware"
+	"leadstorefront/pkgs/models"
 	"net/http"
 	"net/url"
 
@@ -37,7 +37,7 @@ func (products *Products) Index(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "products_index", gin.H{
-		"Title":    "Products | Gadget Scout",
+		"Title":    "Products | LeadStorefront",
 		"Country":  countryCode,
 		"Products": response.Products,
 	})
@@ -60,7 +60,7 @@ func (products *Products) Show(c *gin.Context) {
 	product := response.Product
 
 	c.HTML(http.StatusOK, "product_show", gin.H{
-		"Title":   product.Name + " | Gadget Scout",
+		"Title":   product.Name + " | LeadStorefront",
 		"Country": countryCode,
 		"Product": product,
 	})
