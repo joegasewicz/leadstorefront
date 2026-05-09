@@ -8,7 +8,7 @@ import (
 
 func health(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"service": "api",
+		"service": "platform_api",
 		"status":  "ok",
 	})
 }

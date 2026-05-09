@@ -1,9 +1,9 @@
 package main
 
 import (
-	"gadgetscout/api/routes"
 	"gadgetscout/pkgs"
 	"gadgetscout/pkgs/utils/database"
+	"gadgetscout/platform_api/routes"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -27,7 +27,7 @@ func main() {
 	app := gin.Default()
 	routes.Register(app, db)
 
-	log.Printf("api serving at http://%s%s", cfg.Domain, cfg.Addr)
+	log.Printf("platform_api serving at http://%s%s", cfg.Domain, cfg.Addr)
 	if err := app.Run(cfg.Addr); err != nil {
 		log.Fatal(err)
 	}

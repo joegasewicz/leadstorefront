@@ -10,7 +10,7 @@ type Health struct{}
 
 func (health *Health) Get(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"service": "web",
+		"service": "platform_web",
 		"status":  "ok",
 	})
 }

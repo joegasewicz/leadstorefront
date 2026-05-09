@@ -33,15 +33,15 @@ The default country is `uk`. If the visitor country cannot be detected, redirect
 ## Project Layout
 
 - Go module: `gadgetscout`
-- Web entry point: `cmd/web/main.go`
-- API entry point: `cmd/api/main.go`
-- Web routes: `web/routes`
-- API routes: `api/routes`
-- Web templates: `web/templates`
-- Web template partials: `web/templates/partials`
-- Web route templates: `web/templates/routes`
-- Web source assets: `web/src`
-- Web built assets: `web/static/assets`
+- Web entry point: `cmd/platform_web/main.go`
+- API entry point: `cmd/platform_api/main.go`
+- Web routes: `platform_web/routes`
+- API routes: `platform_api/routes`
+- Web templates: `platform_web/templates`
+- Web template partials: `platform_web/templates/partials`
+- Web route templates: `platform_web/templates/routes`
+- Web source assets: `platform_web/src`
+- Web built assets: `platform_web/static/assets`
 - Runtime config: `pkgs/config.go`
 - Shared models: `pkgs/models`
 - Shared middleware: `pkgs/middleware`
@@ -59,14 +59,14 @@ cd infra
 make docker-compose-local
 ```
 
-The compose service is `postgres-gadgetscout` and uses `infra/.env-dev`.
+The compose service is `postgres-platformdb` and uses `infra/.env-dev`.
 
 Expected local database env vars:
 
 ```sh
 POSTGRES_USER=admin
 POSTGRES_PASSWORD=admin
-POSTGRES_DB=gadgetscout
+POSTGRES_DB=platformdb
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 POSTGRES_SSLMODE=disable
@@ -80,7 +80,7 @@ SESSION_SECRET=local-dev-session-secret-change-me
 - `pkgs/utils/database.NewMigrate(db)` creates a migration runner.
 - `Migrate.Run()` auto-migrates the `Country`, `ProductCategory`, `Product`, `ArticleCategory`, `Article`, `Role`, and `User` models, then calls `Seed(db)`.
 - `pkgs/utils/database/seeds.go` seeds supported countries, roles (`admin`, `editor`, `user`), a local admin user, article categories, and broad tech product categories.
-- `cmd/api/main.go` creates the Postgres connection, logs connection success, logs migration start, and runs migrations.
+- `cmd/platform_api/main.go` creates the Postgres connection, logs connection success, logs migration start, and runs migrations.
 - All database access must stay inside the API service. The web service must not import `pkgs/utils/database`, accept `*gorm.DB`, call GORM query methods, or otherwise connect/query Postgres directly.
 - Web handlers must call the API over HTTP for application data and admin mutations, then marshal/unmarshal JSON into the structs needed by templates.
 - Always use `github.com/joegasewicz/identity-client` v0.4.0 or newer where possible for web-to-API JSON requests, including `Get`, `Post`, `Put`, and `Delete`.
@@ -89,19 +89,19 @@ SESSION_SECRET=local-dev-session-secret-change-me
 - Always use `github.com/joegasewicz/entity-file-uploader` where possible for API-owned file persistence and retrieval.
 - When a dependency, configuration, or repeated value is used across multiple route methods, prefer storing it as a struct member instead of recreating a local variable in every method.
 - API routes must be versioned with `pkgs/utils.GetVersion`, which prepends `/api/v1`. For example: `app.GET(utils.GetVersion("/health"), health)`.
-- `api/routes.Register(app, db)` must declare routes directly. Do not hide route declarations behind `registerX(app, db)` helper functions.
-- When creating a new API request handler, always create or use `api/routes/name-of-model.go`. In that file, define a struct named after the model, then implement four pointer receiver methods on that struct: `Get`, `Post`, `Put`, and `Delete`. This is the required pattern for every model route.
-- Web route files must follow the same object pattern: each `web/routes/name-of-route.go` file creates a struct named after the route, and that struct implements pointer receiver methods `Get`, `Post`, `Put`, and `Delete`. Web methods must call the API for every operation involving database-backed data.
+- `platform_api/routes.Register(app, db)` must declare routes directly. Do not hide route declarations behind `registerX(app, db)` helper functions.
+- When creating a new API request handler, always create or use `platform_api/routes/name-of-model.go`. In that file, define a struct named after the model, then implement four pointer receiver methods on that struct: `Get`, `Post`, `Put`, and `Delete`. This is the required pattern for every model route.
+- Web route files must follow the same object pattern: each `platform_web/routes/name-of-route.go` file creates a struct named after the route, and that struct implements pointer receiver methods `Get`, `Post`, `Put`, and `Delete`. Web methods must call the API for every operation involving database-backed data.
 - Keep route files REST-oriented and table-backed. API route files should represent database models/tables, not random feature names or generic function buckets.
 - Do not put cross-cutting business logic in route files. Shared concerns such as pagination, route versioning, URL parsing, and common route helpers belong in `pkgs/utils/routes.go` unless they are model-specific behavior inside that model's route file.
 
 ## HTTP Apps
 
-- `cmd/web/main.go` starts the Gin web app on `WEB_ADDR`, default `:8000`.
-- `cmd/api/main.go` starts the Gin JSON API on `API_ADDR`, default `:8001`.
-- Web routes are registered in `web/routes.Register(app)`.
-- Web templates are loaded in `cmd/web/main.go`.
-- API routes are registered in `api/routes.Register(app, db)`.
+- `cmd/platform_web/main.go` starts the Gin web app on `WEB_ADDR`, default `:8000`.
+- `cmd/platform_api/main.go` starts the Gin JSON API on `API_ADDR`, default `:8001`.
+- Web routes are registered in `platform_web/routes.Register(app)`.
+- Web templates are loaded in `cmd/platform_web/main.go`.
+- API routes are registered in `platform_api/routes.Register(app, db)`.
 - Web exposes `GET /health`; API exposes `GET /api/v1/health` through `pkgs/utils.GetVersion("/health")`.
 - Admin web routes live under `/admin`, not country paths.
 - Admin routes:
@@ -133,12 +133,12 @@ SESSION_SECRET=local-dev-session-secret-change-me
 
 ## Frontend Assets
 
-- Web custom TypeScript and Sass live in `web/src`.
-- Vite builds `web/src/main.ts` to `web/static/assets/app.js` and `web/static/assets/app.css`.
-- Build frontend assets from `web` with `npm run build`.
-- `cmd/web/main.go` serves built assets at `/assets`.
-- `web/templates/base.gohtml` renders `/assets/app.css` in the head.
-- `web/templates/partials/scripts.gohtml` renders `/assets/app.js` in the footer.
+- Web custom TypeScript and Sass live in `platform_web/src`.
+- Vite builds `platform_web/src/main.ts` to `platform_web/static/assets/app.js` and `platform_web/static/assets/app.css`.
+- Build frontend assets from `platform_web` with `npm run build`.
+- `cmd/platform_web/main.go` serves built assets at `/assets`.
+- `platform_web/templates/base.gohtml` renders `/assets/app.css` in the head.
+- `platform_web/templates/partials/scripts.gohtml` renders `/assets/app.js` in the footer.
 
 ## Model Conventions
 
@@ -224,8 +224,8 @@ Useful compile checks:
 ```sh
 go test ./pkgs/models
 go test ./pkgs/utils/database
-go test -c ./cmd/web -o /tmp/gadgetscout-web.test
-go test -c ./cmd/api -o /tmp/gadgetscout-api.test
+go test -c ./cmd/platform_web -o /tmp/gadgetscout-platform_web.test
+go test -c ./cmd/platform_api -o /tmp/gadgetscout-platform_api.test
 ```
 
-`go test ./cmd/api` may execute database startup and attempt to connect to Postgres. Prefer `go test -c` for a compile-only check unless the database is intentionally running.
+`go test ./cmd/platform_api` may execute database startup and attempt to connect to Postgres. Prefer `go test -c` for a compile-only check unless the database is intentionally running.

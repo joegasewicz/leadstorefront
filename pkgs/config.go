@@ -35,7 +35,7 @@ func Load() AppConfig {
 			Host:     envOrDefault("POSTGRES_HOST", "localhost"),
 			User:     envOrDefault("POSTGRES_USER", "admin"),
 			Password: envOrDefault("POSTGRES_PASSWORD", "admin"),
-			Database: envOrDefault("POSTGRES_DB", "gadgetscout"),
+			Database: envOrDefault("POSTGRES_DB", "platformdb"),
 			Port:     envOrDefault("POSTGRES_PORT", "5432"),
 			SSLMode:  envOrDefault("POSTGRES_SSLMODE", "disable"),
 		},
