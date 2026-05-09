@@ -1,0 +1,55 @@
+services:
+  api:
+    image: ${API_IMAGE:-joegasewicz/leadstorefront:api-latest}
+    restart: always
+    env_file:
+      - ${APP_ENV_FILE:-.env}
+    volumes:
+      - /opt/caddy/data/api-uploads:/server/uploads
+    ports:
+      - "8001:8001"
+
+  web:
+    image: ${WEB_IMAGE:-joegasewicz/leadstorefront:web-latest}
+    restart: always
+    env_file:
+      - ${APP_ENV_FILE:-.env}
+    volumes:
+      - /opt/caddy/data/api-uploads:/server/uploads
+    ports:
+      - "8000:8000"
+
+  caddy:
+    image: caddy:2.6.4
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - /opt/caddy/data:/data
+      - caddy_config:/config
+
+  woodpecker-server:
+    image: woodpeckerci/woodpecker-server:v3
+    restart: always
+    env_file:
+      - ${APP_ENV_FILE:-.env}
+    volumes:
+      - woodpecker_data:/var/lib/woodpecker
+    ports:
+      - "8002:8000"
+
+  woodpecker-agent:
+    image: woodpeckerci/woodpecker-agent:v3
+    restart: always
+    depends_on:
+      - woodpecker-server
+    env_file:
+      - ${APP_ENV_FILE:-.env}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  woodpecker_data:
+  caddy_config:
