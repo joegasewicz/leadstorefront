@@ -15,6 +15,7 @@ func main() {
 	app := gin.Default()
 	app.Use(middleware.Sessions())
 	app.Static("/assets", "platform_web/static/assets")
+	app.Static("/imgs", "platform_web/static/imgs")
 	app.Static("/uploads", "uploads")
 	app.LoadHTMLFiles(
 		"platform_web/templates/base.gohtml",
