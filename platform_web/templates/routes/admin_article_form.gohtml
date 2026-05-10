@@ -38,15 +38,6 @@
 
             <div class="grid gap-6 md:grid-cols-2">
                 <div>
-                    <label class="block text-sm font-medium text-slate-200" for="storefront_id">Storefront</label>
-                    <select id="storefront_id" name="storefront_id" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-                        <option value="">Select storefront</option>
-                        {{ range .Storefronts }}
-                        <option value="{{ .ID }}" {{ if eq $.Article.StorefrontID .ID }}selected{{ end }}>{{ .Name }}</option>
-                        {{ end }}
-                    </select>
-                </div>
-                <div>
                     <label class="block text-sm font-medium text-slate-200" for="article_category_id">Article category</label>
                     <select id="article_category_id" name="article_category_id" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
                         <option value="">Select category</option>
@@ -67,6 +58,15 @@
                         {{ end }}
                     </select>
                 </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-200" for="storefront_ids">Storefronts</label>
+                <select id="storefront_ids" name="storefront_ids" multiple class="mt-2 h-32 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                    {{ range .Storefronts }}
+                    <option value="{{ .ID }}">{{ .Name }}</option>
+                    {{ end }}
+                </select>
             </div>
 
             <div class="grid gap-6 md:grid-cols-2">

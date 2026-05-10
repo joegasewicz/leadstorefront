@@ -3,6 +3,7 @@ package routes
 import (
 	"leadstorefront/pkgs/middleware"
 	"leadstorefront/pkgs/models"
+	"leadstorefront/pkgs/utils"
 	"net/http"
 	"strings"
 
@@ -52,12 +53,22 @@ func (admin *Admin) Delete(c *gin.Context) {
 }
 
 func (admin *Admin) Home(c *gin.Context) {
-	user, _ := c.Get("currentUser")
-	currentUser := user.(models.User)
+	var response struct {
+		Storefronts []models.Storefront `json:"storefronts"`
+		Pagination  utils.Pagination    `json:"pagination"`
+	}
+	page, limit := utils.GetPaginationQuery(c)
+	if err := admin.API.Get(c, "/admin/storefronts?page="+page+"&limit="+limit, &response); err != nil {
+		c.String(http.StatusInternalServerError, "could not load storefronts")
+		return
+	}
 
-	c.HTML(http.StatusOK, "admin_home", gin.H{
-		"Title":        "Admin",
-		"Email":        currentUser.Email,
+	c.HTML(http.StatusOK, "admin_storefronts_index", gin.H{
+		"Title":        "Storefronts",
+		"Storefronts":  response.Storefronts,
+		"Pagination":   response.Pagination,
+		"Limit":        limit,
+		"Flash":        middleware.PopFlash(c),
 		"IsAdmin":      true,
 		"IsAdminRoute": true,
 	})

@@ -24,11 +24,26 @@ func (m *Migrate) Run() error {
 		&models.Storefront{},
 		&models.ProductCategory{},
 		&models.Product{},
+		&models.ProductStorefront{},
 		&models.ArticleCategory{},
 		&models.Article{},
+		&models.ArticleStorefront{},
 	); err != nil {
+		return err
+	}
+	if err := m.dropReplacedStorefrontColumns(); err != nil {
 		return err
 	}
 
 	return Seed(m.DB)
+}
+
+func (m *Migrate) dropReplacedStorefrontColumns() error {
+	if err := m.DB.Exec("ALTER TABLE products DROP COLUMN IF EXISTS storefront_id").Error; err != nil {
+		return err
+	}
+	if err := m.DB.Exec("ALTER TABLE articles DROP COLUMN IF EXISTS storefront_id").Error; err != nil {
+		return err
+	}
+	return nil
 }

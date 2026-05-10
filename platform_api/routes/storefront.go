@@ -4,6 +4,7 @@ import (
 	"leadstorefront/pkgs/models"
 	"leadstorefront/pkgs/utils"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -43,6 +44,14 @@ func (storefront *Storefront) getOptions(c *gin.Context) {
 }
 
 func (storefront *Storefront) Post(c *gin.Context) {
+	if strings.Contains(c.FullPath(), "/products") {
+		storefront.postProduct(c)
+		return
+	}
+	if strings.Contains(c.FullPath(), "/articles") {
+		storefront.postArticle(c)
+		return
+	}
 	record, ok := storefront.bindJSON(c)
 	if !ok {
 		return
@@ -52,6 +61,46 @@ func (storefront *Storefront) Post(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"storefront": record})
+}
+
+func (storefront *Storefront) postProduct(c *gin.Context) {
+	var request struct {
+		ProductID uint `json:"product_id"`
+	}
+	if err := c.ShouldBindJSON(&request); err != nil || request.ProductID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid product storefront"})
+		return
+	}
+	record := models.ProductStorefront{ProductID: request.ProductID, StorefrontID: uintPathID(c.Param("id"))}
+	if record.StorefrontID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		return
+	}
+	if err := storefront.DB.Where("product_id = ? AND storefront_id = ?", record.ProductID, record.StorefrontID).FirstOrCreate(&record).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not assign product"})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"product_storefront": record})
+}
+
+func (storefront *Storefront) postArticle(c *gin.Context) {
+	var request struct {
+		ArticleID uint `json:"article_id"`
+	}
+	if err := c.ShouldBindJSON(&request); err != nil || request.ArticleID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid article storefront"})
+		return
+	}
+	record := models.ArticleStorefront{ArticleID: request.ArticleID, StorefrontID: uintPathID(c.Param("id"))}
+	if record.StorefrontID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		return
+	}
+	if err := storefront.DB.Where("article_id = ? AND storefront_id = ?", record.ArticleID, record.StorefrontID).FirstOrCreate(&record).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not assign article"})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"article_storefront": record})
 }
 
 func (storefront *Storefront) Put(c *gin.Context) {
@@ -152,4 +201,12 @@ func storefrontUpdateMap(storefront models.Storefront) map[string]interface{} {
 		"primary_country_id": storefront.PrimaryCountryID,
 		"owner_id":           storefront.OwnerID,
 	}
+}
+
+func uintPathID(value string) uint {
+	parsed, err := strconv.Atoi(value)
+	if err != nil || parsed <= 0 {
+		return 0
+	}
+	return uint(parsed)
 }

@@ -160,6 +160,7 @@ const webTestTemplates = `
 {{ define "admin_register" }}admin register {{ .Error }}{{ end }}
 {{ define "admin_home" }}admin home {{ .Email }}{{ end }}
 {{ define "admin_storefronts_index" }}admin storefronts{{ end }}
+{{ define "admin_storefront_show" }}admin storefront show{{ end }}
 {{ define "admin_storefront_form" }}admin storefront form {{ .Error }}{{ end }}
 {{ define "products_index" }}products{{ end }}
 {{ define "product_show" }}product{{ end }}

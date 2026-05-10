@@ -76,7 +76,7 @@ func (product *Product) getByCountry(c *gin.Context) {
 	var products []models.Product
 	query := product.DB.Preload("Country").Preload("Category").Where("country_id = ?", record.ID).Order("is_featured desc, deal_score desc, created_at desc")
 	if storefrontID := strings.TrimSpace(c.Query("storefront_id")); storefrontID != "" {
-		query = query.Where("storefront_id = ?", storefrontID)
+		query = query.Joins("JOIN product_storefronts ON product_storefronts.product_id = products.id").Where("product_storefronts.storefront_id = ?", storefrontID)
 	}
 	if err := query.Find(&products).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not load products"})
@@ -89,7 +89,7 @@ func (product *Product) getByCountrySlug(c *gin.Context) {
 	var record models.Product
 	query := product.DB.Preload("Country").Preload("Category").Joins("JOIN countries ON countries.id = products.country_id").Where("countries.code = ? AND products.slug = ?", strings.ToLower(utils.CountryCodeFromRequest(c)), c.Param("slug"))
 	if storefrontID := strings.TrimSpace(c.Query("storefront_id")); storefrontID != "" {
-		query = query.Where("products.storefront_id = ?", storefrontID)
+		query = query.Joins("JOIN product_storefronts ON product_storefronts.product_id = products.id").Where("product_storefronts.storefront_id = ?", storefrontID)
 	}
 	err := query.First(&record).Error
 	if err != nil {
@@ -105,15 +105,15 @@ func (product *Product) getAdminList(c *gin.Context) {
 	page, limit, offset := utils.GetPagination(c)
 	query := product.DB.Model(&models.Product{})
 	if storefrontID := strings.TrimSpace(c.Query("storefront_id")); storefrontID != "" {
-		query = query.Where("storefront_id = ?", storefrontID)
+		query = query.Joins("JOIN product_storefronts ON product_storefronts.product_id = products.id").Where("product_storefronts.storefront_id = ?", storefrontID)
 	}
 	if err := query.Count(&total).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not count products"})
 		return
 	}
-	listQuery := product.DB.Preload("Country").Preload("Category").Preload("Storefront").Order("created_at desc").Limit(limit).Offset(offset)
+	listQuery := product.DB.Preload("Country").Preload("Category").Order("created_at desc").Limit(limit).Offset(offset)
 	if storefrontID := strings.TrimSpace(c.Query("storefront_id")); storefrontID != "" {
-		listQuery = listQuery.Where("storefront_id = ?", storefrontID)
+		listQuery = listQuery.Joins("JOIN product_storefronts ON product_storefronts.product_id = products.id").Where("product_storefronts.storefront_id = ?", storefrontID)
 	}
 	if err := listQuery.Find(&products).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not load products"})
@@ -154,7 +154,6 @@ func productUpdateMap(product models.Product) map[string]interface{} {
 		"coupon_code": product.CouponCode, "deal_score": product.DealScore, "rating": product.Rating,
 		"review_count": product.ReviewCount, "is_available": product.IsAvailable, "is_featured": product.IsFeatured,
 		"starts_at": product.StartsAt, "ends_at": product.EndsAt, "last_checked_at": product.LastCheckedAt,
-		"storefront_id": product.StorefrontID,
-		"country_id":    product.CountryID, "category_id": product.CategoryID,
+		"country_id": product.CountryID, "category_id": product.CategoryID,
 	}
 }

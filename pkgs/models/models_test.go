@@ -17,8 +17,10 @@ func TestModelsEmbedGormModel(t *testing.T) {
 		Country{},
 		Product{},
 		ProductCategory{},
+		ProductStorefront{},
 		Role{},
 		Storefront{},
+		ArticleStorefront{},
 		User{},
 	}
 
@@ -122,7 +124,6 @@ func TestPublicModelJSONFields(t *testing.T) {
 				ReviewCount:        12,
 				IsAvailable:        true,
 				IsFeatured:         true,
-				StorefrontID:       9,
 				CountryID:          1,
 				CategoryID:         2,
 			},
@@ -150,7 +151,6 @@ func TestPublicModelJSONFields(t *testing.T) {
 				"review_count":         float64(12),
 				"is_available":         true,
 				"is_featured":          true,
-				"storefront_id":        float64(9),
 				"country_id":           float64(1),
 				"category_id":          float64(2),
 			},
@@ -170,7 +170,6 @@ func TestPublicModelJSONFields(t *testing.T) {
 				MetaKeywords:      "keywords",
 				CanonicalURL:      "https://example.com/guide",
 				IsPublished:       true,
-				StorefrontID:      9,
 				ArticleCategoryID: 3,
 				ProductID:         &productID,
 			},
@@ -187,9 +186,24 @@ func TestPublicModelJSONFields(t *testing.T) {
 				"meta_keywords":       "keywords",
 				"canonical_url":       "https://example.com/guide",
 				"is_published":        true,
-				"storefront_id":       float64(9),
 				"article_category_id": float64(3),
 				"product_id":          float64(7),
+			},
+		},
+		{
+			name:  "product storefront",
+			model: ProductStorefront{ProductID: 4, StorefrontID: 9},
+			expected: map[string]interface{}{
+				"product_id":    float64(4),
+				"storefront_id": float64(9),
+			},
+		},
+		{
+			name:  "article storefront",
+			model: ArticleStorefront{ArticleID: 5, StorefrontID: 9},
+			expected: map[string]interface{}{
+				"article_id":    float64(5),
+				"storefront_id": float64(9),
 			},
 		},
 	}

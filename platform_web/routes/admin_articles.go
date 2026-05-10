@@ -70,6 +70,10 @@ func (articles *AdminArticles) Post(c *gin.Context) {
 		articles.renderForm(c, http.StatusBadRequest, "Create article", "/admin/articles/create", article, "Could not create the article.")
 		return
 	}
+	if err := articles.assignStorefronts(c, response.Article.ID); err != nil {
+		articles.renderForm(c, http.StatusBadRequest, "Create article", "/admin/articles/create", article, "Could not assign the article to the selected storefronts.")
+		return
+	}
 	if err := articles.API.UploadArticleImage(c, response.Article.ID); err != nil {
 		articles.renderForm(c, http.StatusBadRequest, "Create article", "/admin/articles/create", article, "Could not save the article image.")
 		return
@@ -102,6 +106,10 @@ func (articles *AdminArticles) Put(c *gin.Context) {
 	}
 	if err := articles.API.Put(c, "/admin/articles/"+id+"/edit", articlePayload(article), nil); err != nil {
 		articles.renderForm(c, http.StatusBadRequest, "Edit article", "/admin/articles/"+c.Param("id")+"/edit", article, "Could not update the article.")
+		return
+	}
+	if err := articles.assignStorefronts(c, uintIDFromPath(id)); err != nil {
+		articles.renderForm(c, http.StatusBadRequest, "Edit article", "/admin/articles/"+c.Param("id")+"/edit", article, "Could not assign the article to the selected storefronts.")
 		return
 	}
 	if parsedID, err := strconv.Atoi(id); err == nil {
@@ -171,11 +179,6 @@ func (articles *AdminArticles) articleFromRequest(c *gin.Context) (models.Articl
 		return models.Article{}, err
 	}
 
-	storefrontID, err := parseRequiredUint(c.PostForm("storefront_id"), "Select a storefront.")
-	if err != nil {
-		return models.Article{}, err
-	}
-
 	productID, err := parseOptionalUint(c.PostForm("product_id"))
 	if err != nil {
 		return models.Article{}, err
@@ -203,7 +206,6 @@ func (articles *AdminArticles) articleFromRequest(c *gin.Context) (models.Articl
 		MetaKeywords:      strings.TrimSpace(c.PostForm("meta_keywords")),
 		CanonicalURL:      strings.TrimSpace(c.PostForm("canonical_url")),
 		IsPublished:       c.PostForm("is_published") == "on",
-		StorefrontID:      storefrontID,
 		ArticleCategoryID: categoryID,
 		ProductID:         productID,
 	}
@@ -245,9 +247,25 @@ func articlePayload(article models.Article) map[string]interface{} {
 		"meta_title": article.MetaTitle, "meta_description": article.MetaDescription,
 		"meta_keywords": article.MetaKeywords, "canonical_url": article.CanonicalURL,
 		"is_published": article.IsPublished, "published_at": article.PublishedAt,
-		"storefront_id": article.StorefrontID, "article_category_id": article.ArticleCategoryID,
-		"product_id": uintPtrPayload(article.ProductID),
+		"article_category_id": article.ArticleCategoryID,
+		"product_id":          uintPtrPayload(article.ProductID),
 	}
+}
+
+func (articles *AdminArticles) assignStorefronts(c *gin.Context, articleID uint) error {
+	if articleID == 0 {
+		return nil
+	}
+	for _, storefrontID := range c.PostFormArray("storefront_ids") {
+		id, err := parseRequiredUint(storefrontID, "Select a valid storefront.")
+		if err != nil {
+			return err
+		}
+		if err := articles.API.Post(c, "/admin/storefronts/"+uintToString(id)+"/articles", map[string]interface{}{"article_id": articleID}, nil); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (articles *AdminArticles) formFields() []form_validator.Field {
@@ -255,7 +273,6 @@ func (articles *AdminArticles) formFields() []form_validator.Field {
 		return articles.FormFields
 	}
 	return []form_validator.Field{
-		{Name: "storefront_id", Validate: true, Type: "uint"},
 		{Name: "article_category_id", Validate: true, Type: "uint"},
 		{Name: "product_id", Validate: false, Type: "string"},
 		{Name: "author", Validate: true, Type: "string"},

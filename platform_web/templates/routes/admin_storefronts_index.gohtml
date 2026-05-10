@@ -23,8 +23,8 @@
             </thead>
             <tbody class="divide-y divide-white/10">
                 {{ range .Storefronts }}
-                <tr class="text-slate-200">
-                    <td class="px-4 py-3 font-medium">{{ .Name }}</td>
+                <tr class="text-slate-200 hover:bg-white/5">
+                    <td class="px-4 py-3 font-medium"><a class="text-cyan-200 hover:text-cyan-100" href="/admin/storefronts/{{ .ID }}">{{ .Name }}</a></td>
                     <td class="px-4 py-3">{{ .Domain }}</td>
                     <td class="px-4 py-3">{{ .PrimaryCountry.Name }}</td>
                     <td class="px-4 py-3">{{ if .IsActive }}Active{{ else }}Paused{{ end }}</td>

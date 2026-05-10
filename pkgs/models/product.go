@@ -34,8 +34,6 @@ type Product struct {
 	StartsAt           *time.Time      `json:"starts_at"`
 	EndsAt             *time.Time      `json:"ends_at" gorm:"index"`
 	LastCheckedAt      *time.Time      `json:"last_checked_at"`
-	StorefrontID       uint            `json:"storefront_id" gorm:"not null;index"`
-	Storefront         Storefront      `json:"storefront" gorm:"foreignKey:StorefrontID"`
 	CountryID          uint            `json:"country_id" gorm:"not null;index"`
 	Country            Country         `json:"country" gorm:"foreignKey:CountryID"`
 	CategoryID         uint            `json:"category_id" gorm:"not null;index"`

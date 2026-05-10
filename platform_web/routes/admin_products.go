@@ -62,8 +62,15 @@ func (products *AdminProducts) Post(c *gin.Context) {
 		return
 	}
 
-	if err := products.API.Post(c, "/admin/products/create", productPayload(product), nil); err != nil {
+	var response struct {
+		Product models.Product `json:"product"`
+	}
+	if err := products.API.Post(c, "/admin/products/create", productPayload(product), &response); err != nil {
 		products.renderForm(c, http.StatusBadRequest, "Create product", "/admin/products/create", product, "Could not create the product.")
+		return
+	}
+	if err := products.assignStorefronts(c, response.Product.ID); err != nil {
+		products.renderForm(c, http.StatusBadRequest, "Create product", "/admin/products/create", product, "Could not assign the product to the selected storefronts.")
 		return
 	}
 
@@ -94,6 +101,10 @@ func (products *AdminProducts) Put(c *gin.Context) {
 	}
 	if err := products.API.Put(c, "/admin/products/"+id+"/edit", productPayload(product), nil); err != nil {
 		products.renderForm(c, http.StatusBadRequest, "Edit product", "/admin/products/"+c.Param("id")+"/edit", product, "Could not update the product.")
+		return
+	}
+	if err := products.assignStorefronts(c, uintIDFromPath(id)); err != nil {
+		products.renderForm(c, http.StatusBadRequest, "Edit product", "/admin/products/"+c.Param("id")+"/edit", product, "Could not assign the product to the selected storefronts.")
 		return
 	}
 
@@ -155,11 +166,6 @@ func (products *AdminProducts) productFromRequest(c *gin.Context) (models.Produc
 	}
 
 	countryID, err := parseRequiredUint(c.PostForm("country_id"), "Select a country.")
-	if err != nil {
-		return models.Product{}, err
-	}
-
-	storefrontID, err := parseRequiredUint(c.PostForm("storefront_id"), "Select a storefront.")
 	if err != nil {
 		return models.Product{}, err
 	}
@@ -266,7 +272,6 @@ func (products *AdminProducts) productFromRequest(c *gin.Context) (models.Produc
 		StartsAt:           startsAt,
 		EndsAt:             endsAt,
 		LastCheckedAt:      lastCheckedAt,
-		StorefrontID:       storefrontID,
 		CountryID:          countryID,
 		CategoryID:         categoryID,
 	}, nil
@@ -302,8 +307,32 @@ func productPayload(product models.Product) map[string]interface{} {
 		"coupon_code": product.CouponCode, "deal_score": product.DealScore, "rating": product.Rating,
 		"review_count": product.ReviewCount, "is_available": product.IsAvailable, "is_featured": product.IsFeatured,
 		"starts_at": product.StartsAt, "ends_at": product.EndsAt, "last_checked_at": product.LastCheckedAt,
-		"storefront_id": product.StorefrontID, "country_id": product.CountryID, "category_id": product.CategoryID,
+		"country_id": product.CountryID, "category_id": product.CategoryID,
 	}
+}
+
+func (products *AdminProducts) assignStorefronts(c *gin.Context, productID uint) error {
+	if productID == 0 {
+		return nil
+	}
+	for _, storefrontID := range c.PostFormArray("storefront_ids") {
+		id, err := parseRequiredUint(storefrontID, "Select a valid storefront.")
+		if err != nil {
+			return err
+		}
+		if err := products.API.Post(c, "/admin/storefronts/"+uintToString(id)+"/products", map[string]interface{}{"product_id": productID}, nil); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func uintIDFromPath(id string) uint {
+	parsed, err := strconv.Atoi(id)
+	if err != nil || parsed <= 0 {
+		return 0
+	}
+	return uint(parsed)
 }
 
 func (products *AdminProducts) formFields() []form_validator.Field {
@@ -311,7 +340,6 @@ func (products *AdminProducts) formFields() []form_validator.Field {
 		return products.FormFields
 	}
 	return []form_validator.Field{
-		{Name: "storefront_id", Validate: true, Type: "uint"},
 		{Name: "country_id", Validate: true, Type: "uint"},
 		{Name: "category_id", Validate: true, Type: "uint"},
 		{Name: "name", Validate: true, Type: "string"},

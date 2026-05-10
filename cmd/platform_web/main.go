@@ -33,6 +33,7 @@ func main() {
 		"platform_web/templates/routes/admin_login.gohtml",
 		"platform_web/templates/routes/admin_register.gohtml",
 		"platform_web/templates/routes/admin_storefronts_index.gohtml",
+		"platform_web/templates/routes/admin_storefront_show.gohtml",
 		"platform_web/templates/routes/admin_storefront_form.gohtml",
 		"platform_web/templates/routes/admin_articles_index.gohtml",
 		"platform_web/templates/routes/admin_article_form.gohtml",

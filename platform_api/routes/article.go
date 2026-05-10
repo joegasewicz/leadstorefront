@@ -98,7 +98,7 @@ func (article *Article) getPublishedList(c *gin.Context) {
 	var articles []models.Article
 	query := publishedArticlesQuery(article.DB)
 	if storefrontID := strings.TrimSpace(c.Query("storefront_id")); storefrontID != "" {
-		query = query.Where("storefront_id = ?", storefrontID)
+		query = query.Joins("JOIN article_storefronts ON article_storefronts.article_id = articles.id").Where("article_storefronts.storefront_id = ?", storefrontID)
 	}
 	if err := query.Find(&articles).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not load articles"})
@@ -112,7 +112,7 @@ func (article *Article) getPublishedBySlug(c *gin.Context) {
 	var record models.Article
 	query := publishedArticlesQuery(article.DB).Where("slug = ?", c.Param("slug"))
 	if storefrontID := strings.TrimSpace(c.Query("storefront_id")); storefrontID != "" {
-		query = query.Where("storefront_id = ?", storefrontID)
+		query = query.Joins("JOIN article_storefronts ON article_storefronts.article_id = articles.id").Where("article_storefronts.storefront_id = ?", storefrontID)
 	}
 	err := query.First(&record).Error
 	if err != nil {
@@ -129,15 +129,15 @@ func (article *Article) getAdminList(c *gin.Context) {
 	page, limit, offset := utils.GetPagination(c)
 	query := article.DB.Model(&models.Article{})
 	if storefrontID := strings.TrimSpace(c.Query("storefront_id")); storefrontID != "" {
-		query = query.Where("storefront_id = ?", storefrontID)
+		query = query.Joins("JOIN article_storefronts ON article_storefronts.article_id = articles.id").Where("article_storefronts.storefront_id = ?", storefrontID)
 	}
 	if err := query.Count(&total).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not count articles"})
 		return
 	}
-	listQuery := article.DB.Preload("ArticleCategory").Preload("Product").Preload("Storefront").Order("created_at desc").Limit(limit).Offset(offset)
+	listQuery := article.DB.Preload("ArticleCategory").Preload("Product").Order("created_at desc").Limit(limit).Offset(offset)
 	if storefrontID := strings.TrimSpace(c.Query("storefront_id")); storefrontID != "" {
-		listQuery = listQuery.Where("storefront_id = ?", storefrontID)
+		listQuery = listQuery.Joins("JOIN article_storefronts ON article_storefronts.article_id = articles.id").Where("article_storefronts.storefront_id = ?", storefrontID)
 	}
 	if err := listQuery.Find(&articles).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not load articles"})
@@ -184,7 +184,7 @@ func articleUpdateMap(article models.Article) map[string]interface{} {
 		"meta_description": article.MetaDescription, "meta_keywords": article.MetaKeywords,
 		"canonical_url": article.CanonicalURL, "is_published": article.IsPublished,
 		"published_at": article.PublishedAt, "article_category_id": article.ArticleCategoryID,
-		"product_id": article.ProductID, "storefront_id": article.StorefrontID,
+		"product_id": article.ProductID,
 	}
 }
 
