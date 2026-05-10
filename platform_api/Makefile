@@ -2,7 +2,7 @@ IMG_NAME=josefdigital/platform:platform_api-v0.0.2
 TEST_CONCURRENCY ?= 4
 
 test:
-	cd .. && go test -parallel $(TEST_CONCURRENCY) ./platform_api/routes
+	cd .. && go test -parallel $(TEST_CONCURRENCY) ./pkgs/... ./platform_api/routes
 
 test_compile:
 	cd .. && go test -c ./cmd/platform_api -o /tmp/leadstorefront-platform_api.test
