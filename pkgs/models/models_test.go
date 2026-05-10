@@ -18,6 +18,7 @@ func TestModelsEmbedGormModel(t *testing.T) {
 		Product{},
 		ProductCategory{},
 		Role{},
+		Storefront{},
 		User{},
 	}
 
@@ -63,6 +64,29 @@ func TestPublicModelJSONFields(t *testing.T) {
 			name:     "role",
 			model:    Role{Name: "admin"},
 			expected: map[string]interface{}{"name": "admin"},
+		},
+		{
+			name: "storefront",
+			model: Storefront{
+				Name:             "Lead Storefront",
+				Slug:             "lead-storefront",
+				Domain:           "leadstorefront.com",
+				Description:      "Hosted storefront",
+				LogoURL:          "/logo.png",
+				IsActive:         true,
+				PrimaryCountryID: 1,
+				OwnerID:          &productID,
+			},
+			expected: map[string]interface{}{
+				"name":               "Lead Storefront",
+				"slug":               "lead-storefront",
+				"domain":             "leadstorefront.com",
+				"description":        "Hosted storefront",
+				"logo_url":           "/logo.png",
+				"is_active":          true,
+				"primary_country_id": float64(1),
+				"owner_id":           float64(7),
+			},
 		},
 		{
 			name:  "user hides password",

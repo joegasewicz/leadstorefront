@@ -8,6 +8,7 @@ func Register(app *gin.Engine) {
 	api := NewAPIClient()
 	health := &Health{}
 	home := &Home{API: api}
+	storefronts := &Storefronts{API: api}
 	products := &Products{API: api}
 	articles := &Articles{API: api}
 	admin := &Admin{API: api}
@@ -21,6 +22,7 @@ func Register(app *gin.Engine) {
 
 	app.GET("/", home.Redirect)
 	app.GET("/:country", home.Get)
+	app.GET("/:country/storefronts/:slug", storefronts.Get)
 
 	app.GET("/:country/articles", articles.Get)
 	app.GET("/:country/articles/:slug", articles.Get)

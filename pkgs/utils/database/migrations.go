@@ -25,6 +25,7 @@ func (m *Migrate) Run() error {
 		&models.Article{},
 		&models.Role{},
 		&models.User{},
+		&models.Storefront{},
 	); err != nil {
 		return err
 	}

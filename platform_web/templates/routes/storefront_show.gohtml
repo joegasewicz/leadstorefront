@@ -1,0 +1,17 @@
+{{ define "storefront_show" }}
+{{ template "base_start" . }}
+<section class="mx-auto max-w-5xl px-6 py-16">
+    <div class="max-w-3xl">
+        <p class="text-sm font-semibold uppercase tracking-wide text-sky-300">{{ .Storefront.Domain }}</p>
+        <h1 class="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">{{ .Storefront.Name }}</h1>
+        {{ if .Storefront.Description }}
+            <p class="mt-6 text-lg leading-8 text-slate-300">{{ .Storefront.Description }}</p>
+        {{ end }}
+        <div class="mt-8 flex flex-wrap gap-3">
+            <a class="rounded-md bg-sky-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-sky-300" href="/{{ .Country }}/products">Products</a>
+            <a class="rounded-md border border-slate-700 px-4 py-2 text-sm font-semibold text-white hover:border-slate-500" href="/{{ .Country }}/articles">Articles</a>
+        </div>
+    </div>
+</section>
+{{ template "base_end" . }}
+{{ end }}

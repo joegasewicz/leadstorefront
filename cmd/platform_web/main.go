@@ -24,6 +24,7 @@ func main() {
 		"platform_web/templates/partials/footer.gohtml",
 		"platform_web/templates/partials/scripts.gohtml",
 		"platform_web/templates/routes/home.gohtml",
+		"platform_web/templates/routes/storefront_show.gohtml",
 		"platform_web/templates/routes/articles_index.gohtml",
 		"platform_web/templates/routes/article_show.gohtml",
 		"platform_web/templates/routes/products_index.gohtml",

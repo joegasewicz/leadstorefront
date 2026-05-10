@@ -56,6 +56,13 @@ func TestRegisteredWebRoutes(t *testing.T) {
 			location: "/uk/products",
 		},
 		{
+			name:     "unsupported storefront country redirects to default country storefront",
+			method:   http.MethodGet,
+			path:     "/fr/storefronts/demo",
+			expected: http.StatusFound,
+			location: "/uk/storefronts/demo",
+		},
+		{
 			name:     "unsupported article country redirects to default country articles",
 			method:   http.MethodGet,
 			path:     "/fr/articles",
@@ -144,6 +151,7 @@ func performWebRequest(router http.Handler, method string, path string, body str
 
 const webTestTemplates = `
 {{ define "home" }}home {{ .Country }}{{ end }}
+{{ define "storefront_show" }}storefront {{ .Storefront.Name }}{{ end }}
 {{ define "admin_login" }}admin login {{ .Error }}{{ end }}
 {{ define "admin_register" }}admin register {{ .Error }}{{ end }}
 {{ define "admin_home" }}admin home {{ .Email }}{{ end }}
