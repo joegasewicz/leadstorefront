@@ -41,35 +41,6 @@ SESSION_SECRET=
 API_IMAGE=josefdigital/platform:platform_api-v0.0.1
 WEB_IMAGE=josefdigital/platform:platform_web-v0.0.1
 
-WOODPECKER_HOST=https://ci.leadstorefront.com
-WOODPECKER_ADMIN=joegasewicz
-WOODPECKER_GITHUB=true
-WOODPECKER_GITHUB_CLIENT=
-WOODPECKER_GITHUB_SECRET=
-WOODPECKER_AGENT_SECRET=
-```
-
-## Woodpecker CI
-
-Woodpecker runs on the app droplet behind Caddy at `https://ci.leadstorefront.com`.
-Create a GitHub OAuth app before starting the CI stack:
-
-- Homepage URL: `https://ci.leadstorefront.com`
-- Authorization callback URL: `https://ci.leadstorefront.com/authorize`
-
-Set `WOODPECKER_GITHUB_CLIENT`, `WOODPECKER_GITHUB_SECRET`, and a random
-`WOODPECKER_AGENT_SECRET` in the root `.env` file used by deployment. Generate
-the agent secret with:
-
-```sh
-openssl rand -hex 32
-```
-
-After updating `/root/.env` on the app droplet, restart Woodpecker:
-
-```sh
-docker compose -f /root/docker-compose.app.yaml up -d woodpecker-server woodpecker-agent
-docker logs --tail=100 root-woodpecker-server-1
 ```
 
 ## Access Remote Postgres Via Tunnel

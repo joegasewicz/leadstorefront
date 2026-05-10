@@ -11,14 +11,3 @@ leadstorefront.com, www.leadstorefront.com {
         format console
     }
 }
-
-ci.leadstorefront.com {
-    reverse_proxy woodpecker-server:8000
-
-    encode gzip
-
-    log {
-        output stdout
-        format console
-    }
-}
