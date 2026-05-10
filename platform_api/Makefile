@@ -1,4 +1,11 @@
 IMG_NAME=josefdigital/platform:platform_api-v0.0.2
+TEST_CONCURRENCY ?= 4
+
+test:
+	cd .. && go test -parallel $(TEST_CONCURRENCY) ./platform_api/routes
+
+test_compile:
+	cd .. && go test -c ./cmd/platform_api -o /tmp/leadstorefront-platform_api.test
 
 docker_build:
 	export DOCKER_DEFAULT_PLATFORM=linux/amd64 && docker build --no-cache --tag $(IMG_NAME) -f Dockerfile ..

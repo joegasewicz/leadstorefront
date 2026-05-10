@@ -5,7 +5,7 @@ steps:
   - name: go-packages
     image: golang:1.26
     commands:
-      - go test ./pkgs/models ./pkgs/utils ./pkgs/utils/database
+      - go test ./pkgs/models ./pkgs/utils ./pkgs/utils/database ./platform_api/routes
 
   - name: api-compile
     image: golang:1.26
