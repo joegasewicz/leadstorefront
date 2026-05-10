@@ -1,27 +1,53 @@
+{
+	on_demand_tls {
+		ask http://web:8000/domain-check
+		interval 2m
+		burst 5
+	}
+}
+
 leadstorefront.com, www.leadstorefront.com {
-    reverse_proxy /api/* api:8001
-    reverse_proxy /assets/* web:8000
-    reverse_proxy /uploads/* web:8000
-    reverse_proxy web:8000
+	reverse_proxy /api/* api:8001
+	reverse_proxy /assets/* web:8000
+	reverse_proxy /uploads/* web:8000
+	reverse_proxy web:8000
 
-    encode gzip
+	encode gzip
 
-    log {
-        output stdout
-        format console
-    }
+	log {
+		output stdout
+		format console
+	}
 }
 
 :80 {
-    reverse_proxy /api/* api:8001
-    reverse_proxy /assets/* web:8000
-    reverse_proxy /uploads/* web:8000
-    reverse_proxy web:8000
+	reverse_proxy /api/* api:8001
+	reverse_proxy /assets/* web:8000
+	reverse_proxy /uploads/* web:8000
+	reverse_proxy web:8000
 
-    encode gzip
+	encode gzip
 
-    log {
-        output stdout
-        format console
-    }
+	log {
+		output stdout
+		format console
+	}
+}
+
+:443 {
+	tls {
+		on_demand
+	}
+
+	reverse_proxy /api/* api:8001
+	reverse_proxy /assets/* web:8000
+	reverse_proxy /uploads/* web:8000
+	reverse_proxy web:8000
+
+	encode gzip
+
+	log {
+		output stdout
+		format console
+	}
 }

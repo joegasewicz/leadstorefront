@@ -7,6 +7,7 @@ import (
 func Register(app *gin.Engine) {
 	api := NewAPIClient()
 	health := &Health{}
+	domainCheck := &DomainCheck{API: api}
 	home := &Home{API: api}
 	storefronts := &Storefronts{API: api}
 	products := &Products{API: api}
@@ -20,6 +21,11 @@ func Register(app *gin.Engine) {
 	app.POST("/health", health.Post)
 	app.PUT("/health", health.Put)
 	app.DELETE("/health", health.Delete)
+
+	app.GET("/domain-check", domainCheck.Get)
+	app.POST("/domain-check", domainCheck.Post)
+	app.PUT("/domain-check", domainCheck.Put)
+	app.DELETE("/domain-check", domainCheck.Delete)
 
 	app.GET("/", home.Redirect)
 	app.GET("/:country", home.Get)

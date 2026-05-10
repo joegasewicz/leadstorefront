@@ -73,6 +73,8 @@ func TestAPIRoutesRejectInvalidJSON(t *testing.T) {
 		{name: "login", path: "/api/v1/admin/login", error: "invalid login"},
 		{name: "register", path: "/api/v1/admin/register", error: "invalid registration"},
 		{name: "storefront create", path: "/api/v1/admin/storefronts/create", error: "invalid storefront"},
+		{name: "product storefront assign", path: "/api/v1/admin/storefronts/1/products", error: "invalid product storefront"},
+		{name: "article storefront assign", path: "/api/v1/admin/storefronts/1/articles", error: "invalid article storefront"},
 		{name: "product create", path: "/api/v1/admin/products/create", error: "invalid product"},
 		{name: "article create", path: "/api/v1/admin/articles/create", error: "invalid article"},
 	}
@@ -106,6 +108,10 @@ func TestRegisterRejectsUnsupportedMethods(t *testing.T) {
 			assert.Equal(t, http.StatusNotFound, response.Code)
 		})
 	}
+}
+
+func TestDomainLookupCandidates(t *testing.T) {
+	assert.Equal(t, []string{"lankanote.com", "www.lankanote.com"}, domainLookupCandidates("www.lankanote.com."))
 }
 
 func testRouter() *gin.Engine {

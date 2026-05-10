@@ -166,12 +166,20 @@ func (storefront *Storefront) getActiveBySlug(c *gin.Context) {
 func (storefront *Storefront) getActiveByDomain(c *gin.Context) {
 	domain := strings.ToLower(strings.TrimSpace(c.Param("domain")))
 	var record models.Storefront
-	err := storefront.DB.Preload("PrimaryCountry").Where("domain = ? AND is_active = ?", domain, true).First(&record).Error
+	err := storefront.DB.Preload("PrimaryCountry").Where("domain IN ? AND is_active = ?", domainLookupCandidates(domain), true).First(&record).Error
 	if err != nil {
 		utils.WriteRecordError(c, err, "could not load storefront")
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"storefront": record})
+}
+
+func domainLookupCandidates(domain string) []string {
+	domain = strings.TrimPrefix(strings.TrimSuffix(domain, "."), "www.")
+	if domain == "" {
+		return []string{""}
+	}
+	return []string{domain, "www." + domain}
 }
 
 func (storefront *Storefront) bindJSON(c *gin.Context) (models.Storefront, bool) {

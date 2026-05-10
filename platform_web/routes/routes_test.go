@@ -2,6 +2,7 @@ package routes
 
 import (
 	"html/template"
+	"leadstorefront/pkgs/models"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -127,6 +128,35 @@ func TestAPIClientURL(t *testing.T) {
 
 	assert.Equal(t, "http://api:8001/api/v1/health", client.URL("/health"))
 	assert.Equal(t, "http://api:8001/api/v1/uk/products", client.URL("uk/products"))
+}
+
+func TestStorefrontCustomDomainURL(t *testing.T) {
+	router := gin.New()
+	router.GET("/:country/storefronts/:slug", func(c *gin.Context) {
+		redirectURL, ok := storefrontCustomDomainURL(c, models.Storefront{Domain: "lankanote.com"})
+		assert.True(t, ok)
+		assert.Equal(t, "https://lankanote.com", redirectURL)
+	})
+
+	response := performWebRequest(router, http.MethodGet, "/uk/storefronts/lanka-note", "", map[string]string{
+		"Host": "leadstorefront.com",
+	})
+
+	assert.Equal(t, http.StatusOK, response.Code)
+}
+
+func TestStorefrontCustomDomainURLIgnoresCurrentCustomHost(t *testing.T) {
+	router := gin.New()
+	router.GET("/:country/storefronts/:slug", func(c *gin.Context) {
+		_, ok := storefrontCustomDomainURL(c, models.Storefront{Domain: "lankanote.com"})
+		assert.False(t, ok)
+	})
+
+	response := performWebRequest(router, http.MethodGet, "/uk/storefronts/lanka-note", "", map[string]string{
+		"Host": "lankanote.com",
+	})
+
+	assert.Equal(t, http.StatusOK, response.Code)
 }
 
 func testWebRouter() *gin.Engine {
