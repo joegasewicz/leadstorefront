@@ -134,8 +134,9 @@ func (articles *AdminArticles) Delete(c *gin.Context) {
 
 func (articles *AdminArticles) renderForm(c *gin.Context, status int, title string, action string, article models.Article, message string) {
 	var response struct {
-		Categories []models.ArticleCategory `json:"categories"`
-		Products   []models.Product         `json:"products"`
+		Categories  []models.ArticleCategory `json:"categories"`
+		Products    []models.Product         `json:"products"`
+		Storefronts []models.Storefront      `json:"storefronts"`
 	}
 	_ = articles.API.Get(c, "/admin/articles/options", &response)
 
@@ -152,6 +153,7 @@ func (articles *AdminArticles) renderForm(c *gin.Context, status int, title stri
 		"ProductID":    productID,
 		"Categories":   response.Categories,
 		"Products":     response.Products,
+		"Storefronts":  response.Storefronts,
 		"Error":        message,
 		"IsAdmin":      true,
 		"IsAdminRoute": true,
@@ -165,6 +167,11 @@ func (articles *AdminArticles) articleFromRequest(c *gin.Context) (models.Articl
 	}
 
 	categoryID, err := parseRequiredUint(c.PostForm("article_category_id"), "Select an article category.")
+	if err != nil {
+		return models.Article{}, err
+	}
+
+	storefrontID, err := parseRequiredUint(c.PostForm("storefront_id"), "Select a storefront.")
 	if err != nil {
 		return models.Article{}, err
 	}
@@ -196,6 +203,7 @@ func (articles *AdminArticles) articleFromRequest(c *gin.Context) (models.Articl
 		MetaKeywords:      strings.TrimSpace(c.PostForm("meta_keywords")),
 		CanonicalURL:      strings.TrimSpace(c.PostForm("canonical_url")),
 		IsPublished:       c.PostForm("is_published") == "on",
+		StorefrontID:      storefrontID,
 		ArticleCategoryID: categoryID,
 		ProductID:         productID,
 	}
@@ -237,7 +245,8 @@ func articlePayload(article models.Article) map[string]interface{} {
 		"meta_title": article.MetaTitle, "meta_description": article.MetaDescription,
 		"meta_keywords": article.MetaKeywords, "canonical_url": article.CanonicalURL,
 		"is_published": article.IsPublished, "published_at": article.PublishedAt,
-		"article_category_id": article.ArticleCategoryID, "product_id": uintPtrPayload(article.ProductID),
+		"storefront_id": article.StorefrontID, "article_category_id": article.ArticleCategoryID,
+		"product_id": uintPtrPayload(article.ProductID),
 	}
 }
 
@@ -246,6 +255,7 @@ func (articles *AdminArticles) formFields() []form_validator.Field {
 		return articles.FormFields
 	}
 	return []form_validator.Field{
+		{Name: "storefront_id", Validate: true, Type: "uint"},
 		{Name: "article_category_id", Validate: true, Type: "uint"},
 		{Name: "product_id", Validate: false, Type: "string"},
 		{Name: "author", Validate: true, Type: "string"},

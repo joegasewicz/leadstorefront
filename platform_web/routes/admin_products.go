@@ -120,8 +120,9 @@ func (products *AdminProducts) Delete(c *gin.Context) {
 
 func (products *AdminProducts) renderForm(c *gin.Context, status int, title string, action string, product models.Product, message string) {
 	var response struct {
-		Countries  []models.Country         `json:"countries"`
-		Categories []models.ProductCategory `json:"categories"`
+		Countries   []models.Country         `json:"countries"`
+		Categories  []models.ProductCategory `json:"categories"`
+		Storefronts []models.Storefront      `json:"storefronts"`
 	}
 	_ = products.API.Get(c, "/admin/products/options", &response)
 
@@ -140,6 +141,7 @@ func (products *AdminProducts) renderForm(c *gin.Context, status int, title stri
 		"LastCheckedAt":     formatDateTimeLocal(product.LastCheckedAt),
 		"Countries":         response.Countries,
 		"Categories":        response.Categories,
+		"Storefronts":       response.Storefronts,
 		"Error":             message,
 		"IsAdmin":           true,
 		"IsAdminRoute":      true,
@@ -153,6 +155,11 @@ func (products *AdminProducts) productFromRequest(c *gin.Context) (models.Produc
 	}
 
 	countryID, err := parseRequiredUint(c.PostForm("country_id"), "Select a country.")
+	if err != nil {
+		return models.Product{}, err
+	}
+
+	storefrontID, err := parseRequiredUint(c.PostForm("storefront_id"), "Select a storefront.")
 	if err != nil {
 		return models.Product{}, err
 	}
@@ -259,6 +266,7 @@ func (products *AdminProducts) productFromRequest(c *gin.Context) (models.Produc
 		StartsAt:           startsAt,
 		EndsAt:             endsAt,
 		LastCheckedAt:      lastCheckedAt,
+		StorefrontID:       storefrontID,
 		CountryID:          countryID,
 		CategoryID:         categoryID,
 	}, nil
@@ -294,7 +302,7 @@ func productPayload(product models.Product) map[string]interface{} {
 		"coupon_code": product.CouponCode, "deal_score": product.DealScore, "rating": product.Rating,
 		"review_count": product.ReviewCount, "is_available": product.IsAvailable, "is_featured": product.IsFeatured,
 		"starts_at": product.StartsAt, "ends_at": product.EndsAt, "last_checked_at": product.LastCheckedAt,
-		"country_id": product.CountryID, "category_id": product.CategoryID,
+		"storefront_id": product.StorefrontID, "country_id": product.CountryID, "category_id": product.CategoryID,
 	}
 }
 
@@ -303,6 +311,7 @@ func (products *AdminProducts) formFields() []form_validator.Field {
 		return products.FormFields
 	}
 	return []form_validator.Field{
+		{Name: "storefront_id", Validate: true, Type: "uint"},
 		{Name: "country_id", Validate: true, Type: "uint"},
 		{Name: "category_id", Validate: true, Type: "uint"},
 		{Name: "name", Validate: true, Type: "string"},

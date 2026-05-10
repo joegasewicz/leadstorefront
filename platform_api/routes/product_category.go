@@ -15,9 +15,11 @@ type ProductCategory struct {
 func (category *ProductCategory) Get(c *gin.Context) {
 	var countries []models.Country
 	var categories []models.ProductCategory
+	var storefronts []models.Storefront
 	_ = category.DB.Order("name asc").Find(&countries).Error
 	_ = category.DB.Order("name asc").Find(&categories).Error
-	c.JSON(http.StatusOK, gin.H{"countries": countries, "categories": categories})
+	_ = category.DB.Order("name asc").Find(&storefronts).Error
+	c.JSON(http.StatusOK, gin.H{"countries": countries, "categories": categories, "storefronts": storefronts})
 }
 
 func (category *ProductCategory) Post(c *gin.Context) {

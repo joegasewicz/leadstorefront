@@ -21,6 +21,8 @@ type Article struct {
 	CanonicalURL      string          `json:"canonical_url"`
 	IsPublished       bool            `json:"is_published" gorm:"not null;default:false;index"`
 	PublishedAt       *time.Time      `json:"published_at" gorm:"index"`
+	StorefrontID      uint            `json:"storefront_id" gorm:"not null;index"`
+	Storefront        Storefront      `json:"storefront" gorm:"foreignKey:StorefrontID"`
 	ArticleCategoryID uint            `json:"article_category_id" gorm:"not null;index"`
 	ArticleCategory   ArticleCategory `json:"article_category" gorm:"foreignKey:ArticleCategoryID"`
 	ProductID         *uint           `json:"product_id" gorm:"index"`

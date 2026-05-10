@@ -31,7 +31,11 @@ func (products *Products) Index(c *gin.Context) {
 	var response struct {
 		Products []models.Product `json:"products"`
 	}
-	if err := products.API.Get(c, "/"+countryCode+"/products", &response); err != nil {
+	path := "/" + countryCode + "/products"
+	if storefront, ok := currentStorefront(c, products.API); ok {
+		path += "?storefront_id=" + url.QueryEscape(uintToString(storefront.ID))
+	}
+	if err := products.API.Get(c, path, &response); err != nil {
 		c.String(http.StatusInternalServerError, "could not load products")
 		return
 	}
@@ -53,7 +57,11 @@ func (products *Products) Show(c *gin.Context) {
 	var response struct {
 		Product models.Product `json:"product"`
 	}
-	if err := products.API.Get(c, "/"+countryCode+"/products/"+url.PathEscape(c.Param("slug")), &response); err != nil {
+	path := "/" + countryCode + "/products/" + url.PathEscape(c.Param("slug"))
+	if storefront, ok := currentStorefront(c, products.API); ok {
+		path += "?storefront_id=" + url.QueryEscape(uintToString(storefront.ID))
+	}
+	if err := products.API.Get(c, path, &response); err != nil {
 		c.String(http.StatusInternalServerError, "could not load product")
 		return
 	}

@@ -9,6 +9,7 @@ import (
 
 func Register(app *gin.Engine, db *gorm.DB) {
 	country := &Country{DB: db}
+	storefront := &Storefront{DB: db}
 	product := &Product{DB: db}
 	productCategory := &ProductCategory{DB: db}
 	article := &Article{DB: db}
@@ -17,6 +18,8 @@ func Register(app *gin.Engine, db *gorm.DB) {
 
 	app.GET(utils.GetVersion("/health"), health)
 	app.GET(utils.GetVersion("/"), utils.APIRoot)
+	app.GET(utils.GetVersion("/storefronts/:slug"), storefront.Get)
+	app.GET(utils.GetVersion("/storefront-domains/:domain"), storefront.Get)
 	app.GET(utils.GetVersion("/us"), country.Get)
 	app.GET(utils.GetVersion("/uk"), country.Get)
 	app.GET(utils.GetVersion("/au"), country.Get)
@@ -65,6 +68,13 @@ func Register(app *gin.Engine, db *gorm.DB) {
 	app.POST(utils.GetVersion("/admin/register"), user.Post)
 	app.POST(utils.GetVersion("/admin/logout"), utils.AdminStatic)
 	app.GET(utils.GetVersion("/admin/users/:id"), user.Get)
+
+	app.GET(utils.GetVersion("/admin/storefronts"), storefront.Get)
+	app.GET(utils.GetVersion("/admin/storefronts/create"), storefront.Get)
+	app.GET(utils.GetVersion("/admin/storefronts/:id"), storefront.Get)
+	app.POST(utils.GetVersion("/admin/storefronts/create"), storefront.Post)
+	app.PUT(utils.GetVersion("/admin/storefronts/:id/edit"), storefront.Put)
+	app.DELETE(utils.GetVersion("/admin/storefronts/:id/delete"), storefront.Delete)
 
 	app.GET(utils.GetVersion("/admin/products"), product.Get)
 	app.GET(utils.GetVersion("/admin/products/options"), productCategory.Get)

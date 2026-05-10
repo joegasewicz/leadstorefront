@@ -56,6 +56,13 @@ func TestRegisteredWebRoutes(t *testing.T) {
 			location: "/uk/products",
 		},
 		{
+			name:     "unsupported storefront country redirects to default country storefront",
+			method:   http.MethodGet,
+			path:     "/fr/storefronts/demo",
+			expected: http.StatusFound,
+			location: "/uk/storefronts/demo",
+		},
+		{
 			name:     "unsupported article country redirects to default country articles",
 			method:   http.MethodGet,
 			path:     "/fr/articles",
@@ -110,10 +117,9 @@ func TestAdminFormsValidateBeforeCallingAPI(t *testing.T) {
 	register := performWebRequest(router, http.MethodPost, "/admin/register", url.Values{
 		"email":    {"editor@example.com"},
 		"password": {"secret"},
-		"role":     {"viewer"},
 	}.Encode(), map[string]string{"Content-Type": "application/x-www-form-urlencoded"})
 	assert.Equal(t, http.StatusBadRequest, register.Code)
-	assert.Contains(t, register.Body.String(), "Select a valid admin role.")
+	assert.Contains(t, register.Body.String(), "Could not create the account.")
 }
 
 func TestAPIClientURL(t *testing.T) {
@@ -134,8 +140,13 @@ func testWebRouter() *gin.Engine {
 
 func performWebRequest(router http.Handler, method string, path string, body string, headers map[string]string) *httptest.ResponseRecorder {
 	request := httptest.NewRequest(method, path, strings.NewReader(body))
+	request.Host = "leadstorefront.com"
 	for key, value := range headers {
-		request.Header.Set(key, value)
+		if strings.EqualFold(key, "Host") {
+			request.Host = value
+		} else {
+			request.Header.Set(key, value)
+		}
 	}
 	response := httptest.NewRecorder()
 	router.ServeHTTP(response, request)
@@ -144,9 +155,12 @@ func performWebRequest(router http.Handler, method string, path string, body str
 
 const webTestTemplates = `
 {{ define "home" }}home {{ .Country }}{{ end }}
+{{ define "storefront_show" }}storefront {{ .Storefront.Name }}{{ end }}
 {{ define "admin_login" }}admin login {{ .Error }}{{ end }}
 {{ define "admin_register" }}admin register {{ .Error }}{{ end }}
 {{ define "admin_home" }}admin home {{ .Email }}{{ end }}
+{{ define "admin_storefronts_index" }}admin storefronts{{ end }}
+{{ define "admin_storefront_form" }}admin storefront form {{ .Error }}{{ end }}
 {{ define "products_index" }}products{{ end }}
 {{ define "product_show" }}product{{ end }}
 {{ define "articles_index" }}articles{{ end }}

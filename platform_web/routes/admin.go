@@ -114,14 +114,7 @@ func (admin *Admin) RegisterPost(c *gin.Context) {
 	}
 	email, _ := form_validator.GetString("email", &config)
 	password, _ := form_validator.GetString("password", &config)
-	roleName, _ := form_validator.GetString("role", &config)
 	email = strings.ToLower(strings.TrimSpace(email))
-	roleName = strings.ToLower(strings.TrimSpace(roleName))
-
-	if roleName != "admin" && roleName != "editor" {
-		renderAdminRegister(c, "Select a valid admin role.")
-		return
-	}
 
 	var response struct {
 		User models.User `json:"user"`
@@ -129,7 +122,7 @@ func (admin *Admin) RegisterPost(c *gin.Context) {
 	if err := admin.API.Post(c, "/admin/register", map[string]interface{}{
 		"email":    email,
 		"password": password,
-		"role":     roleName,
+		"role":     "admin",
 	}, &response); err != nil {
 		renderAdminRegister(c, "Could not create the account.")
 		return
@@ -140,7 +133,7 @@ func (admin *Admin) RegisterPost(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusFound, "/admin")
+	c.Redirect(http.StatusFound, "/admin/storefronts/create")
 }
 
 func (admin *Admin) loginFields() []form_validator.Field {
@@ -157,7 +150,6 @@ func (admin *Admin) registerFields() []form_validator.Field {
 	return []form_validator.Field{
 		{Name: "email", Validate: true, Type: "string"},
 		{Name: "password", Validate: true, Type: "string"},
-		{Name: "role", Validate: true, Type: "string"},
 	}
 }
 

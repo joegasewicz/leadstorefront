@@ -8,9 +8,11 @@ func Register(app *gin.Engine) {
 	api := NewAPIClient()
 	health := &Health{}
 	home := &Home{API: api}
+	storefronts := &Storefronts{API: api}
 	products := &Products{API: api}
 	articles := &Articles{API: api}
 	admin := &Admin{API: api}
+	adminStorefronts := &AdminStorefronts{API: api}
 	adminArticles := &AdminArticles{API: api}
 	adminProducts := &AdminProducts{API: api}
 
@@ -21,6 +23,7 @@ func Register(app *gin.Engine) {
 
 	app.GET("/", home.Redirect)
 	app.GET("/:country", home.Get)
+	app.GET("/:country/storefronts/:slug", storefronts.Get)
 
 	app.GET("/:country/articles", articles.Get)
 	app.GET("/:country/articles/:slug", articles.Get)
@@ -39,6 +42,9 @@ func Register(app *gin.Engine) {
 	protected.Use(admin.Auth("admin", "editor"))
 	protected.GET("", admin.Get)
 	protected.PUT("", admin.Put)
+	protected.GET("/storefronts", adminStorefronts.Get)
+	protected.GET("/storefronts/create", adminStorefronts.Get)
+	protected.POST("/storefronts/create", adminStorefronts.Post)
 	protected.GET("/articles", adminArticles.Get)
 	protected.GET("/articles/create", adminArticles.Get)
 	protected.POST("/articles/create", adminArticles.Post)
