@@ -42,11 +42,14 @@ services:
 
   woodpecker-agent:
     image: woodpeckerci/woodpecker-agent:v3
+    command: agent
     restart: always
     depends_on:
       - woodpecker-server
     env_file:
       - ${APP_ENV_FILE:-.env}
+    environment:
+      WOODPECKER_SERVER: woodpecker-server:9000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
