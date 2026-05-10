@@ -1,0 +1,25 @@
+when:
+  - event: [push, pull_request, manual]
+
+steps:
+  - name: go-packages
+    image: golang:1.26
+    commands:
+      - make test
+
+  - name: api-compile
+    image: golang:1.26
+    commands:
+      - go test -c ./cmd/platform_api -o /tmp/leadstorefront-platform_api.test
+
+  - name: web-compile
+    image: golang:1.26
+    commands:
+      - go test -c ./cmd/platform_web -o /tmp/leadstorefront-platform_web.test
+
+  - name: web-assets
+    image: node:22-alpine
+    commands:
+      - cd platform_web
+      - npm ci
+      - npm run build
