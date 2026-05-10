@@ -15,6 +15,14 @@ type Storefront struct {
 }
 
 func (storefront *Storefront) Get(c *gin.Context) {
+	if strings.HasSuffix(c.FullPath(), "/create") {
+		storefront.getOptions(c)
+		return
+	}
+	if c.Param("domain") != "" {
+		storefront.getActiveByDomain(c)
+		return
+	}
 	if c.Param("id") != "" {
 		storefront.getByID(c)
 		return
@@ -24,6 +32,14 @@ func (storefront *Storefront) Get(c *gin.Context) {
 		return
 	}
 	storefront.getAdminList(c)
+}
+
+func (storefront *Storefront) getOptions(c *gin.Context) {
+	var countries []models.Country
+	var users []models.User
+	_ = storefront.DB.Order("name asc").Find(&countries).Error
+	_ = storefront.DB.Preload("Role").Order("email asc").Find(&users).Error
+	c.JSON(http.StatusOK, gin.H{"countries": countries, "users": users})
 }
 
 func (storefront *Storefront) Post(c *gin.Context) {
@@ -91,6 +107,17 @@ func (storefront *Storefront) getByID(c *gin.Context) {
 func (storefront *Storefront) getActiveBySlug(c *gin.Context) {
 	var record models.Storefront
 	err := storefront.DB.Preload("PrimaryCountry").Where("slug = ? AND is_active = ?", c.Param("slug"), true).First(&record).Error
+	if err != nil {
+		utils.WriteRecordError(c, err, "could not load storefront")
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"storefront": record})
+}
+
+func (storefront *Storefront) getActiveByDomain(c *gin.Context) {
+	domain := strings.ToLower(strings.TrimSpace(c.Param("domain")))
+	var record models.Storefront
+	err := storefront.DB.Preload("PrimaryCountry").Where("domain = ? AND is_active = ?", domain, true).First(&record).Error
 	if err != nil {
 		utils.WriteRecordError(c, err, "could not load storefront")
 		return

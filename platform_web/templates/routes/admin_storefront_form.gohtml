@@ -1,0 +1,59 @@
+{{ define "admin_storefront_form" }}
+{{ template "base_start" . }}
+<section class="mx-auto max-w-5xl px-6 py-10">
+    <div class="mb-8 flex items-center justify-between gap-4">
+        <div>
+            <p class="text-sm font-semibold uppercase tracking-wide text-cyan-300">Storefront setup</p>
+            <h1 class="mt-2 text-3xl font-bold tracking-normal text-white">{{ .Title }}</h1>
+        </div>
+        <a href="/admin/storefronts" class="rounded-md border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">Storefronts</a>
+    </div>
+    <form method="post" action="{{ .Action }}" class="grid gap-6 rounded-lg border border-white/10 bg-white/5 p-6 md:grid-cols-2">
+        {{ if .Error }}
+        <p class="md:col-span-2 rounded-md border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">{{ .Error }}</p>
+        {{ end }}
+        <label class="block text-sm font-medium text-slate-200" for="name">
+            Name
+            <input id="name" name="name" value="{{ .Storefront.Name }}" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+        </label>
+        <label class="block text-sm font-medium text-slate-200" for="domain">
+            Domain
+            <input id="domain" name="domain" value="{{ .Storefront.Domain }}" placeholder="example.com" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+        </label>
+        <label class="block text-sm font-medium text-slate-200" for="primary_country_id">
+            Primary country
+            <select id="primary_country_id" name="primary_country_id" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                <option value="">Select country</option>
+                {{ range .Countries }}
+                <option value="{{ .ID }}" {{ if eq $.Storefront.PrimaryCountryID .ID }}selected{{ end }}>{{ .Name }}</option>
+                {{ end }}
+            </select>
+        </label>
+        <label class="block text-sm font-medium text-slate-200" for="owner_id">
+            Owner
+            <select id="owner_id" name="owner_id" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                <option value="">No owner</option>
+                {{ range .Users }}
+                <option value="{{ .ID }}" {{ if eq $.OwnerID .ID }}selected{{ end }}>{{ .Email }}</option>
+                {{ end }}
+            </select>
+        </label>
+        <label class="md:col-span-2 block text-sm font-medium text-slate-200" for="description">
+            Description
+            <textarea id="description" name="description" rows="4" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">{{ .Storefront.Description }}</textarea>
+        </label>
+        <label class="block text-sm font-medium text-slate-200" for="logo_url">
+            Logo URL
+            <input id="logo_url" name="logo_url" value="{{ .Storefront.LogoURL }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+        </label>
+        <label class="mt-8 flex items-center gap-3 text-sm font-medium text-slate-200">
+            <input name="is_active" type="checkbox" {{ if .Storefront.IsActive }}checked{{ end }} class="h-4 w-4 rounded border-white/10 bg-slate-900 text-cyan-300">
+            Active
+        </label>
+        <div class="md:col-span-2 flex justify-end">
+            <button type="submit" class="rounded-md bg-cyan-300 px-4 py-2 font-semibold text-slate-950 hover:bg-cyan-200">Create storefront</button>
+        </div>
+    </form>
+</section>
+{{ template "base_end" . }}
+{{ end }}

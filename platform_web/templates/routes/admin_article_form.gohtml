@@ -38,6 +38,15 @@
 
             <div class="grid gap-6 md:grid-cols-2">
                 <div>
+                    <label class="block text-sm font-medium text-slate-200" for="storefront_id">Storefront</label>
+                    <select id="storefront_id" name="storefront_id" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                        <option value="">Select storefront</option>
+                        {{ range .Storefronts }}
+                        <option value="{{ .ID }}" {{ if eq $.Article.StorefrontID .ID }}selected{{ end }}>{{ .Name }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+                <div>
                     <label class="block text-sm font-medium text-slate-200" for="article_category_id">Article category</label>
                     <select id="article_category_id" name="article_category_id" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
                         <option value="">Select category</option>
@@ -46,6 +55,9 @@
                         {{ end }}
                     </select>
                 </div>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-2">
                 <div>
                     <label class="block text-sm font-medium text-slate-200" for="product_id">Referenced product</label>
                     <select id="product_id" name="product_id" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">

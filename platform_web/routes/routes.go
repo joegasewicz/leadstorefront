@@ -12,6 +12,7 @@ func Register(app *gin.Engine) {
 	products := &Products{API: api}
 	articles := &Articles{API: api}
 	admin := &Admin{API: api}
+	adminStorefronts := &AdminStorefronts{API: api}
 	adminArticles := &AdminArticles{API: api}
 	adminProducts := &AdminProducts{API: api}
 
@@ -41,6 +42,9 @@ func Register(app *gin.Engine) {
 	protected.Use(admin.Auth("admin", "editor"))
 	protected.GET("", admin.Get)
 	protected.PUT("", admin.Put)
+	protected.GET("/storefronts", adminStorefronts.Get)
+	protected.GET("/storefronts/create", adminStorefronts.Get)
+	protected.POST("/storefronts/create", adminStorefronts.Post)
 	protected.GET("/articles", adminArticles.Get)
 	protected.GET("/articles/create", adminArticles.Get)
 	protected.POST("/articles/create", adminArticles.Post)

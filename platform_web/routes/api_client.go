@@ -140,3 +140,7 @@ func apiPathID(id string) (string, bool) {
 	}
 	return id, true
 }
+
+func uintToString(value uint) string {
+	return strconv.Itoa(int(value))
+}

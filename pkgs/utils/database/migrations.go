@@ -19,13 +19,13 @@ func NewMigrate(db *gorm.DB) *Migrate {
 func (m *Migrate) Run() error {
 	if err := m.DB.AutoMigrate(
 		&models.Country{},
+		&models.Role{},
+		&models.User{},
+		&models.Storefront{},
 		&models.ProductCategory{},
 		&models.Product{},
 		&models.ArticleCategory{},
 		&models.Article{},
-		&models.Role{},
-		&models.User{},
-		&models.Storefront{},
 	); err != nil {
 		return err
 	}

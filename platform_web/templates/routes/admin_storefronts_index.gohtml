@@ -1,0 +1,42 @@
+{{ define "admin_storefronts_index" }}
+{{ template "base_start" . }}
+<section class="mx-auto max-w-6xl px-6 py-10">
+    <div class="mb-8 flex items-center justify-between gap-4">
+        <div>
+            <p class="text-sm font-semibold uppercase tracking-wide text-cyan-300">Platform</p>
+            <h1 class="mt-2 text-3xl font-bold tracking-normal text-white">Storefronts</h1>
+        </div>
+        <a href="/admin/storefronts/create" class="rounded-md bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-cyan-200">Create storefront</a>
+    </div>
+    {{ if .Flash }}
+    <p class="mb-6 rounded-md border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">{{ .Flash }}</p>
+    {{ end }}
+    <div class="overflow-hidden rounded-lg border border-white/10">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-white/5 text-slate-300">
+                <tr>
+                    <th class="px-4 py-3">Name</th>
+                    <th class="px-4 py-3">Domain</th>
+                    <th class="px-4 py-3">Primary country</th>
+                    <th class="px-4 py-3">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-white/10">
+                {{ range .Storefronts }}
+                <tr class="text-slate-200">
+                    <td class="px-4 py-3 font-medium">{{ .Name }}</td>
+                    <td class="px-4 py-3">{{ .Domain }}</td>
+                    <td class="px-4 py-3">{{ .PrimaryCountry.Name }}</td>
+                    <td class="px-4 py-3">{{ if .IsActive }}Active{{ else }}Paused{{ end }}</td>
+                </tr>
+                {{ else }}
+                <tr>
+                    <td colspan="4" class="px-4 py-8 text-center text-slate-400">No storefronts yet.</td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+</section>
+{{ template "base_end" . }}
+{{ end }}

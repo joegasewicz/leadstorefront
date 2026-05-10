@@ -33,6 +33,15 @@
 
             <div class="grid gap-6 md:grid-cols-2">
                 <div>
+                    <label class="block text-sm font-medium text-slate-200" for="storefront_id">Storefront</label>
+                    <select id="storefront_id" name="storefront_id" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                        <option value="">Select storefront</option>
+                        {{ range .Storefronts }}
+                        <option value="{{ .ID }}" {{ if eq $.Product.StorefrontID .ID }}selected{{ end }}>{{ .Name }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+                <div>
                     <label class="block text-sm font-medium text-slate-200" for="country_id">Country</label>
                     <select id="country_id" name="country_id" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
                         <option value="">Select country</option>
@@ -41,6 +50,9 @@
                         {{ end }}
                     </select>
                 </div>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-2">
                 <div>
                     <label class="block text-sm font-medium text-slate-200" for="category_id">Category</label>
                     <select id="category_id" name="category_id" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
