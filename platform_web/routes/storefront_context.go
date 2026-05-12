@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"leadstorefront/pkgs"
 	"leadstorefront/pkgs/models"
 	"net/url"
 	"strings"
@@ -19,6 +20,7 @@ func currentStorefront(c *gin.Context, api *APIClient) (models.Storefront, bool)
 		if response.Storefront.ID == 0 {
 			return models.Storefront{}, false
 		}
+		normalizeStorefrontAssetURLs(&response.Storefront)
 		return response.Storefront, true
 	}
 
@@ -36,7 +38,31 @@ func currentStorefront(c *gin.Context, api *APIClient) (models.Storefront, bool)
 	if response.Storefront.ID == 0 {
 		return models.Storefront{}, false
 	}
+	normalizeStorefrontAssetURLs(&response.Storefront)
 	return response.Storefront, true
+}
+
+func normalizeStorefrontAssetURLs(storefront *models.Storefront) {
+	if storefront == nil {
+		return
+	}
+	if strings.HasPrefix(storefront.LogoURL, "/uploads/") {
+		storefront.LogoURL = platformWebOrigin() + storefront.LogoURL
+	}
+}
+
+func platformWebOrigin() string {
+	domain := strings.TrimSpace(pkgs.Config.Web.Domain)
+	if domain == "" {
+		domain = "localhost"
+	}
+	if strings.HasPrefix(domain, "http://") || strings.HasPrefix(domain, "https://") {
+		return strings.TrimRight(domain, "/")
+	}
+	if domain == "localhost" || domain == "127.0.0.1" {
+		return "http://" + domain + pkgs.Config.Web.Addr
+	}
+	return "https://" + domain
 }
 
 func storefrontIDFromPath(c *gin.Context) string {

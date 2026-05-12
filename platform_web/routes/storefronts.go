@@ -32,6 +32,7 @@ func (storefronts *Storefronts) Get(c *gin.Context) {
 	}
 
 	storefront := response.Storefront
+	normalizeStorefrontAssetURLs(&storefront)
 	if redirectURL, ok := storefrontCustomDomainURL(c, storefront); ok {
 		c.Redirect(http.StatusMovedPermanently, redirectURL)
 		return

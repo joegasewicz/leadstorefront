@@ -2,6 +2,7 @@ package routes
 
 import (
 	"errors"
+	"leadstorefront/pkgs"
 	"leadstorefront/pkgs/models"
 	"leadstorefront/pkgs/utils"
 	"net/http"
@@ -407,8 +408,22 @@ func saveStorefrontNavLogo(c *gin.Context, storefront *models.Storefront) (bool,
 }
 
 func storefrontLogoManager() (*entityfileuploader.FileManager, error) {
-	fileUpload := entityfileuploader.FileUpload{UploadDir: "uploads", MaxFileSize: 5, FileTypes: []string{"jpg", "jpeg", "png", "svg", "webp"}, URL: ""}
+	fileUpload := entityfileuploader.FileUpload{UploadDir: "uploads", MaxFileSize: 5, FileTypes: []string{"jpg", "jpeg", "png", "svg", "webp"}, URL: platformWebOrigin()}
 	return fileUpload.Init("storefronts")
+}
+
+func platformWebOrigin() string {
+	domain := strings.TrimSpace(pkgs.Config.Web.Domain)
+	if domain == "" {
+		domain = "localhost"
+	}
+	if strings.HasPrefix(domain, "http://") || strings.HasPrefix(domain, "https://") {
+		return strings.TrimRight(domain, "/")
+	}
+	if domain == "localhost" || domain == "127.0.0.1" {
+		return "http://" + domain + pkgs.Config.Web.Addr
+	}
+	return "https://" + domain
 }
 
 func isAllowedStorefrontLogo(fileName string) bool {
