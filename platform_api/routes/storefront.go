@@ -131,10 +131,23 @@ func (storefront *Storefront) postNavLogo(c *gin.Context) {
 		utils.WriteRecordError(c, err, "could not load storefront")
 		return
 	}
+	changed := false
+	if logoWidth := strings.TrimSpace(c.PostForm("logo_width_px")); logoWidth != "" {
+		parsed, err := strconv.Atoi(logoWidth)
+		if err != nil || parsed <= 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "nav logo width must be a positive whole number"})
+			return
+		}
+		record.LogoWidthPx = parsed
+		changed = true
+	}
 	if uploaded, err := saveStorefrontNavLogo(c, &record); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	} else if uploaded {
+		changed = true
+	}
+	if changed {
 		_ = storefront.DB.Save(&record).Error
 	}
 	c.JSON(http.StatusOK, gin.H{"storefront": record})
@@ -351,6 +364,7 @@ func storefrontUpdateMap(storefront models.Storefront) map[string]interface{} {
 		"domain":             storefront.Domain,
 		"description":        storefront.Description,
 		"logo_url":           storefront.LogoURL,
+		"logo_width_px":      storefront.LogoWidthPx,
 		"is_active":          storefront.IsActive,
 		"primary_country_id": storefront.PrimaryCountryID,
 		"owner_id":           storefront.OwnerID,

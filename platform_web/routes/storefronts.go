@@ -15,6 +15,9 @@ type Storefronts struct {
 
 func (storefronts *Storefronts) Get(c *gin.Context) {
 	country := c.Param("country")
+	if country == "" {
+		country = middleware.DefaultCountryCode
+	}
 	if !middleware.IsSupportedCountryCode(country) {
 		c.Redirect(http.StatusFound, "/"+middleware.DefaultCountryCode+"/storefronts/"+c.Param("id"))
 		return
@@ -46,6 +49,9 @@ func renderStorefront(c *gin.Context, status int, country string, storefront mod
 }
 
 func storefrontCustomDomainURL(c *gin.Context, storefront models.Storefront) (string, bool) {
+	if isLocalHost(requestHost(c.Request.Host)) {
+		return "", false
+	}
 	domain := requestHost(storefront.Domain)
 	if domain == "" || isPlatformHost(domain) || requestHost(c.Request.Host) == domain {
 		return "", false
@@ -54,6 +60,15 @@ func storefrontCustomDomainURL(c *gin.Context, storefront models.Storefront) (st
 		return "", false
 	}
 	return "https://" + strings.TrimSuffix(domain, "/"), true
+}
+
+func isLocalHost(host string) bool {
+	switch host {
+	case "localhost", "127.0.0.1", "::1":
+		return true
+	default:
+		return false
+	}
 }
 
 func (storefronts *Storefronts) Post(c *gin.Context) {

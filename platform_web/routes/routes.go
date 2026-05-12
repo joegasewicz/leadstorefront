@@ -28,6 +28,7 @@ func Register(app *gin.Engine) {
 	app.DELETE("/domain-check", domainCheck.Delete)
 
 	app.GET("/", home.Redirect)
+	app.GET("/storefronts/:id", storefronts.Get)
 	app.GET("/:country", home.Get)
 	app.GET("/:country/storefronts/:id", storefronts.Get)
 

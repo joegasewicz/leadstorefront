@@ -4,7 +4,7 @@
         <a href="/" class="navbar-brand" aria-label="{{ with .Storefront }}{{ if .Name }}{{ .Name }} home{{ else }}LeadStorefront home{{ end }}{{ else }}LeadStorefront home{{ end }}">
             {{ with .Storefront }}
             {{ if .LogoURL }}
-            <img src="{{ .LogoURL }}" alt="{{ .Name }}" width="305" height="31">
+            <img src="{{ .LogoURL }}" alt="{{ .Name }}" style="width: {{ if .LogoWidthPx }}{{ .LogoWidthPx }}{{ else }}305{{ end }}px; height: auto;">
             {{ else }}
             <img src="/imgs/leadstorefront-logo.png" alt="LeadStorefront" width="305" height="31">
             {{ end }}

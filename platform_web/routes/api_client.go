@@ -130,30 +130,36 @@ func (client *APIClient) ReplaceStorefrontNavLogo(c *gin.Context, storefrontID u
 
 func (client *APIClient) uploadStorefrontNavLogo(c *gin.Context, storefrontID uint, required bool) error {
 	multipartRequest := multipart_requests.MultipartRequest{TempPath: "temp"}
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	if logoWidth := c.PostForm("logo_width_px"); logoWidth != "" {
+		if err := writer.WriteField("logo_width_px", logoWidth); err != nil {
+			return err
+		}
+	}
+
 	fileName, file, err := multipartRequest.GetFile(c.Request, "nav_logo")
 	if err != nil {
 		if err == http.ErrMissingFile {
 			if required {
 				return fmt.Errorf("nav logo is required")
 			}
-			return nil
+			return client.postMultipart(c, fmt.Sprintf("/admin/storefronts/%d/nav-logo", storefrontID), body, writer)
 		}
 		return err
 	}
 	defer file.Close()
-	return client.uploadMultipart(c, fmt.Sprintf("/admin/storefronts/%d/nav-logo", storefrontID), file, *fileName, "nav_logo")
-}
-
-func (client *APIClient) uploadMultipart(c *gin.Context, path string, file multipart.File, fileName string, field string) error {
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile(field, fileName)
+	part, err := writer.CreateFormFile("nav_logo", *fileName)
 	if err != nil {
 		return err
 	}
 	if _, err := io.Copy(part, file); err != nil {
 		return err
 	}
+	return client.postMultipart(c, fmt.Sprintf("/admin/storefronts/%d/nav-logo", storefrontID), body, writer)
+}
+
+func (client *APIClient) postMultipart(c *gin.Context, path string, body *bytes.Buffer, writer *multipart.Writer) error {
 	if err := writer.Close(); err != nil {
 		return err
 	}
