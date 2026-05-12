@@ -16,7 +16,10 @@ func main() {
 	app.Use(middleware.Sessions())
 	app.Static("/assets", "platform_web/static/assets")
 	app.Static("/imgs", "platform_web/static/imgs")
-	app.Static("/uploads", "uploads")
+	app.GET("/uploads", func(c *gin.Context) {
+		c.Redirect(301, "/uploads/")
+	})
+	app.StaticFS("/uploads", gin.Dir("uploads", true))
 	app.LoadHTMLFiles(
 		"platform_web/templates/base.gohtml",
 		"platform_web/templates/partials/meta-tags.gohtml",
