@@ -34,11 +34,11 @@
 {{ end }}
 
 <section class="mx-auto grid max-w-5xl gap-6 px-6 py-12 md:grid-cols-2">
-    <a class="rounded-lg border border-white/10 bg-white/5 p-6 hover:border-sky-300/50" href="/{{ .Country }}/products">
+    <a class="rounded-lg border border-white/10 bg-white/5 p-6 hover:border-sky-300/50" href="{{ .StorefrontPath }}/products">
         <h3 class="text-2xl font-bold tracking-normal text-white">Products</h3>
         <p class="mt-3 text-sm leading-6 text-slate-300">Browse the products featured by this storefront.</p>
     </a>
-    <a class="rounded-lg border border-white/10 bg-white/5 p-6 hover:border-sky-300/50" href="/{{ .Country }}/articles">
+    <a class="rounded-lg border border-white/10 bg-white/5 p-6 hover:border-sky-300/50" href="{{ .StorefrontPath }}/articles">
         <h3 class="text-2xl font-bold tracking-normal text-white">Articles</h3>
         <p class="mt-3 text-sm leading-6 text-slate-300">Read the latest articles and guides from this storefront.</p>
     </a>

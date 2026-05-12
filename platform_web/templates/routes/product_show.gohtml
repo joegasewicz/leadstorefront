@@ -3,7 +3,7 @@
 <section class="bg-slate-950">
     <div class="mx-auto grid max-w-6xl gap-10 px-6 py-12 lg:grid-cols-[1fr_0.9fr] lg:items-start">
         <div>
-            <a href="/{{ .Country }}/products" class="text-sm font-semibold text-cyan-300 hover:text-cyan-200">Products</a>
+            <a href="{{ .ProductsPath }}" class="text-sm font-semibold text-cyan-300 hover:text-cyan-200">Products</a>
             <div class="mt-6 flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
                 <span>{{ .Product.Category.Name }}</span>
                 <span>{{ .Product.RetailerName }}</span>
@@ -45,7 +45,7 @@
                 {{ else }}
                 <a href="{{ .Product.ProductURL }}" class="rounded-md bg-cyan-300 px-5 py-3 font-semibold text-slate-950">View deal</a>
                 {{ end }}
-                <a href="/{{ .Country }}/products" class="rounded-md border border-white/10 px-5 py-3 font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">Back to products</a>
+                <a href="{{ .ProductsPath }}" class="rounded-md border border-white/10 px-5 py-3 font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">Back to products</a>
             </div>
         </div>
 

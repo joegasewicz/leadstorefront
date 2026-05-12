@@ -23,7 +23,18 @@ func (articles *Articles) Get(c *gin.Context) {
 
 func (articles *Articles) Index(c *gin.Context) {
 	country := c.Param("country")
+	storefront, hasStorefront := currentStorefront(c, articles.API)
+	if country == "" && hasStorefront {
+		country = storefront.PrimaryCountry.Code
+	}
+	if country == "" {
+		country = middleware.DefaultCountryCode
+	}
 	if !middleware.IsSupportedCountryCode(country) {
+		if storefrontIDFromPath(c) != "" {
+			c.Redirect(http.StatusFound, "/"+middleware.DefaultCountryCode+"/storefronts/"+storefrontIDFromPath(c)+"/articles")
+			return
+		}
 		c.Redirect(http.StatusFound, "/"+middleware.DefaultCountryCode+"/articles")
 		return
 	}
@@ -32,8 +43,10 @@ func (articles *Articles) Index(c *gin.Context) {
 		Articles []models.Article `json:"articles"`
 	}
 	path := "/" + country + "/articles"
-	if storefront, ok := currentStorefront(c, articles.API); ok {
+	articlesPath := "/" + country + "/articles"
+	if hasStorefront {
 		path += "?storefront_id=" + url.QueryEscape(uintToString(storefront.ID))
+		articlesPath = storefrontBasePath(c, country, storefront) + "/articles"
 	}
 	if err := articles.API.Get(c, path, &response); err != nil {
 		c.String(http.StatusInternalServerError, "could not load articles")
@@ -41,15 +54,28 @@ func (articles *Articles) Index(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "articles_index", gin.H{
-		"Title":    "Articles | LeadStorefront",
-		"Country":  country,
-		"Articles": response.Articles,
+		"Title":        "Articles | LeadStorefront",
+		"Country":      country,
+		"Articles":     response.Articles,
+		"ArticlesPath": articlesPath,
+		"Storefront":   storefront,
 	})
 }
 
 func (articles *Articles) Show(c *gin.Context) {
 	country := c.Param("country")
+	storefront, hasStorefront := currentStorefront(c, articles.API)
+	if country == "" && hasStorefront {
+		country = storefront.PrimaryCountry.Code
+	}
+	if country == "" {
+		country = middleware.DefaultCountryCode
+	}
 	if !middleware.IsSupportedCountryCode(country) {
+		if storefrontIDFromPath(c) != "" {
+			c.Redirect(http.StatusFound, "/"+middleware.DefaultCountryCode+"/storefronts/"+storefrontIDFromPath(c)+"/articles/"+c.Param("slug"))
+			return
+		}
 		c.Redirect(http.StatusFound, "/"+middleware.DefaultCountryCode+"/articles/"+c.Param("slug"))
 		return
 	}
@@ -58,8 +84,10 @@ func (articles *Articles) Show(c *gin.Context) {
 		Article models.Article `json:"article"`
 	}
 	path := "/" + country + "/articles/" + url.PathEscape(c.Param("slug"))
-	if storefront, ok := currentStorefront(c, articles.API); ok {
+	articlesPath := "/" + country + "/articles"
+	if hasStorefront {
 		path += "?storefront_id=" + url.QueryEscape(uintToString(storefront.ID))
+		articlesPath = storefrontBasePath(c, country, storefront) + "/articles"
 	}
 	if err := articles.API.Get(c, path, &response); err != nil {
 		c.String(http.StatusInternalServerError, "could not load article")
@@ -73,9 +101,11 @@ func (articles *Articles) Show(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "article_show", gin.H{
-		"Title":   title,
-		"Country": country,
-		"Article": article,
+		"Title":        title,
+		"Country":      country,
+		"Article":      article,
+		"ArticlesPath": articlesPath,
+		"Storefront":   storefront,
 	})
 }
 

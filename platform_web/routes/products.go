@@ -23,7 +23,18 @@ func (products *Products) Get(c *gin.Context) {
 
 func (products *Products) Index(c *gin.Context) {
 	countryCode := c.Param("country")
+	storefront, hasStorefront := currentStorefront(c, products.API)
+	if countryCode == "" && hasStorefront {
+		countryCode = storefront.PrimaryCountry.Code
+	}
+	if countryCode == "" {
+		countryCode = middleware.DefaultCountryCode
+	}
 	if !middleware.IsSupportedCountryCode(countryCode) {
+		if storefrontIDFromPath(c) != "" {
+			c.Redirect(http.StatusFound, "/"+middleware.DefaultCountryCode+"/storefronts/"+storefrontIDFromPath(c)+"/products")
+			return
+		}
 		c.Redirect(http.StatusFound, "/"+middleware.DefaultCountryCode+"/products")
 		return
 	}
@@ -32,8 +43,10 @@ func (products *Products) Index(c *gin.Context) {
 		Products []models.Product `json:"products"`
 	}
 	path := "/" + countryCode + "/products"
-	if storefront, ok := currentStorefront(c, products.API); ok {
+	productsPath := "/" + countryCode + "/products"
+	if hasStorefront {
 		path += "?storefront_id=" + url.QueryEscape(uintToString(storefront.ID))
+		productsPath = storefrontBasePath(c, countryCode, storefront) + "/products"
 	}
 	if err := products.API.Get(c, path, &response); err != nil {
 		c.String(http.StatusInternalServerError, "could not load products")
@@ -41,15 +54,28 @@ func (products *Products) Index(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "products_index", gin.H{
-		"Title":    "Products | LeadStorefront",
-		"Country":  countryCode,
-		"Products": response.Products,
+		"Title":        "Products | LeadStorefront",
+		"Country":      countryCode,
+		"Products":     response.Products,
+		"ProductsPath": productsPath,
+		"Storefront":   storefront,
 	})
 }
 
 func (products *Products) Show(c *gin.Context) {
 	countryCode := c.Param("country")
+	storefront, hasStorefront := currentStorefront(c, products.API)
+	if countryCode == "" && hasStorefront {
+		countryCode = storefront.PrimaryCountry.Code
+	}
+	if countryCode == "" {
+		countryCode = middleware.DefaultCountryCode
+	}
 	if !middleware.IsSupportedCountryCode(countryCode) {
+		if storefrontIDFromPath(c) != "" {
+			c.Redirect(http.StatusFound, "/"+middleware.DefaultCountryCode+"/storefronts/"+storefrontIDFromPath(c)+"/products/"+c.Param("slug"))
+			return
+		}
 		c.Redirect(http.StatusFound, "/"+middleware.DefaultCountryCode+"/products/"+c.Param("slug"))
 		return
 	}
@@ -58,8 +84,10 @@ func (products *Products) Show(c *gin.Context) {
 		Product models.Product `json:"product"`
 	}
 	path := "/" + countryCode + "/products/" + url.PathEscape(c.Param("slug"))
-	if storefront, ok := currentStorefront(c, products.API); ok {
+	productsPath := "/" + countryCode + "/products"
+	if hasStorefront {
 		path += "?storefront_id=" + url.QueryEscape(uintToString(storefront.ID))
+		productsPath = storefrontBasePath(c, countryCode, storefront) + "/products"
 	}
 	if err := products.API.Get(c, path, &response); err != nil {
 		c.String(http.StatusInternalServerError, "could not load product")
@@ -68,9 +96,11 @@ func (products *Products) Show(c *gin.Context) {
 	product := response.Product
 
 	c.HTML(http.StatusOK, "product_show", gin.H{
-		"Title":   product.Name + " | LeadStorefront",
-		"Country": countryCode,
-		"Product": product,
+		"Title":        product.Name + " | LeadStorefront",
+		"Country":      countryCode,
+		"Product":      product,
+		"ProductsPath": productsPath,
+		"Storefront":   storefront,
 	})
 }
 

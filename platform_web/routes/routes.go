@@ -29,8 +29,16 @@ func Register(app *gin.Engine) {
 
 	app.GET("/", home.Redirect)
 	app.GET("/storefronts/:id", storefronts.Get)
+	app.GET("/storefronts/:id/articles", articles.Get)
+	app.GET("/storefronts/:id/articles/:slug", articles.Get)
+	app.GET("/storefronts/:id/products", products.Get)
+	app.GET("/storefronts/:id/products/:slug", products.Get)
 	app.GET("/:country", home.Get)
 	app.GET("/:country/storefronts/:id", storefronts.Get)
+	app.GET("/:country/storefronts/:id/articles", articles.Get)
+	app.GET("/:country/storefronts/:id/articles/:slug", articles.Get)
+	app.GET("/:country/storefronts/:id/products", products.Get)
+	app.GET("/:country/storefronts/:id/products/:slug", products.Get)
 
 	app.GET("/:country/articles", articles.Get)
 	app.GET("/:country/articles/:slug", articles.Get)

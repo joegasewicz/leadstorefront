@@ -41,10 +41,12 @@ func (storefronts *Storefronts) Get(c *gin.Context) {
 }
 
 func renderStorefront(c *gin.Context, status int, country string, storefront models.Storefront) {
+	storefrontPath := storefrontBasePath(c, country, storefront)
 	c.HTML(status, "storefront_show", gin.H{
-		"Title":      storefront.Name + " | LeadStorefront",
-		"Country":    country,
-		"Storefront": storefront,
+		"Title":          storefront.Name + " | LeadStorefront",
+		"Country":        country,
+		"Storefront":     storefront,
+		"StorefrontPath": storefrontPath,
 	})
 }
 
