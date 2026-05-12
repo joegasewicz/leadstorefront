@@ -33,6 +33,10 @@ func (storefronts *AdminStorefronts) Get(c *gin.Context) {
 }
 
 func (storefronts *AdminStorefronts) Post(c *gin.Context) {
+	if strings.Contains(c.FullPath(), "/content") {
+		storefronts.UpdateContent(c)
+		return
+	}
 	if strings.Contains(c.FullPath(), "/nav-logo") {
 		storefronts.UploadNavLogo(c)
 		return
@@ -202,6 +206,32 @@ func (storefronts *AdminStorefronts) UploadNavLogo(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/admin/storefronts/"+id)
 }
 
+func (storefronts *AdminStorefronts) UpdateContent(c *gin.Context) {
+	id, ok := apiPathID(c.Param("id"))
+	if !ok {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+	storefront, ok := storefronts.find(c, id)
+	if !ok {
+		return
+	}
+	storefront.HeroTitle = strings.TrimSpace(c.PostForm("hero_title"))
+	storefront.HeroSubtitle = strings.TrimSpace(c.PostForm("hero_subtitle"))
+	storefront.HeroImageURL = strings.TrimSpace(c.PostForm("hero_image_url"))
+	storefront.AboutTitle = strings.TrimSpace(c.PostForm("about_title"))
+	storefront.AboutBody = strings.TrimSpace(c.PostForm("about_body"))
+
+	if err := storefronts.API.Put(c, "/admin/storefronts/"+id+"/edit", storefrontPayload(storefront), nil); err != nil {
+		_ = middleware.SetFlash(c, "Could not update the storefront content.")
+		c.Redirect(http.StatusFound, "/admin/storefronts/"+id)
+		return
+	}
+
+	_ = middleware.SetFlash(c, "Storefront content updated.")
+	c.Redirect(http.StatusFound, "/admin/storefronts/"+id)
+}
+
 func (storefronts *AdminStorefronts) Put(c *gin.Context) {
 	c.AbortWithStatus(http.StatusMethodNotAllowed)
 }
@@ -338,6 +368,11 @@ func (storefronts *AdminStorefronts) storefrontFromRequest(c *gin.Context) (mode
 		Description:      strings.TrimSpace(c.PostForm("description")),
 		LogoURL:          strings.TrimSpace(c.PostForm("logo_url")),
 		LogoWidthPx:      logoWidthPx,
+		HeroTitle:        strings.TrimSpace(c.PostForm("hero_title")),
+		HeroSubtitle:     strings.TrimSpace(c.PostForm("hero_subtitle")),
+		HeroImageURL:     strings.TrimSpace(c.PostForm("hero_image_url")),
+		AboutTitle:       strings.TrimSpace(c.PostForm("about_title")),
+		AboutBody:        strings.TrimSpace(c.PostForm("about_body")),
 		IsActive:         c.PostForm("is_active") == "on",
 		PrimaryCountryID: countryID,
 		OwnerID:          ownerID,
@@ -352,6 +387,11 @@ func storefrontPayload(storefront models.Storefront) map[string]interface{} {
 		"description":        storefront.Description,
 		"logo_url":           storefront.LogoURL,
 		"logo_width_px":      storefront.LogoWidthPx,
+		"hero_title":         storefront.HeroTitle,
+		"hero_subtitle":      storefront.HeroSubtitle,
+		"hero_image_url":     storefront.HeroImageURL,
+		"about_title":        storefront.AboutTitle,
+		"about_body":         storefront.AboutBody,
 		"is_active":          storefront.IsActive,
 		"primary_country_id": storefront.PrimaryCountryID,
 		"owner_id":           uintPtrPayload(storefront.OwnerID),
