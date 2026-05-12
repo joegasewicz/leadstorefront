@@ -59,9 +59,9 @@ func TestRegisteredWebRoutes(t *testing.T) {
 		{
 			name:     "unsupported storefront country redirects to default country storefront",
 			method:   http.MethodGet,
-			path:     "/fr/storefronts/demo",
+			path:     "/fr/storefronts/2",
 			expected: http.StatusFound,
-			location: "/uk/storefronts/demo",
+			location: "/uk/storefronts/2",
 		},
 		{
 			name:     "unsupported article country redirects to default country articles",
@@ -132,13 +132,13 @@ func TestAPIClientURL(t *testing.T) {
 
 func TestStorefrontCustomDomainURL(t *testing.T) {
 	router := gin.New()
-	router.GET("/:country/storefronts/:slug", func(c *gin.Context) {
+	router.GET("/:country/storefronts/:id", func(c *gin.Context) {
 		redirectURL, ok := storefrontCustomDomainURL(c, models.Storefront{Domain: "lankanote.com"})
 		assert.True(t, ok)
 		assert.Equal(t, "https://lankanote.com", redirectURL)
 	})
 
-	response := performWebRequest(router, http.MethodGet, "/uk/storefronts/lanka-note", "", map[string]string{
+	response := performWebRequest(router, http.MethodGet, "/uk/storefronts/2", "", map[string]string{
 		"Host": "leadstorefront.com",
 	})
 
@@ -147,12 +147,12 @@ func TestStorefrontCustomDomainURL(t *testing.T) {
 
 func TestStorefrontCustomDomainURLIgnoresCurrentCustomHost(t *testing.T) {
 	router := gin.New()
-	router.GET("/:country/storefronts/:slug", func(c *gin.Context) {
+	router.GET("/:country/storefronts/:id", func(c *gin.Context) {
 		_, ok := storefrontCustomDomainURL(c, models.Storefront{Domain: "lankanote.com"})
 		assert.False(t, ok)
 	})
 
-	response := performWebRequest(router, http.MethodGet, "/uk/storefronts/lanka-note", "", map[string]string{
+	response := performWebRequest(router, http.MethodGet, "/uk/storefronts/2", "", map[string]string{
 		"Host": "lankanote.com",
 	})
 

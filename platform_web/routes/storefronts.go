@@ -4,7 +4,6 @@ import (
 	"leadstorefront/pkgs/middleware"
 	"leadstorefront/pkgs/models"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -17,14 +16,14 @@ type Storefronts struct {
 func (storefronts *Storefronts) Get(c *gin.Context) {
 	country := c.Param("country")
 	if !middleware.IsSupportedCountryCode(country) {
-		c.Redirect(http.StatusFound, "/"+middleware.DefaultCountryCode+"/storefronts/"+c.Param("slug"))
+		c.Redirect(http.StatusFound, "/"+middleware.DefaultCountryCode+"/storefronts/"+c.Param("id"))
 		return
 	}
 
 	var response struct {
 		Storefront models.Storefront `json:"storefront"`
 	}
-	if err := storefronts.API.Get(c, "/storefronts/"+url.PathEscape(c.Param("slug")), &response); err != nil {
+	if err := storefronts.API.Get(c, "/storefronts/"+c.Param("id"), &response); err != nil {
 		c.String(http.StatusInternalServerError, "could not load storefront")
 		return
 	}

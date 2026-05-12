@@ -33,6 +33,10 @@ func (storefronts *AdminStorefronts) Get(c *gin.Context) {
 }
 
 func (storefronts *AdminStorefronts) Post(c *gin.Context) {
+	if strings.Contains(c.FullPath(), "/nav-logo") {
+		storefronts.UploadNavLogo(c)
+		return
+	}
 	if strings.Contains(c.FullPath(), "/products") {
 		storefronts.AssignProduct(c)
 		return
@@ -132,6 +136,10 @@ func (storefronts *AdminStorefronts) CreatePost(c *gin.Context) {
 		storefronts.renderForm(c, http.StatusBadRequest, "Create storefront", "/admin/storefronts/create", storefront, "Could not create the storefront.")
 		return
 	}
+	if err := storefronts.API.UploadStorefrontNavLogo(c, response.Storefront.ID); err != nil {
+		storefronts.renderForm(c, http.StatusBadRequest, "Create storefront", "/admin/storefronts/create", storefront, "Could not upload the storefront nav logo.")
+		return
+	}
 
 	_ = middleware.SetFlash(c, "Storefront created.")
 	c.Redirect(http.StatusFound, "/admin/storefronts")
@@ -176,6 +184,21 @@ func (storefronts *AdminStorefronts) AssignArticle(c *gin.Context) {
 		return
 	}
 	_ = middleware.SetFlash(c, "Article assigned.")
+	c.Redirect(http.StatusFound, "/admin/storefronts/"+id)
+}
+
+func (storefronts *AdminStorefronts) UploadNavLogo(c *gin.Context) {
+	id, ok := apiPathID(c.Param("id"))
+	if !ok {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+	if err := storefronts.API.ReplaceStorefrontNavLogo(c, uintIDFromPath(id)); err != nil {
+		_ = middleware.SetFlash(c, "Could not upload the nav logo.")
+		c.Redirect(http.StatusFound, "/admin/storefronts/"+id)
+		return
+	}
+	_ = middleware.SetFlash(c, "Nav logo uploaded.")
 	c.Redirect(http.StatusFound, "/admin/storefronts/"+id)
 }
 

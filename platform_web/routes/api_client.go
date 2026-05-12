@@ -1,11 +1,14 @@
 package routes
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"leadstorefront/pkgs"
 	"leadstorefront/pkgs/middleware"
 	"leadstorefront/pkgs/utils"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 
@@ -113,6 +116,64 @@ func (client *APIClient) UploadArticleImage(c *gin.Context, articleID uint) erro
 	defer resp.Body.Close()
 	if resp.StatusCode >= http.StatusBadRequest {
 		return fmt.Errorf("api returned %s", resp.Status)
+	}
+	return nil
+}
+
+func (client *APIClient) UploadStorefrontNavLogo(c *gin.Context, storefrontID uint) error {
+	return client.uploadStorefrontNavLogo(c, storefrontID, false)
+}
+
+func (client *APIClient) ReplaceStorefrontNavLogo(c *gin.Context, storefrontID uint) error {
+	return client.uploadStorefrontNavLogo(c, storefrontID, true)
+}
+
+func (client *APIClient) uploadStorefrontNavLogo(c *gin.Context, storefrontID uint, required bool) error {
+	multipartRequest := multipart_requests.MultipartRequest{TempPath: "temp"}
+	fileName, file, err := multipartRequest.GetFile(c.Request, "nav_logo")
+	if err != nil {
+		if err == http.ErrMissingFile {
+			if required {
+				return fmt.Errorf("nav logo is required")
+			}
+			return nil
+		}
+		return err
+	}
+	defer file.Close()
+	return client.uploadMultipart(c, fmt.Sprintf("/admin/storefronts/%d/nav-logo", storefrontID), file, *fileName, "nav_logo")
+}
+
+func (client *APIClient) uploadMultipart(c *gin.Context, path string, file multipart.File, fileName string, field string) error {
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile(field, fileName)
+	if err != nil {
+		return err
+	}
+	if _, err := io.Copy(part, file); err != nil {
+		return err
+	}
+	if err := writer.Close(); err != nil {
+		return err
+	}
+
+	request, err := http.NewRequest(http.MethodPost, client.URL(path), body)
+	if err != nil {
+		return err
+	}
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+	if userID, ok := middleware.CurrentUserID(c); ok {
+		request.Header.Set("Authorization", utils.SignedUserAuthToken(userID))
+	}
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+	if response.StatusCode >= http.StatusBadRequest {
+		return fmt.Errorf("api returned %s", response.Status)
 	}
 	return nil
 }

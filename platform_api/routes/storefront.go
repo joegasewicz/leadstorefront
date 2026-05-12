@@ -5,9 +5,11 @@ import (
 	"leadstorefront/pkgs/models"
 	"leadstorefront/pkgs/utils"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
 
+	entityfileuploader "codeberg.org/joegasewicz/entity-file-uploader"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -27,10 +29,6 @@ func (storefront *Storefront) Get(c *gin.Context) {
 	}
 	if c.Param("id") != "" {
 		storefront.getByID(c)
-		return
-	}
-	if c.Param("slug") != "" {
-		storefront.getActiveBySlug(c)
 		return
 	}
 	storefront.getAdminList(c)
@@ -54,6 +52,10 @@ func (storefront *Storefront) getOptions(c *gin.Context) {
 }
 
 func (storefront *Storefront) Post(c *gin.Context) {
+	if strings.Contains(c.FullPath(), "/nav-logo") {
+		storefront.postNavLogo(c)
+		return
+	}
 	if strings.Contains(c.FullPath(), "/products") {
 		storefront.postProduct(c)
 		return
@@ -112,6 +114,30 @@ func (storefront *Storefront) restoreDeleted(c *gin.Context, record models.Store
 		return models.Storefront{}, true
 	}
 	return existing, true
+}
+
+func (storefront *Storefront) postNavLogo(c *gin.Context) {
+	storefrontID := uintPathID(c.Param("id"))
+	if storefrontID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		return
+	}
+	if ok := storefront.authorizeStorefrontID(c, storefrontID); !ok {
+		return
+	}
+
+	var record models.Storefront
+	if err := storefront.DB.First(&record, storefrontID).Error; err != nil {
+		utils.WriteRecordError(c, err, "could not load storefront")
+		return
+	}
+	if uploaded, err := saveStorefrontNavLogo(c, &record); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	} else if uploaded {
+		_ = storefront.DB.Save(&record).Error
+	}
+	c.JSON(http.StatusOK, gin.H{"storefront": record})
 }
 
 func (storefront *Storefront) postProduct(c *gin.Context) {
@@ -233,6 +259,10 @@ func (storefront *Storefront) getAdminList(c *gin.Context) {
 }
 
 func (storefront *Storefront) getByID(c *gin.Context) {
+	if !strings.HasPrefix(c.FullPath(), utils.APIVersion+"/admin/") {
+		storefront.getActiveByID(c)
+		return
+	}
 	user, ok := currentAPIUser(c, storefront.DB)
 	if !ok {
 		return
@@ -243,6 +273,16 @@ func (storefront *Storefront) getByID(c *gin.Context) {
 		query = query.Where("owner_id = ?", user.ID)
 	}
 	if err := query.First(&record, c.Param("id")).Error; err != nil {
+		utils.WriteRecordError(c, err, "could not load storefront")
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"storefront": record})
+}
+
+func (storefront *Storefront) getActiveByID(c *gin.Context) {
+	var record models.Storefront
+	err := storefront.DB.Preload("PrimaryCountry").Where("id = ? AND is_active = ?", c.Param("id"), true).First(&record).Error
+	if err != nil {
 		utils.WriteRecordError(c, err, "could not load storefront")
 		return
 	}
@@ -267,16 +307,6 @@ func (storefront *Storefront) authorizeStorefrontID(c *gin.Context, storefrontID
 		return false
 	}
 	return true
-}
-
-func (storefront *Storefront) getActiveBySlug(c *gin.Context) {
-	var record models.Storefront
-	err := storefront.DB.Preload("PrimaryCountry").Where("slug = ? AND is_active = ?", c.Param("slug"), true).First(&record).Error
-	if err != nil {
-		utils.WriteRecordError(c, err, "could not load storefront")
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"storefront": record})
 }
 
 func (storefront *Storefront) getActiveByDomain(c *gin.Context) {
@@ -325,6 +355,55 @@ func storefrontUpdateMap(storefront models.Storefront) map[string]interface{} {
 		"primary_country_id": storefront.PrimaryCountryID,
 		"owner_id":           storefront.OwnerID,
 	}
+}
+
+func saveStorefrontNavLogo(c *gin.Context, storefront *models.Storefront) (bool, error) {
+	file, header, err := c.Request.FormFile("nav_logo")
+	if err != nil {
+		if errors.Is(err, http.ErrMissingFile) {
+			return false, nil
+		}
+		return false, err
+	}
+	_ = file.Close()
+	if header.Filename == "" {
+		return false, nil
+	}
+	if !isSafeStorefrontLogoName(header.Filename) {
+		return false, errors.New("nav logo filename is invalid")
+	}
+	if !isAllowedStorefrontLogo(header.Filename) {
+		return false, errors.New("nav logo must be a JPG, JPEG, PNG, SVG, or WebP file")
+	}
+	manager, err := storefrontLogoManager()
+	if err != nil {
+		return false, err
+	}
+	id := strconv.Itoa(int(storefront.ID))
+	if _, err := manager.Upload(c.Writer, c.Request, id, "nav_logo"); err != nil {
+		return false, err
+	}
+	storefront.LogoURL = manager.Get(header.Filename, id)
+	return true, nil
+}
+
+func storefrontLogoManager() (*entityfileuploader.FileManager, error) {
+	fileUpload := entityfileuploader.FileUpload{UploadDir: "uploads", MaxFileSize: 5, FileTypes: []string{"jpg", "jpeg", "png", "svg", "webp"}, URL: ""}
+	return fileUpload.Init("storefronts")
+}
+
+func isAllowedStorefrontLogo(fileName string) bool {
+	extension := strings.TrimPrefix(strings.ToLower(filepath.Ext(fileName)), ".")
+	switch extension {
+	case "jpg", "jpeg", "png", "svg", "webp":
+		return true
+	default:
+		return false
+	}
+}
+
+func isSafeStorefrontLogoName(fileName string) bool {
+	return fileName == filepath.Base(fileName) && !strings.ContainsAny(fileName, `/\`)
 }
 
 func uintPathID(value string) uint {
