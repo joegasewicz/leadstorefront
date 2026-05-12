@@ -41,6 +41,38 @@
         </div>
     </section>
 
+    <section class="mb-8 rounded-lg border border-white/10 bg-white/5">
+        <div class="border-b border-white/10 px-4 py-3">
+            <h2 class="text-lg font-semibold text-white">Storefront content</h2>
+            <p class="mt-1 text-sm text-slate-400">Optional hero and about sections shown above products and articles.</p>
+        </div>
+        <form method="post" action="/admin/storefronts/{{ .Storefront.ID }}/content" class="grid gap-4 p-4 md:grid-cols-2">
+            <label class="block text-sm font-medium text-slate-200">
+                Hero H1
+                <input name="hero_title" value="{{ .Storefront.HeroTitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </label>
+            <label class="block text-sm font-medium text-slate-200">
+                Hero H2
+                <input name="hero_subtitle" value="{{ .Storefront.HeroSubtitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </label>
+            <label class="md:col-span-2 block text-sm font-medium text-slate-200">
+                Hero background image URL
+                <input name="hero_image_url" value="{{ .Storefront.HeroImageURL }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </label>
+            <label class="block text-sm font-medium text-slate-200">
+                About H3
+                <input name="about_title" value="{{ .Storefront.AboutTitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </label>
+            <label class="md:col-span-2 block text-sm font-medium text-slate-200">
+                About paragraph
+                <textarea name="about_body" rows="4" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">{{ .Storefront.AboutBody }}</textarea>
+            </label>
+            <div class="md:col-span-2 flex justify-end">
+                <button type="submit" class="rounded-md bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950">Save content</button>
+            </div>
+        </form>
+    </section>
+
     <div class="grid gap-8 lg:grid-cols-2">
         <section class="rounded-lg border border-white/10 bg-white/5">
             <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">

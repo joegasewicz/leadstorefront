@@ -55,6 +55,7 @@ func Register(app *gin.Engine) {
 	protected.GET("/storefronts/:id/delete", adminStorefronts.Get)
 	protected.POST("/storefronts/:id/delete", adminStorefronts.Delete)
 	protected.GET("/storefronts/:id", adminStorefronts.Get)
+	protected.POST("/storefronts/:id/content", adminStorefronts.Post)
 	protected.POST("/storefronts/:id/nav-logo", adminStorefronts.Post)
 	protected.POST("/storefronts/:id/products", adminStorefronts.Post)
 	protected.POST("/storefronts/:id/articles", adminStorefronts.Post)
