@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"errors"
 	"leadstorefront/pkgs/models"
 	"leadstorefront/pkgs/utils"
 	"net/http"
@@ -72,11 +73,45 @@ func (storefront *Storefront) Post(c *gin.Context) {
 	if !isSuper(user) {
 		record.OwnerID = &user.ID
 	}
+	restored, handled := storefront.restoreDeleted(c, record, user)
+	if handled {
+		if restored.ID != 0 {
+			c.JSON(http.StatusCreated, gin.H{"storefront": restored})
+		}
+		return
+	}
 	if err := storefront.DB.Create(&record).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create storefront"})
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"storefront": record})
+}
+
+func (storefront *Storefront) restoreDeleted(c *gin.Context, record models.Storefront, user models.User) (models.Storefront, bool) {
+	var existing models.Storefront
+	query := storefront.DB.Unscoped().Where("domain = ? AND deleted_at IS NOT NULL", record.Domain)
+	if !isSuper(user) {
+		query = query.Where("owner_id = ?", user.ID)
+	}
+	if err := query.First(&existing).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return models.Storefront{}, false
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not load storefront"})
+		return models.Storefront{}, true
+	}
+
+	updates := storefrontUpdateMap(record)
+	updates["deleted_at"] = nil
+	if err := storefront.DB.Unscoped().Model(&existing).Updates(updates).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not restore storefront"})
+		return models.Storefront{}, true
+	}
+	if err := storefront.DB.Preload("PrimaryCountry").Preload("Owner.Role").First(&existing, existing.ID).Error; err != nil {
+		utils.WriteRecordError(c, err, "could not load storefront")
+		return models.Storefront{}, true
+	}
+	return existing, true
 }
 
 func (storefront *Storefront) postProduct(c *gin.Context) {

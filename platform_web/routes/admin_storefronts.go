@@ -21,6 +21,10 @@ func (storefronts *AdminStorefronts) Get(c *gin.Context) {
 		storefronts.Create(c)
 		return
 	}
+	if strings.HasSuffix(c.FullPath(), "/delete") {
+		storefronts.DeleteForm(c)
+		return
+	}
 	if c.Param("id") != "" {
 		storefronts.Show(c)
 		return
@@ -180,7 +184,69 @@ func (storefronts *AdminStorefronts) Put(c *gin.Context) {
 }
 
 func (storefronts *AdminStorefronts) Delete(c *gin.Context) {
-	c.AbortWithStatus(http.StatusMethodNotAllowed)
+	id, ok := apiPathID(c.Param("id"))
+	if !ok {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	storefront, ok := storefronts.find(c, id)
+	if !ok {
+		return
+	}
+
+	if c.PostForm("confirm_delete") != "on" {
+		storefronts.renderDelete(c, http.StatusBadRequest, storefront, "Confirm that you want to delete this storefront.")
+		return
+	}
+	if strings.TrimSpace(c.PostForm("domain")) != storefront.Domain {
+		storefronts.renderDelete(c, http.StatusBadRequest, storefront, "Type the storefront domain exactly as shown.")
+		return
+	}
+
+	if err := storefronts.API.Delete(c, "/admin/storefronts/"+id+"/delete", nil); err != nil {
+		storefronts.renderDelete(c, http.StatusBadRequest, storefront, "Could not delete the storefront.")
+		return
+	}
+
+	_ = middleware.SetFlash(c, "Storefront deleted.")
+	c.Redirect(http.StatusFound, "/admin/storefronts")
+}
+
+func (storefronts *AdminStorefronts) DeleteForm(c *gin.Context) {
+	id, ok := apiPathID(c.Param("id"))
+	if !ok {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	storefront, ok := storefronts.find(c, id)
+	if !ok {
+		return
+	}
+
+	storefronts.renderDelete(c, http.StatusOK, storefront, "")
+}
+
+func (storefronts *AdminStorefronts) find(c *gin.Context, id string) (models.Storefront, bool) {
+	var response struct {
+		Storefront models.Storefront `json:"storefront"`
+	}
+	if err := storefronts.API.Get(c, "/admin/storefronts/"+id, &response); err != nil {
+		c.String(http.StatusNotFound, "could not load storefront")
+		return models.Storefront{}, false
+	}
+	return response.Storefront, true
+}
+
+func (storefronts *AdminStorefronts) renderDelete(c *gin.Context, status int, storefront models.Storefront, message string) {
+	c.HTML(status, "admin_storefront_delete", gin.H{
+		"Title":        "Delete storefront",
+		"Storefront":   storefront,
+		"Error":        message,
+		"IsAdmin":      true,
+		"IsAdminRoute": true,
+	})
 }
 
 func (storefronts *AdminStorefronts) renderForm(c *gin.Context, status int, title string, action string, storefront models.Storefront, message string) {

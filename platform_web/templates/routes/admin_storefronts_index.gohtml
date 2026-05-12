@@ -19,6 +19,7 @@
                     <th class="px-4 py-3">Domain</th>
                     <th class="px-4 py-3">Primary country</th>
                     <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3 text-right">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-white/10">
@@ -28,10 +29,11 @@
                     <td class="px-4 py-3">{{ .Domain }}</td>
                     <td class="px-4 py-3">{{ .PrimaryCountry.Name }}</td>
                     <td class="px-4 py-3">{{ if .IsActive }}Active{{ else }}Paused{{ end }}</td>
+                    <td class="px-4 py-3 text-right"><a href="/admin/storefronts/{{ .ID }}/delete" class="text-sm font-semibold text-red-200 hover:text-red-100">Delete</a></td>
                 </tr>
                 {{ else }}
                 <tr>
-                    <td colspan="4" class="px-4 py-8 text-center text-slate-400">No storefronts yet.</td>
+                    <td colspan="5" class="px-4 py-8 text-center text-slate-400">No storefronts yet.</td>
                 </tr>
                 {{ end }}
             </tbody>
