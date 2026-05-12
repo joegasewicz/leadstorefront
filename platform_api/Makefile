@@ -1,4 +1,4 @@
-IMG_NAME=josefdigital/platform:platform_api-v0.0.4
+IMG_NAME=josefdigital/platform:platform_api-v0.0.5
 TEST_CONCURRENCY ?= 4
 
 test:
