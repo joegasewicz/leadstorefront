@@ -4,10 +4,9 @@
 <section class="relative overflow-hidden">
     {{ if .Storefront.HeroImageURL }}
     <img src="{{ .Storefront.HeroImageURL }}" alt="" class="absolute inset-0 h-full w-full object-cover opacity-45">
-    <div class="absolute inset-0 bg-slate-950/70"></div>
+    <div class="absolute inset-0 bg-slate-950/40"></div>
     {{ end }}
     <div class="relative mx-auto max-w-5xl px-6 py-20">
-        <p class="text-sm font-semibold uppercase tracking-wide text-sky-300">{{ .Storefront.Domain }}</p>
         <h1 class="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-white sm:text-5xl">{{ if .Storefront.HeroTitle }}{{ .Storefront.HeroTitle }}{{ else }}{{ .Storefront.Name }}{{ end }}</h1>
         {{ if .Storefront.HeroSubtitle }}
         <h2 class="mt-5 max-w-3xl text-2xl font-semibold tracking-normal text-slate-200">{{ .Storefront.HeroSubtitle }}</h2>
