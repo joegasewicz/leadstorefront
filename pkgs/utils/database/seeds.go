@@ -26,6 +26,7 @@ func Seed(db *gorm.DB) error {
 	}
 
 	roles := []models.Role{
+		{Name: "super"},
 		{Name: "admin"},
 		{Name: "editor"},
 		{Name: "user"},
@@ -37,8 +38,8 @@ func Seed(db *gorm.DB) error {
 		}
 	}
 
-	var adminRole models.Role
-	if err := db.Where("name = ?", "admin").First(&adminRole).Error; err != nil {
+	var superRole models.Role
+	if err := db.Where("name = ?", "super").First(&superRole).Error; err != nil {
 		return err
 	}
 
@@ -50,10 +51,13 @@ func Seed(db *gorm.DB) error {
 	adminUser := models.User{
 		Email:    "joegoosebass@gmail.com",
 		Password: string(adminPasswordHash),
-		RoleID:   adminRole.ID,
+		RoleID:   superRole.ID,
 	}
 
 	if err := db.Where("email = ?", adminUser.Email).FirstOrCreate(&adminUser).Error; err != nil {
+		return err
+	}
+	if err := db.Model(&models.User{}).Where("email = ?", adminUser.Email).Update("role_id", superRole.ID).Error; err != nil {
 		return err
 	}
 

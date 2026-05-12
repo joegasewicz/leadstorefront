@@ -30,7 +30,10 @@ func RequireRoles(allowedRoles ...string) gin.HandlerFunc {
 			User models.User `json:"user"`
 		}
 		path := utils.GetVersion(fmt.Sprintf("/admin/users/%d", userID))
-		client := identity_client.Identity{URL: fmt.Sprintf("http://%s%s%s", pkgs.Config.API.Domain, pkgs.Config.API.Addr, path)}
+		client := identity_client.Identity{
+			URL:   fmt.Sprintf("http://%s%s%s", pkgs.Config.API.Domain, pkgs.Config.API.Addr, path),
+			Token: utils.SignedUserAuthToken(userID),
+		}
 		data, err := client.Get(c.Request)
 		if err != nil {
 			c.Redirect(http.StatusFound, "/admin/login")

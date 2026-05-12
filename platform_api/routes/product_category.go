@@ -13,12 +13,20 @@ type ProductCategory struct {
 }
 
 func (category *ProductCategory) Get(c *gin.Context) {
+	user, ok := currentAPIUser(c, category.DB)
+	if !ok {
+		return
+	}
 	var countries []models.Country
 	var categories []models.ProductCategory
 	var storefronts []models.Storefront
 	_ = category.DB.Order("name asc").Find(&countries).Error
 	_ = category.DB.Order("name asc").Find(&categories).Error
-	_ = category.DB.Order("name asc").Find(&storefronts).Error
+	query := category.DB.Order("name asc")
+	if !isSuper(user) {
+		query = query.Where("owner_id = ?", user.ID)
+	}
+	_ = query.Find(&storefronts).Error
 	c.JSON(http.StatusOK, gin.H{"countries": countries, "categories": categories, "storefronts": storefronts})
 }
 
