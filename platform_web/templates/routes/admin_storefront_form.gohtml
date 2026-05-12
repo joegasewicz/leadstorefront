@@ -8,7 +8,7 @@
         </div>
         <a href="/admin/storefronts" class="rounded-md border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">Storefronts</a>
     </div>
-    <form method="post" action="{{ .Action }}" class="grid gap-6 rounded-lg border border-white/10 bg-white/5 p-6 md:grid-cols-2">
+    <form method="post" action="{{ .Action }}" enctype="multipart/form-data" class="grid gap-6 rounded-lg border border-white/10 bg-white/5 p-6 md:grid-cols-2">
         {{ if .Error }}
         <p class="md:col-span-2 rounded-md border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">{{ .Error }}</p>
         {{ end }}
@@ -43,8 +43,16 @@
             <textarea id="description" name="description" rows="4" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">{{ .Storefront.Description }}</textarea>
         </label>
         <label class="block text-sm font-medium text-slate-200" for="logo_url">
-            Logo URL
+            Nav logo URL
             <input id="logo_url" name="logo_url" value="{{ .Storefront.LogoURL }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+        </label>
+        <label class="block text-sm font-medium text-slate-200" for="logo_width_px">
+            Nav logo width
+            <input id="logo_width_px" name="logo_width_px" type="number" min="1" value="{{ if .Storefront.LogoWidthPx }}{{ .Storefront.LogoWidthPx }}{{ else }}305{{ end }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+        </label>
+        <label class="block text-sm font-medium text-slate-200" for="nav_logo">
+            Upload nav logo
+            <input id="nav_logo" name="nav_logo" type="file" accept=".jpg,.jpeg,.png,.svg,.webp,image/jpeg,image/png,image/svg+xml,image/webp" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white outline-none file:mr-3 file:rounded-md file:border-0 file:bg-cyan-300 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-slate-950 focus:border-cyan-300">
         </label>
         <label class="mt-8 flex items-center gap-3 text-sm font-medium text-slate-200">
             <input name="is_active" type="checkbox" {{ if .Storefront.IsActive }}checked{{ end }} class="h-4 w-4 rounded border-white/10 bg-slate-900 text-cyan-300">

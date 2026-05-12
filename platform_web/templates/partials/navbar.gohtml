@@ -1,8 +1,16 @@
 {{ define "navbar" }}
 <header class="border-b border-white/10 bg-slate-950/90">
     <nav class="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <a href="/" class="navbar-brand" aria-label="LeadStorefront home">
+        <a href="/" class="navbar-brand" aria-label="{{ with .Storefront }}{{ if .Name }}{{ .Name }} home{{ else }}LeadStorefront home{{ end }}{{ else }}LeadStorefront home{{ end }}">
+            {{ with .Storefront }}
+            {{ if .LogoURL }}
+            <img src="{{ .LogoURL }}" alt="{{ .Name }}" style="width: {{ if .LogoWidthPx }}{{ .LogoWidthPx }}{{ else }}305{{ end }}px; height: auto;">
+            {{ else }}
             <img src="/imgs/leadstorefront-logo.png" alt="LeadStorefront" width="305" height="31">
+            {{ end }}
+            {{ else }}
+            <img src="/imgs/leadstorefront-logo.png" alt="LeadStorefront" width="305" height="31">
+            {{ end }}
         </a>
         <div class="flex items-center gap-4 text-sm text-slate-300">
             {{ if .IsAdmin }}

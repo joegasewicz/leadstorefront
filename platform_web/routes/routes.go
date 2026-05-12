@@ -28,8 +28,9 @@ func Register(app *gin.Engine) {
 	app.DELETE("/domain-check", domainCheck.Delete)
 
 	app.GET("/", home.Redirect)
+	app.GET("/storefronts/:id", storefronts.Get)
 	app.GET("/:country", home.Get)
-	app.GET("/:country/storefronts/:slug", storefronts.Get)
+	app.GET("/:country/storefronts/:id", storefronts.Get)
 
 	app.GET("/:country/articles", articles.Get)
 	app.GET("/:country/articles/:slug", articles.Get)
@@ -54,6 +55,7 @@ func Register(app *gin.Engine) {
 	protected.GET("/storefronts/:id/delete", adminStorefronts.Get)
 	protected.POST("/storefronts/:id/delete", adminStorefronts.Delete)
 	protected.GET("/storefronts/:id", adminStorefronts.Get)
+	protected.POST("/storefronts/:id/nav-logo", adminStorefronts.Post)
 	protected.POST("/storefronts/:id/products", adminStorefronts.Post)
 	protected.POST("/storefronts/:id/articles", adminStorefronts.Post)
 	protected.GET("/articles", adminArticles.Get)

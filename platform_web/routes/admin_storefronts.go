@@ -33,6 +33,10 @@ func (storefronts *AdminStorefronts) Get(c *gin.Context) {
 }
 
 func (storefronts *AdminStorefronts) Post(c *gin.Context) {
+	if strings.Contains(c.FullPath(), "/nav-logo") {
+		storefronts.UploadNavLogo(c)
+		return
+	}
 	if strings.Contains(c.FullPath(), "/products") {
 		storefronts.AssignProduct(c)
 		return
@@ -132,6 +136,10 @@ func (storefronts *AdminStorefronts) CreatePost(c *gin.Context) {
 		storefronts.renderForm(c, http.StatusBadRequest, "Create storefront", "/admin/storefronts/create", storefront, "Could not create the storefront.")
 		return
 	}
+	if err := storefronts.API.UploadStorefrontNavLogo(c, response.Storefront.ID); err != nil {
+		storefronts.renderForm(c, http.StatusBadRequest, "Create storefront", "/admin/storefronts/create", storefront, "Could not upload the storefront nav logo.")
+		return
+	}
 
 	_ = middleware.SetFlash(c, "Storefront created.")
 	c.Redirect(http.StatusFound, "/admin/storefronts")
@@ -176,6 +184,21 @@ func (storefronts *AdminStorefronts) AssignArticle(c *gin.Context) {
 		return
 	}
 	_ = middleware.SetFlash(c, "Article assigned.")
+	c.Redirect(http.StatusFound, "/admin/storefronts/"+id)
+}
+
+func (storefronts *AdminStorefronts) UploadNavLogo(c *gin.Context) {
+	id, ok := apiPathID(c.Param("id"))
+	if !ok {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+	if err := storefronts.API.UploadStorefrontNavLogo(c, uintIDFromPath(id)); err != nil {
+		_ = middleware.SetFlash(c, "Could not upload the nav logo.")
+		c.Redirect(http.StatusFound, "/admin/storefronts/"+id)
+		return
+	}
+	_ = middleware.SetFlash(c, "Nav logo updated.")
 	c.Redirect(http.StatusFound, "/admin/storefronts/"+id)
 }
 
@@ -300,12 +323,21 @@ func (storefronts *AdminStorefronts) storefrontFromRequest(c *gin.Context) (mode
 		return models.Storefront{}, formError("Domain is required.")
 	}
 
+	logoWidthPx, err := parseOptionalInt(c.PostForm("logo_width_px"))
+	if err != nil {
+		return models.Storefront{}, err
+	}
+	if logoWidthPx == 0 {
+		logoWidthPx = 305
+	}
+
 	return models.Storefront{
 		Name:             name,
 		Slug:             slugify(name),
 		Domain:           domain,
 		Description:      strings.TrimSpace(c.PostForm("description")),
 		LogoURL:          strings.TrimSpace(c.PostForm("logo_url")),
+		LogoWidthPx:      logoWidthPx,
 		IsActive:         c.PostForm("is_active") == "on",
 		PrimaryCountryID: countryID,
 		OwnerID:          ownerID,
@@ -319,6 +351,7 @@ func storefrontPayload(storefront models.Storefront) map[string]interface{} {
 		"domain":             storefront.Domain,
 		"description":        storefront.Description,
 		"logo_url":           storefront.LogoURL,
+		"logo_width_px":      storefront.LogoWidthPx,
 		"is_active":          storefront.IsActive,
 		"primary_country_id": storefront.PrimaryCountryID,
 		"owner_id":           uintPtrPayload(storefront.OwnerID),

@@ -1,11 +1,14 @@
 package routes
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"leadstorefront/pkgs"
 	"leadstorefront/pkgs/middleware"
 	"leadstorefront/pkgs/utils"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 
@@ -113,6 +116,70 @@ func (client *APIClient) UploadArticleImage(c *gin.Context, articleID uint) erro
 	defer resp.Body.Close()
 	if resp.StatusCode >= http.StatusBadRequest {
 		return fmt.Errorf("api returned %s", resp.Status)
+	}
+	return nil
+}
+
+func (client *APIClient) UploadStorefrontNavLogo(c *gin.Context, storefrontID uint) error {
+	return client.uploadStorefrontNavLogo(c, storefrontID, false)
+}
+
+func (client *APIClient) ReplaceStorefrontNavLogo(c *gin.Context, storefrontID uint) error {
+	return client.uploadStorefrontNavLogo(c, storefrontID, true)
+}
+
+func (client *APIClient) uploadStorefrontNavLogo(c *gin.Context, storefrontID uint, required bool) error {
+	multipartRequest := multipart_requests.MultipartRequest{TempPath: "temp"}
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	if logoWidth := c.PostForm("logo_width_px"); logoWidth != "" {
+		if err := writer.WriteField("logo_width_px", logoWidth); err != nil {
+			return err
+		}
+	}
+
+	fileName, file, err := multipartRequest.GetFile(c.Request, "nav_logo")
+	if err != nil {
+		if err == http.ErrMissingFile {
+			if required {
+				return fmt.Errorf("nav logo is required")
+			}
+			return client.postMultipart(c, fmt.Sprintf("/admin/storefronts/%d/nav-logo", storefrontID), body, writer)
+		}
+		return err
+	}
+	defer file.Close()
+	part, err := writer.CreateFormFile("nav_logo", *fileName)
+	if err != nil {
+		return err
+	}
+	if _, err := io.Copy(part, file); err != nil {
+		return err
+	}
+	return client.postMultipart(c, fmt.Sprintf("/admin/storefronts/%d/nav-logo", storefrontID), body, writer)
+}
+
+func (client *APIClient) postMultipart(c *gin.Context, path string, body *bytes.Buffer, writer *multipart.Writer) error {
+	if err := writer.Close(); err != nil {
+		return err
+	}
+
+	request, err := http.NewRequest(http.MethodPost, client.URL(path), body)
+	if err != nil {
+		return err
+	}
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+	if userID, ok := middleware.CurrentUserID(c); ok {
+		request.Header.Set("Authorization", utils.SignedUserAuthToken(userID))
+	}
+
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+	if response.StatusCode >= http.StatusBadRequest {
+		return fmt.Errorf("api returned %s", response.Status)
 	}
 	return nil
 }

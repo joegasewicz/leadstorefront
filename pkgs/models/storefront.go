@@ -9,6 +9,7 @@ type Storefront struct {
 	Domain           string  `json:"domain" gorm:"not null;uniqueIndex"`
 	Description      string  `json:"description"`
 	LogoURL          string  `json:"logo_url"`
+	LogoWidthPx      int     `json:"logo_width_px" gorm:"not null;default:305"`
 	IsActive         bool    `json:"is_active" gorm:"not null;default:true;index"`
 	PrimaryCountryID uint    `json:"primary_country_id" gorm:"not null;index"`
 	PrimaryCountry   Country `json:"primary_country" gorm:"foreignKey:PrimaryCountryID"`
