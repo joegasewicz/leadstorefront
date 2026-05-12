@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"leadstorefront/pkgs"
+	"leadstorefront/pkgs/middleware"
 	"leadstorefront/pkgs/utils"
 	"net/http"
 	"strconv"
@@ -32,7 +33,7 @@ func apiURL(path string) string {
 }
 
 func (client *APIClient) Get(c *gin.Context, path string, out any) error {
-	identity := identity_client.Identity{URL: client.URL(path)}
+	identity := client.identity(c, path)
 	data, err := identity.Get(c.Request)
 	if err != nil {
 		return err
@@ -41,7 +42,7 @@ func (client *APIClient) Get(c *gin.Context, path string, out any) error {
 }
 
 func (client *APIClient) Post(c *gin.Context, path string, payload map[string]interface{}, out any) error {
-	identity := identity_client.Identity{URL: client.URL(path)}
+	identity := client.identity(c, path)
 	data, err := identity.Post(c.Request, payload)
 	if err != nil {
 		return err
@@ -53,7 +54,7 @@ func (client *APIClient) Post(c *gin.Context, path string, payload map[string]in
 }
 
 func (client *APIClient) Put(c *gin.Context, path string, payload map[string]interface{}, out any) error {
-	identity := identity_client.Identity{URL: client.URL(path)}
+	identity := client.identity(c, path)
 	data, err := identity.Put(c.Request, payload)
 	if err != nil {
 		return err
@@ -65,7 +66,7 @@ func (client *APIClient) Put(c *gin.Context, path string, payload map[string]int
 }
 
 func (client *APIClient) Delete(c *gin.Context, path string, out any) error {
-	identity := identity_client.Identity{URL: client.URL(path)}
+	identity := client.identity(c, path)
 	data, err := identity.Delete(c.Request)
 	if err != nil {
 		return err
@@ -74,6 +75,14 @@ func (client *APIClient) Delete(c *gin.Context, path string, out any) error {
 		return nil
 	}
 	return decodeAPIData(data, out)
+}
+
+func (client *APIClient) identity(c *gin.Context, path string) identity_client.Identity {
+	identity := identity_client.Identity{URL: client.URL(path)}
+	if userID, ok := middleware.CurrentUserID(c); ok {
+		identity.Token = utils.SignedUserAuthToken(userID)
+	}
+	return identity
 }
 
 func decodeAPIData(data interface{}, out any) error {

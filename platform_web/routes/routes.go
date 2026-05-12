@@ -45,7 +45,7 @@ func Register(app *gin.Engine) {
 	adminGroup.POST("/logout", admin.Delete)
 
 	protected := adminGroup.Group("")
-	protected.Use(admin.Auth("admin", "editor"))
+	protected.Use(admin.Auth("super", "admin", "editor", "user"))
 	protected.GET("", admin.Get)
 	protected.PUT("", admin.Put)
 	protected.GET("/storefronts", adminStorefronts.Get)

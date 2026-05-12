@@ -36,10 +36,19 @@ func (storefront *Storefront) Get(c *gin.Context) {
 }
 
 func (storefront *Storefront) getOptions(c *gin.Context) {
+	user, ok := currentAPIUser(c, storefront.DB)
+	if !ok {
+		return
+	}
+
 	var countries []models.Country
 	var users []models.User
 	_ = storefront.DB.Order("name asc").Find(&countries).Error
-	_ = storefront.DB.Preload("Role").Order("email asc").Find(&users).Error
+	if isSuper(user) {
+		_ = storefront.DB.Preload("Role").Order("email asc").Find(&users).Error
+	} else {
+		users = []models.User{user}
+	}
 	c.JSON(http.StatusOK, gin.H{"countries": countries, "users": users})
 }
 
@@ -55,6 +64,13 @@ func (storefront *Storefront) Post(c *gin.Context) {
 	record, ok := storefront.bindJSON(c)
 	if !ok {
 		return
+	}
+	user, ok := currentAPIUser(c, storefront.DB)
+	if !ok {
+		return
+	}
+	if !isSuper(user) {
+		record.OwnerID = &user.ID
 	}
 	if err := storefront.DB.Create(&record).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not create storefront"})
@@ -74,6 +90,9 @@ func (storefront *Storefront) postProduct(c *gin.Context) {
 	record := models.ProductStorefront{ProductID: request.ProductID, StorefrontID: uintPathID(c.Param("id"))}
 	if record.StorefrontID == 0 {
 		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		return
+	}
+	if ok := storefront.authorizeStorefrontID(c, record.StorefrontID); !ok {
 		return
 	}
 	if err := storefront.DB.Where("product_id = ? AND storefront_id = ?", record.ProductID, record.StorefrontID).FirstOrCreate(&record).Error; err != nil {
@@ -96,6 +115,9 @@ func (storefront *Storefront) postArticle(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return
 	}
+	if ok := storefront.authorizeStorefrontID(c, record.StorefrontID); !ok {
+		return
+	}
 	if err := storefront.DB.Where("article_id = ? AND storefront_id = ?", record.ArticleID, record.StorefrontID).FirstOrCreate(&record).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not assign article"})
 		return
@@ -108,10 +130,21 @@ func (storefront *Storefront) Put(c *gin.Context) {
 	if !ok {
 		return
 	}
+	user, ok := currentAPIUser(c, storefront.DB)
+	if !ok {
+		return
+	}
 	var existing models.Storefront
-	if err := storefront.DB.First(&existing, c.Param("id")).Error; err != nil {
+	query := storefront.DB
+	if !isSuper(user) {
+		query = query.Where("owner_id = ?", user.ID)
+	}
+	if err := query.First(&existing, c.Param("id")).Error; err != nil {
 		utils.WriteRecordError(c, err, "could not load storefront")
 		return
+	}
+	if !isSuper(user) {
+		record.OwnerID = existing.OwnerID
 	}
 	if err := storefront.DB.Model(&existing).Updates(storefrontUpdateMap(record)).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not update storefront"})
@@ -121,23 +154,43 @@ func (storefront *Storefront) Put(c *gin.Context) {
 }
 
 func (storefront *Storefront) Delete(c *gin.Context) {
-	if err := storefront.DB.Delete(&models.Storefront{}, c.Param("id")).Error; err != nil {
+	user, ok := currentAPIUser(c, storefront.DB)
+	if !ok {
+		return
+	}
+	query := storefront.DB
+	if !isSuper(user) {
+		query = query.Where("owner_id = ?", user.ID)
+	}
+	result := query.Delete(&models.Storefront{}, c.Param("id"))
+	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not delete storefront"})
+		return
+	}
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"deleted": true})
 }
 
 func (storefront *Storefront) getAdminList(c *gin.Context) {
+	user, ok := currentAPIUser(c, storefront.DB)
+	if !ok {
+		return
+	}
 	var storefronts []models.Storefront
 	var total int64
 	page, limit, offset := utils.GetPagination(c)
 	query := storefront.DB.Model(&models.Storefront{})
+	if !isSuper(user) {
+		query = query.Where("owner_id = ?", user.ID)
+	}
 	if err := query.Count(&total).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not count storefronts"})
 		return
 	}
-	if err := storefront.DB.Preload("PrimaryCountry").Preload("Owner.Role").Order("created_at desc").Limit(limit).Offset(offset).Find(&storefronts).Error; err != nil {
+	if err := query.Preload("PrimaryCountry").Preload("Owner.Role").Order("created_at desc").Limit(limit).Offset(offset).Find(&storefronts).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not load storefronts"})
 		return
 	}
@@ -145,12 +198,40 @@ func (storefront *Storefront) getAdminList(c *gin.Context) {
 }
 
 func (storefront *Storefront) getByID(c *gin.Context) {
+	user, ok := currentAPIUser(c, storefront.DB)
+	if !ok {
+		return
+	}
 	var record models.Storefront
-	if err := storefront.DB.Preload("PrimaryCountry").Preload("Owner.Role").First(&record, c.Param("id")).Error; err != nil {
+	query := storefront.DB.Preload("PrimaryCountry").Preload("Owner.Role")
+	if !isSuper(user) {
+		query = query.Where("owner_id = ?", user.ID)
+	}
+	if err := query.First(&record, c.Param("id")).Error; err != nil {
 		utils.WriteRecordError(c, err, "could not load storefront")
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"storefront": record})
+}
+
+func (storefront *Storefront) authorizeStorefrontID(c *gin.Context, storefrontID uint) bool {
+	user, ok := currentAPIUser(c, storefront.DB)
+	if !ok {
+		return false
+	}
+	if isSuper(user) {
+		return true
+	}
+	var count int64
+	if err := storefront.DB.Model(&models.Storefront{}).Where("id = ? AND owner_id = ?", storefrontID, user.ID).Count(&count).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not load storefront"})
+		return false
+	}
+	if count == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		return false
+	}
+	return true
 }
 
 func (storefront *Storefront) getActiveBySlug(c *gin.Context) {

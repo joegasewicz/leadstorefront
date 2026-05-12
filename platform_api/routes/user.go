@@ -16,8 +16,22 @@ type User struct {
 }
 
 func (user *User) Get(c *gin.Context) {
+	currentUser, ok := currentAPIUser(c, user.DB)
+	if !ok {
+		return
+	}
+	requestedUserID := uintPathID(c.Param("id"))
+	if requestedUserID == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		return
+	}
+	if !isSuper(currentUser) && currentUser.ID != requestedUserID {
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+		return
+	}
+
 	var record models.User
-	err := user.DB.Preload("Role").First(&record, c.Param("id")).Error
+	err := user.DB.Preload("Role").First(&record, requestedUserID).Error
 	if err != nil {
 		utils.WriteRecordError(c, err, "could not load user")
 		return
@@ -59,7 +73,7 @@ func (user *User) login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid login"})
 		return
 	}
-	if record.Role.Name != "admin" && record.Role.Name != "editor" {
+	if record.Role.Name != "super" && record.Role.Name != "admin" && record.Role.Name != "editor" && record.Role.Name != "user" {
 		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
@@ -77,7 +91,7 @@ func (user *User) register(c *gin.Context) {
 		return
 	}
 	roleName := strings.ToLower(strings.TrimSpace(request.Role))
-	if roleName != "admin" && roleName != "editor" {
+	if roleName != "admin" && roleName != "editor" && roleName != "user" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid role"})
 		return
 	}

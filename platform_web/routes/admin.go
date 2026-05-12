@@ -133,7 +133,7 @@ func (admin *Admin) RegisterPost(c *gin.Context) {
 	if err := admin.API.Post(c, "/admin/register", map[string]interface{}{
 		"email":    email,
 		"password": password,
-		"role":     "admin",
+		"role":     "user",
 	}, &response); err != nil {
 		renderAdminRegister(c, "Could not create the account.")
 		return
@@ -168,7 +168,7 @@ func (admin *Admin) roles() []string {
 	if admin.Roles != nil {
 		return admin.Roles
 	}
-	return []string{"admin", "editor"}
+	return []string{"admin", "editor", "user"}
 }
 
 func renderAdminLogin(c *gin.Context, message string) {
@@ -183,7 +183,7 @@ func renderAdminRegister(c *gin.Context, message string) {
 	c.HTML(http.StatusBadRequest, "admin_register", gin.H{
 		"Title":        "Admin Register",
 		"Error":        message,
-		"Roles":        []string{"admin", "editor"},
+		"Roles":        []string{"admin", "editor", "user"},
 		"IsAdminRoute": true,
 	})
 }
