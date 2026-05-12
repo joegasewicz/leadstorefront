@@ -10,7 +10,10 @@
             <p class="mt-4 max-w-3xl text-sm leading-6 text-slate-300">{{ .Storefront.Description }}</p>
             {{ end }}
         </div>
-        <a href="/{{ .Storefront.PrimaryCountry.Code }}/storefronts/{{ .Storefront.Slug }}" class="rounded-md border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">View storefront</a>
+        <div class="flex flex-wrap justify-end gap-3">
+            <a href="/{{ .Storefront.PrimaryCountry.Code }}/storefronts/{{ .Storefront.Slug }}" class="rounded-md border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">View storefront</a>
+            <a href="/admin/storefronts/{{ .Storefront.ID }}/delete" class="rounded-md border border-red-400/30 px-4 py-2 text-sm font-semibold text-red-200 hover:bg-red-500/10">Delete</a>
+        </div>
     </div>
 
     <div class="grid gap-8 lg:grid-cols-2">
