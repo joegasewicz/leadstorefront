@@ -13,6 +13,14 @@ type Storefronts struct {
 	API *APIClient
 }
 
+type publicLeadField struct {
+	Label      string
+	Name       string
+	Type       string
+	Options    []string
+	IsRequired bool
+}
+
 func (storefronts *Storefronts) Get(c *gin.Context) {
 	country := c.Param("country")
 	if country == "" {
@@ -38,17 +46,52 @@ func (storefronts *Storefronts) Get(c *gin.Context) {
 		return
 	}
 
-	renderStorefront(c, http.StatusOK, country, storefront)
+	renderStorefront(c, storefronts.API, http.StatusOK, country, storefront)
 }
 
-func renderStorefront(c *gin.Context, status int, country string, storefront models.Storefront) {
+func renderStorefront(c *gin.Context, api *APIClient, status int, country string, storefront models.Storefront) {
 	storefrontPath := storefrontBasePath(c, country, storefront)
 	c.HTML(status, "storefront_show", gin.H{
 		"Title":          storefront.Name + " | LeadStorefront",
 		"Country":        country,
 		"Storefront":     storefront,
 		"StorefrontPath": storefrontPath,
+		"LeadFields":     publicLeadFields(c, api, storefront.ID),
+		"LeadFormAction": c.Request.URL.RequestURI(),
+		"Flash":          middleware.PopFlash(c),
 	})
+}
+
+func publicLeadFields(c *gin.Context, api *APIClient, storefrontID uint) []publicLeadField {
+	var response struct {
+		Fields []models.LeadFormField `json:"fields"`
+	}
+	if err := api.Get(c, "/storefronts/"+uintToString(storefrontID)+"/lead-form", &response); err != nil {
+		return nil
+	}
+	fields := make([]publicLeadField, 0, len(response.Fields))
+	for _, field := range response.Fields {
+		fields = append(fields, publicLeadField{
+			Label:      field.Label,
+			Name:       field.Name,
+			Type:       field.Type,
+			Options:    leadFieldOptions(field.Options),
+			IsRequired: field.IsRequired,
+		})
+	}
+	return fields
+}
+
+func leadFieldOptions(raw string) []string {
+	parts := strings.Split(raw, ",")
+	options := make([]string, 0, len(parts))
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part != "" {
+			options = append(options, part)
+		}
+	}
+	return options
 }
 
 func storefrontCustomDomainURL(c *gin.Context, storefront models.Storefront) (string, bool) {

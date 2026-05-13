@@ -18,7 +18,7 @@ func (home *Home) Redirect(c *gin.Context) {
 		if !middleware.IsSupportedCountryCode(country) {
 			country = middleware.DefaultCountryCode
 		}
-		renderStorefront(c, http.StatusOK, country, storefront)
+		renderStorefront(c, home.API, http.StatusOK, country, storefront)
 		return
 	}
 	middleware.RedirectToLocalizedHome()(c)
@@ -31,7 +31,7 @@ func (home *Home) Get(c *gin.Context) {
 		return
 	}
 	if storefront, ok := currentStorefront(c, home.API); ok {
-		renderStorefront(c, http.StatusOK, countryCode, storefront)
+		renderStorefront(c, home.API, http.StatusOK, countryCode, storefront)
 		return
 	}
 

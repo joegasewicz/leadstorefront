@@ -21,6 +21,8 @@ func TestModelsEmbedGormModel(t *testing.T) {
 		Role{},
 		Storefront{},
 		ArticleStorefront{},
+		LeadFormField{},
+		Lead{},
 		User{},
 	}
 
