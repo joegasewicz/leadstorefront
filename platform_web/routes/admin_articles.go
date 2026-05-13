@@ -48,6 +48,7 @@ func (articles *AdminArticles) Index(c *gin.Context) {
 		"DefaultCountry": middleware.DefaultCountryCode,
 		"Flash":          middleware.PopFlash(c),
 		"IsAdmin":        true,
+		"IsSuper":        isCurrentSuper(c),
 		"IsAdminRoute":   true,
 	})
 }
@@ -164,6 +165,7 @@ func (articles *AdminArticles) renderForm(c *gin.Context, status int, title stri
 		"Storefronts":  response.Storefronts,
 		"Error":        message,
 		"IsAdmin":      true,
+		"IsSuper":      isCurrentSuper(c),
 		"IsAdminRoute": true,
 	})
 }

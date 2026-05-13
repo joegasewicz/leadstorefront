@@ -47,6 +47,7 @@ func (products *AdminProducts) Index(c *gin.Context) {
 		"Limit":        limit,
 		"Flash":        middleware.PopFlash(c),
 		"IsAdmin":      true,
+		"IsSuper":      isCurrentSuper(c),
 		"IsAdminRoute": true,
 	})
 }
@@ -155,6 +156,7 @@ func (products *AdminProducts) renderForm(c *gin.Context, status int, title stri
 		"Storefronts":       response.Storefronts,
 		"Error":             message,
 		"IsAdmin":           true,
+		"IsSuper":           isCurrentSuper(c),
 		"IsAdminRoute":      true,
 	})
 }

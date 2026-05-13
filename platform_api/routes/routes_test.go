@@ -110,6 +110,19 @@ func TestRegisterRejectsUnsupportedMethods(t *testing.T) {
 	}
 }
 
+func TestUserManagementRequiresAuth(t *testing.T) {
+	router := testRouter()
+
+	for _, path := range []string{"/api/v1/admin/users", "/api/v1/admin/users/1"} {
+		t.Run(path, func(t *testing.T) {
+			response := performRequest(router, http.MethodGet, path, "")
+
+			assert.Equal(t, http.StatusUnauthorized, response.Code)
+			assertJSONIncludes(t, response.Body.String(), map[string]interface{}{"error": "unauthorized"})
+		})
+	}
+}
+
 func TestDomainLookupCandidates(t *testing.T) {
 	assert.Equal(t, []string{"lankanote.com", "www.lankanote.com"}, domainLookupCandidates("www.lankanote.com."))
 }

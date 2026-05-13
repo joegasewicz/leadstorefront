@@ -45,6 +45,8 @@ func main() {
 		"platform_web/templates/routes/admin_article_form.gohtml",
 		"platform_web/templates/routes/admin_products_index.gohtml",
 		"platform_web/templates/routes/admin_product_form.gohtml",
+		"platform_web/templates/routes/admin_users_index.gohtml",
+		"platform_web/templates/routes/admin_user_form.gohtml",
 	)
 	routes.Register(app)
 
