@@ -244,4 +244,7 @@ const webTestTemplates = `
 {{ define "admin_product_form" }}admin product form {{ .Error }}{{ end }}
 {{ define "admin_users_index" }}admin users{{ end }}
 {{ define "admin_user_form" }}admin user form {{ .Error }}{{ end }}
+{{ define "admin_lead_form" }}admin lead form {{ .Error }}{{ end }}
+{{ define "admin_leads_index" }}admin leads{{ end }}
+{{ define "admin_lead_show" }}admin lead{{ end }}
 `
