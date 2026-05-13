@@ -1,0 +1,42 @@
+{{ define "purchase" }}
+{{ template "base_start" . }}
+<section class="min-h-[calc(100vh-8rem)] bg-slate-950">
+    <div class="mx-auto max-w-6xl px-6 py-12">
+        <div class="mb-8 max-w-3xl">
+            <p class="text-sm font-semibold uppercase tracking-wide text-cyan-300">Step 2 of 4</p>
+            <h1 class="mt-2 text-3xl font-bold tracking-normal text-white">Choose a tier</h1>
+            <p class="mt-3 text-sm leading-6 text-slate-300">Select the storefront tier that fits your launch. You can create your storefront after the payment step.</p>
+        </div>
+
+        {{ if .Error }}
+        <p class="mb-6 rounded-md border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">{{ .Error }}</p>
+        {{ end }}
+
+        <form method="post" action="/purchase" class="grid gap-4 lg:grid-cols-3">
+            {{ range .Tiers }}
+            <label class="relative flex min-h-full cursor-pointer flex-col rounded-lg border {{ if .Featured }}border-cyan-300 bg-cyan-300/10{{ else }}border-white/10 bg-white/5{{ end }} p-5 hover:border-cyan-300">
+                {{ if .Featured }}
+                <span class="mb-3 w-fit rounded-md bg-cyan-300 px-2 py-1 text-xs font-bold text-slate-950">Recommended</span>
+                {{ end }}
+                <input class="sr-only peer" type="radio" name="tier" value="{{ .ID }}" {{ if eq $.SelectedTier .ID }}checked{{ end }}>
+                <span class="text-sm font-semibold uppercase tracking-wide text-slate-300">{{ .Name }}</span>
+                <strong class="mt-3 text-3xl text-white">{{ .Price }}</strong>
+                <span class="mt-3 text-sm leading-6 text-slate-300">{{ .Description }}</span>
+                <ul class="mt-5 grid gap-2 text-sm text-slate-200">
+                    {{ range .Features }}
+                    <li class="flex gap-2"><span class="text-cyan-300">&check;</span>{{ . }}</li>
+                    {{ end }}
+                </ul>
+                <span class="mt-6 rounded-md border border-white/10 px-3 py-2 text-center text-sm font-semibold text-slate-100 peer-checked:border-cyan-300 peer-checked:bg-cyan-300 peer-checked:text-slate-950">Choose {{ .Name }}</span>
+            </label>
+            {{ end }}
+
+            <div class="lg:col-span-3 mt-2 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <a href="/admin/storefronts" class="text-sm font-semibold text-slate-300 hover:text-white">Back to admin</a>
+                <button type="submit" class="rounded-md bg-cyan-300 px-5 py-2 text-sm font-semibold text-slate-950 hover:bg-cyan-200">Continue to payment</button>
+            </div>
+        </form>
+    </div>
+</section>
+{{ template "base_end" . }}
+{{ end }}

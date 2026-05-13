@@ -23,6 +23,10 @@ func (admin *Admin) Auth(roles ...string) gin.HandlerFunc {
 
 func (admin *Admin) Get(c *gin.Context) {
 	switch c.FullPath() {
+	case "/register":
+		admin.RegisterForm(c)
+	case "/:country/register":
+		admin.RegisterForm(c)
 	case "/admin/login":
 		admin.Login(c)
 	case "/admin/register":
@@ -34,6 +38,10 @@ func (admin *Admin) Get(c *gin.Context) {
 
 func (admin *Admin) Post(c *gin.Context) {
 	switch c.FullPath() {
+	case "/register":
+		admin.RegisterPost(c)
+	case "/:country/register":
+		admin.RegisterPost(c)
 	case "/admin/login":
 		admin.LoginPost(c)
 	case "/admin/register":
@@ -112,6 +120,7 @@ func (admin *Admin) LoginPost(c *gin.Context) {
 func (admin *Admin) RegisterForm(c *gin.Context) {
 	c.HTML(http.StatusOK, "admin_register", gin.H{
 		"Title":        "Admin Register",
+		"Country":      c.Param("country"),
 		"Roles":        admin.roles(),
 		"IsAdminRoute": true,
 	})
@@ -144,7 +153,7 @@ func (admin *Admin) RegisterPost(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusFound, "/admin/storefronts/create")
+	c.Redirect(http.StatusFound, "/purchase")
 }
 
 func (admin *Admin) loginFields() []form_validator.Field {
@@ -183,6 +192,7 @@ func renderAdminRegister(c *gin.Context, message string) {
 	c.HTML(http.StatusBadRequest, "admin_register", gin.H{
 		"Title":        "Admin Register",
 		"Error":        message,
+		"Country":      c.Param("country"),
 		"Roles":        []string{"admin", "editor", "user"},
 		"IsAdminRoute": true,
 	})

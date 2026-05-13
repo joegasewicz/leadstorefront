@@ -13,6 +13,7 @@ func Register(app *gin.Engine) {
 	products := &Products{API: api}
 	articles := &Articles{API: api}
 	admin := &Admin{API: api}
+	purchase := &Purchase{}
 	adminStorefronts := &AdminStorefronts{API: api}
 	adminArticles := &AdminArticles{API: api}
 	adminProducts := &AdminProducts{API: api}
@@ -33,6 +34,14 @@ func Register(app *gin.Engine) {
 	app.GET("/storefronts/:id/articles/:slug", articles.Get)
 	app.GET("/storefronts/:id/products", products.Get)
 	app.GET("/storefronts/:id/products/:slug", products.Get)
+	app.GET("/register", admin.Get)
+	app.POST("/register", admin.Post)
+	app.GET("/purchase", admin.Auth("super", "admin", "editor", "user"), purchase.Get)
+	app.POST("/purchase", admin.Auth("super", "admin", "editor", "user"), purchase.Post)
+	app.GET("/payment", admin.Auth("super", "admin", "editor", "user"), purchase.Get)
+	app.POST("/payment", admin.Auth("super", "admin", "editor", "user"), purchase.Post)
+	app.GET("/:country/register", admin.Get)
+	app.POST("/:country/register", admin.Post)
 	app.GET("/:country", home.Get)
 	app.GET("/:country/storefronts/:id", storefronts.Get)
 	app.GET("/:country/storefronts/:id/articles", articles.Get)
