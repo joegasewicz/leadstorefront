@@ -1,0 +1,65 @@
+{{ define "admin_lead_form" }}
+{{ template "base_start" . }}
+<section class="mx-auto max-w-6xl px-6 py-10">
+    <div class="mb-8 flex items-start justify-between gap-4">
+        <div>
+            <a href="/admin/storefronts/{{ .Storefront.ID }}" class="text-sm font-semibold text-cyan-300 hover:text-cyan-200">Storefront</a>
+            <h1 class="mt-3 text-3xl font-bold tracking-normal text-white">Lead form</h1>
+            <p class="mt-2 text-sm text-slate-300">{{ .Storefront.Domain }}</p>
+        </div>
+        <a href="/admin/storefronts/{{ .Storefront.ID }}" class="rounded-md border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">Back</a>
+    </div>
+
+    {{ if .Error }}
+    <p class="mb-6 rounded-md border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">{{ .Error }}</p>
+    {{ end }}
+
+    <form method="post" action="/admin/storefronts/{{ .Storefront.ID }}/lead-form" class="grid gap-4">
+        <div class="overflow-hidden rounded-lg border border-white/10">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-white/5 text-slate-300">
+                    <tr>
+                        <th class="px-4 py-3">Label</th>
+                        <th class="px-4 py-3">Field name</th>
+                        <th class="px-4 py-3">Type</th>
+                        <th class="px-4 py-3">Options</th>
+                        <th class="px-4 py-3">Required</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/10">
+                    {{ range $index, $field := .Fields }}
+                    <tr>
+                        <td class="px-4 py-3">
+                            <input name="field_label" value="{{ $field.Label }}" class="w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                        </td>
+                        <td class="px-4 py-3">
+                            <input name="field_name" value="{{ $field.Name }}" placeholder="auto from label" class="w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                        </td>
+                        <td class="px-4 py-3">
+                            <select name="field_type" class="w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                                <option value="text" {{ if eq $field.Type "text" }}selected{{ end }}>Text</option>
+                                <option value="email" {{ if eq $field.Type "email" }}selected{{ end }}>Email</option>
+                                <option value="tel" {{ if eq $field.Type "tel" }}selected{{ end }}>Tel</option>
+                                <option value="textarea" {{ if eq $field.Type "textarea" }}selected{{ end }}>Textarea</option>
+                                <option value="option" {{ if eq $field.Type "option" }}selected{{ end }}>Option</option>
+                            </select>
+                        </td>
+                        <td class="px-4 py-3">
+                            <input name="field_options" value="{{ $field.Options }}" placeholder="Option A, Option B" class="w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                        </td>
+                        <td class="px-4 py-3">
+                            <input name="field_required" value="{{ $index }}" type="checkbox" {{ if $field.IsRequired }}checked{{ end }} class="h-4 w-4 rounded border-white/10 bg-slate-900 text-cyan-300">
+                        </td>
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+            <p class="text-sm text-slate-400">Leave a row label blank to remove that field. Option fields use comma-separated choices.</p>
+            <button type="submit" class="rounded-md bg-cyan-300 px-5 py-2 text-sm font-semibold text-slate-950 hover:bg-cyan-200">Save form</button>
+        </div>
+    </form>
+</section>
+{{ template "base_end" . }}
+{{ end }}

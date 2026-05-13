@@ -10,6 +10,7 @@ func Register(app *gin.Engine) {
 	domainCheck := &DomainCheck{API: api}
 	home := &Home{API: api}
 	storefronts := &Storefronts{API: api}
+	leads := &Leads{API: api}
 	products := &Products{API: api}
 	articles := &Articles{API: api}
 	admin := &Admin{API: api}
@@ -18,6 +19,7 @@ func Register(app *gin.Engine) {
 	adminArticles := &AdminArticles{API: api}
 	adminProducts := &AdminProducts{API: api}
 	adminUsers := &AdminUsers{API: api}
+	adminLeadForms := &AdminLeadForms{API: api}
 
 	app.GET("/health", health.Get)
 	app.POST("/health", health.Post)
@@ -31,6 +33,7 @@ func Register(app *gin.Engine) {
 
 	app.GET("/", home.Redirect)
 	app.GET("/storefronts/:id", storefronts.Get)
+	app.POST("/storefronts/:id", leads.Post)
 	app.GET("/storefronts/:id/articles", articles.Get)
 	app.GET("/storefronts/:id/articles/:slug", articles.Get)
 	app.GET("/storefronts/:id/products", products.Get)
@@ -45,6 +48,7 @@ func Register(app *gin.Engine) {
 	app.POST("/:country/register", admin.Post)
 	app.GET("/:country", home.Get)
 	app.GET("/:country/storefronts/:id", storefronts.Get)
+	app.POST("/:country/storefronts/:id", leads.Post)
 	app.GET("/:country/storefronts/:id/articles", articles.Get)
 	app.GET("/:country/storefronts/:id/articles/:slug", articles.Get)
 	app.GET("/:country/storefronts/:id/products", products.Get)
@@ -73,6 +77,8 @@ func Register(app *gin.Engine) {
 	protected.GET("/storefronts/:id/delete", adminStorefronts.Get)
 	protected.POST("/storefronts/:id/delete", adminStorefronts.Delete)
 	protected.GET("/storefronts/:id", adminStorefronts.Get)
+	protected.GET("/storefronts/:id/lead-form", adminLeadForms.Get)
+	protected.POST("/storefronts/:id/lead-form", adminLeadForms.Post)
 	protected.POST("/storefronts/:id/content", adminStorefronts.Post)
 	protected.POST("/storefronts/:id/nav-logo", adminStorefronts.Post)
 	protected.POST("/storefronts/:id/products", adminStorefronts.Post)
@@ -89,6 +95,8 @@ func Register(app *gin.Engine) {
 	protected.GET("/products/:id/edit", adminProducts.Get)
 	protected.POST("/products/:id/edit", adminProducts.Put)
 	protected.POST("/products/:id/delete", adminProducts.Delete)
+	protected.GET("/leads", leads.Get)
+	protected.GET("/leads/:id", leads.Get)
 
 	superProtected := adminGroup.Group("")
 	superProtected.Use(admin.Auth("super"))

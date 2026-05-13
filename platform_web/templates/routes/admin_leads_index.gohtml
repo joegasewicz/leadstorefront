@@ -1,0 +1,43 @@
+{{ define "admin_leads_index" }}
+{{ template "base_start" . }}
+<section class="mx-auto max-w-6xl px-6 py-10">
+    <div class="mb-8">
+        <p class="text-sm font-semibold uppercase tracking-wide text-cyan-300">Lead capture</p>
+        <h1 class="mt-2 text-3xl font-bold tracking-normal text-white">Leads</h1>
+    </div>
+    {{ if .Flash }}
+    <p class="mb-6 rounded-md border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">{{ .Flash }}</p>
+    {{ end }}
+    <div class="overflow-hidden rounded-lg border border-white/10">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-white/5 text-slate-300">
+                <tr>
+                    <th class="px-4 py-3">Date</th>
+                    <th class="px-4 py-3">Storefront</th>
+                    <th class="px-4 py-3">Domain</th>
+                    <th class="px-4 py-3">Source</th>
+                    <th class="px-4 py-3">Tracking</th>
+                    <th class="px-4 py-3 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-white/10">
+                {{ range .Leads }}
+                <tr class="text-slate-200 hover:bg-white/5">
+                    <td class="px-4 py-3">{{ .CreatedAt.Format "2006-01-02 15:04" }}</td>
+                    <td class="px-4 py-3">{{ .Storefront.Name }}</td>
+                    <td class="px-4 py-3">{{ .Storefront.Domain }}</td>
+                    <td class="px-4 py-3">{{ .Source }}</td>
+                    <td class="px-4 py-3">{{ .Tracking }}</td>
+                    <td class="px-4 py-3 text-right"><a href="/admin/leads/{{ .ID }}" class="text-sm font-semibold text-cyan-200 hover:text-cyan-100">View</a></td>
+                </tr>
+                {{ else }}
+                <tr>
+                    <td colspan="6" class="px-4 py-8 text-center text-slate-400">No leads yet.</td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+</section>
+{{ template "base_end" . }}
+{{ end }}

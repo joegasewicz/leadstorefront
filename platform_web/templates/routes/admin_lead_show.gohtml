@@ -1,0 +1,51 @@
+{{ define "admin_lead_show" }}
+{{ template "base_start" . }}
+<section class="mx-auto max-w-4xl px-6 py-10">
+    <div class="mb-8 flex items-start justify-between gap-4">
+        <div>
+            <a href="/admin/leads" class="text-sm font-semibold text-cyan-300 hover:text-cyan-200">Leads</a>
+            <h1 class="mt-3 text-3xl font-bold tracking-normal text-white">Lead details</h1>
+            <p class="mt-2 text-sm text-slate-300">{{ .Lead.CreatedAt.Format "2006-01-02 15:04" }}</p>
+        </div>
+        <a href="/admin/storefronts/{{ .Lead.Storefront.ID }}" class="rounded-md border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">Storefront</a>
+    </div>
+
+    <div class="grid gap-6">
+        <section class="rounded-lg border border-white/10 bg-white/5 p-6">
+            <h2 class="text-lg font-semibold text-white">Source</h2>
+            <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                <div>
+                    <dt class="text-slate-400">Storefront</dt>
+                    <dd class="mt-1 text-slate-100">{{ .Lead.Storefront.Name }}</dd>
+                </div>
+                <div>
+                    <dt class="text-slate-400">Domain</dt>
+                    <dd class="mt-1 text-slate-100">{{ .Lead.Storefront.Domain }}</dd>
+                </div>
+                <div>
+                    <dt class="text-slate-400">Tracking source</dt>
+                    <dd class="mt-1 text-slate-100">{{ .Lead.Source }}</dd>
+                </div>
+                <div>
+                    <dt class="text-slate-400">Tracking value</dt>
+                    <dd class="mt-1 text-slate-100">{{ .Lead.Tracking }}</dd>
+                </div>
+            </dl>
+        </section>
+        <section class="rounded-lg border border-white/10 bg-white/5 p-6">
+            <h2 class="text-lg font-semibold text-white">Form values</h2>
+            <dl class="mt-4 grid gap-3">
+                {{ range .Values }}
+                <div class="rounded-md border border-white/10 bg-slate-900 p-3">
+                    <dt class="text-sm font-semibold text-slate-300">{{ .Name }}</dt>
+                    <dd class="mt-1 whitespace-pre-wrap text-sm text-white">{{ .Value }}</dd>
+                </div>
+                {{ else }}
+                <p class="text-sm text-slate-400">No form values were stored.</p>
+                {{ end }}
+            </dl>
+        </section>
+    </div>
+</section>
+{{ template "base_end" . }}
+{{ end }}

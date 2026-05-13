@@ -28,6 +28,8 @@ func (m *Migrate) Run() error {
 		&models.ArticleCategory{},
 		&models.Article{},
 		&models.ArticleStorefront{},
+		&models.LeadFormField{},
+		&models.Lead{},
 	); err != nil {
 		return err
 	}
