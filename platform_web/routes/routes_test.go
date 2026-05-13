@@ -77,6 +77,25 @@ func TestRegisteredWebRoutes(t *testing.T) {
 			expected: http.StatusFound,
 			location: "/admin/login",
 		},
+		{
+			name:     "public register page",
+			method:   http.MethodGet,
+			path:     "/register",
+			expected: http.StatusOK,
+		},
+		{
+			name:     "country register page",
+			method:   http.MethodGet,
+			path:     "/uk/register",
+			expected: http.StatusOK,
+		},
+		{
+			name:     "purchase requires login",
+			method:   http.MethodGet,
+			path:     "/purchase",
+			expected: http.StatusFound,
+			location: "/admin/login",
+		},
 	}
 
 	for _, tt := range tests {
@@ -202,6 +221,8 @@ const webTestTemplates = `
 {{ define "storefront_show" }}storefront {{ .Storefront.Name }}{{ end }}
 {{ define "admin_login" }}admin login {{ .Error }}{{ end }}
 {{ define "admin_register" }}admin register {{ .Error }}{{ end }}
+{{ define "purchase" }}purchase {{ .Error }}{{ end }}
+{{ define "payment" }}payment {{ .Error }}{{ end }}
 {{ define "admin_home" }}admin home {{ .Email }}{{ end }}
 {{ define "admin_storefronts_index" }}admin storefronts{{ end }}
 {{ define "admin_storefront_show" }}admin storefront show{{ end }}
