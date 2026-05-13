@@ -26,6 +26,17 @@
                     <a href="/admin/articles" class="block px-4 py-2 text-sm text-slate-200 hover:bg-white/5 hover:text-white">Articles</a>
                 </div>
             </div>
+            {{ if .IsSuper }}
+            <div class="group relative">
+                <button type="button" class="inline-flex items-center gap-2 rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">
+                    Super
+                    <span aria-hidden="true">▾</span>
+                </button>
+                <div class="invisible absolute right-0 z-20 mt-2 w-44 rounded-md border border-white/10 bg-slate-900 py-2 opacity-0 shadow-xl transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                    <a href="/admin/users" class="block px-4 py-2 text-sm text-slate-200 hover:bg-white/5 hover:text-white">Users</a>
+                </div>
+            </div>
+            {{ end }}
             {{ else }}
             <a href="/admin/login" class="rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">Login</a>
             {{ end }}

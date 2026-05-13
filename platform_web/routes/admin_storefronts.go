@@ -70,6 +70,7 @@ func (storefronts *AdminStorefronts) Index(c *gin.Context) {
 		"Limit":        limit,
 		"Flash":        middleware.PopFlash(c),
 		"IsAdmin":      true,
+		"IsSuper":      isCurrentSuper(c),
 		"IsAdminRoute": true,
 	})
 }
@@ -122,6 +123,7 @@ func (storefronts *AdminStorefronts) Show(c *gin.Context) {
 		"AvailableArticles": unassignedArticles(availableArticleResponse.Articles, articleResponse.Articles),
 		"Flash":             middleware.PopFlash(c),
 		"IsAdmin":           true,
+		"IsSuper":           isCurrentSuper(c),
 		"IsAdminRoute":      true,
 	})
 }
@@ -298,6 +300,7 @@ func (storefronts *AdminStorefronts) renderDelete(c *gin.Context, status int, st
 		"Storefront":   storefront,
 		"Error":        message,
 		"IsAdmin":      true,
+		"IsSuper":      isCurrentSuper(c),
 		"IsAdminRoute": true,
 	})
 }
@@ -323,6 +326,7 @@ func (storefronts *AdminStorefronts) renderForm(c *gin.Context, status int, titl
 		"OwnerID":      ownerID,
 		"Error":        message,
 		"IsAdmin":      true,
+		"IsSuper":      isCurrentSuper(c),
 		"IsAdminRoute": true,
 	})
 }

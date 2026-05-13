@@ -17,6 +17,7 @@ func Register(app *gin.Engine) {
 	adminStorefronts := &AdminStorefronts{API: api}
 	adminArticles := &AdminArticles{API: api}
 	adminProducts := &AdminProducts{API: api}
+	adminUsers := &AdminUsers{API: api}
 
 	app.GET("/health", health.Get)
 	app.POST("/health", health.Post)
@@ -88,4 +89,11 @@ func Register(app *gin.Engine) {
 	protected.GET("/products/:id/edit", adminProducts.Get)
 	protected.POST("/products/:id/edit", adminProducts.Put)
 	protected.POST("/products/:id/delete", adminProducts.Delete)
+
+	superProtected := adminGroup.Group("")
+	superProtected.Use(admin.Auth("super"))
+	superProtected.GET("/users", adminUsers.Get)
+	superProtected.GET("/users/:id/edit", adminUsers.Get)
+	superProtected.POST("/users/:id/edit", adminUsers.Post)
+	superProtected.POST("/users/:id/delete", adminUsers.Post)
 }

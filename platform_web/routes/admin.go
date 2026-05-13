@@ -78,6 +78,7 @@ func (admin *Admin) Home(c *gin.Context) {
 		"Limit":        limit,
 		"Flash":        middleware.PopFlash(c),
 		"IsAdmin":      true,
+		"IsSuper":      isCurrentSuper(c),
 		"IsAdminRoute": true,
 	})
 }
@@ -87,6 +88,15 @@ func (admin *Admin) Login(c *gin.Context) {
 		"Title":        "Admin Login",
 		"IsAdminRoute": true,
 	})
+}
+
+func isCurrentSuper(c *gin.Context) bool {
+	currentUser, ok := c.Get("currentUser")
+	if !ok {
+		return false
+	}
+	user, ok := currentUser.(models.User)
+	return ok && user.Role.Name == "super"
 }
 
 func (admin *Admin) LoginPost(c *gin.Context) {

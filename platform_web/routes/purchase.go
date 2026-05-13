@@ -64,6 +64,7 @@ func (purchase *Purchase) Choose(c *gin.Context) {
 		"Tiers":        purchaseTiers(),
 		"SelectedTier": selectedTier(c),
 		"IsAdmin":      true,
+		"IsSuper":      isCurrentSuper(c),
 		"IsAdminRoute": true,
 	})
 }
@@ -102,6 +103,7 @@ func (purchase *Purchase) Payment(c *gin.Context) {
 		"Title":        "Payment",
 		"Tier":         tierByID(tier),
 		"IsAdmin":      true,
+		"IsSuper":      isCurrentSuper(c),
 		"IsAdminRoute": true,
 	})
 }
@@ -118,6 +120,7 @@ func (purchase *Purchase) PaymentPost(c *gin.Context) {
 			"Tier":         tierByID(tier),
 			"Error":        "Confirm that you want to continue with this tier.",
 			"IsAdmin":      true,
+			"IsSuper":      isCurrentSuper(c),
 			"IsAdminRoute": true,
 		})
 		return
@@ -136,6 +139,7 @@ func (purchase *Purchase) renderChoose(c *gin.Context, status int, message strin
 		"SelectedTier": selectedTier(c),
 		"Error":        message,
 		"IsAdmin":      true,
+		"IsSuper":      isCurrentSuper(c),
 		"IsAdminRoute": true,
 	})
 }

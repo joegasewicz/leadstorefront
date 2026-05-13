@@ -96,6 +96,13 @@ func TestRegisteredWebRoutes(t *testing.T) {
 			expected: http.StatusFound,
 			location: "/admin/login",
 		},
+		{
+			name:     "users requires super login",
+			method:   http.MethodGet,
+			path:     "/admin/users",
+			expected: http.StatusFound,
+			location: "/admin/login",
+		},
 	}
 
 	for _, tt := range tests {
@@ -235,4 +242,6 @@ const webTestTemplates = `
 {{ define "admin_article_form" }}admin article form {{ .Error }}{{ end }}
 {{ define "admin_products_index" }}admin products{{ end }}
 {{ define "admin_product_form" }}admin product form {{ .Error }}{{ end }}
+{{ define "admin_users_index" }}admin users{{ end }}
+{{ define "admin_user_form" }}admin user form {{ .Error }}{{ end }}
 `

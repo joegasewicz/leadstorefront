@@ -1,0 +1,55 @@
+{{ define "admin_users_index" }}
+{{ template "base_start" . }}
+<section class="mx-auto max-w-6xl px-6 py-10">
+    <div class="mb-8 flex items-center justify-between gap-4">
+        <div>
+            <p class="text-sm font-semibold uppercase tracking-wide text-cyan-300">Super admin</p>
+            <h1 class="mt-2 text-3xl font-bold tracking-normal text-white">Users</h1>
+            <p class="mt-2 text-sm text-slate-300">Manage account access for LeadStorefront users.</p>
+        </div>
+    </div>
+
+    {{ if .Flash }}
+    <p class="mb-6 rounded-md border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">{{ .Flash }}</p>
+    {{ end }}
+
+    <div class="overflow-hidden rounded-lg border border-white/10">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-white/5 text-slate-300">
+                <tr>
+                    <th class="px-4 py-3">Email</th>
+                    <th class="px-4 py-3">Role</th>
+                    <th class="px-4 py-3">Created</th>
+                    <th class="px-4 py-3 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-white/10">
+                {{ range .Users }}
+                <tr class="text-slate-200 hover:bg-white/5">
+                    <td class="px-4 py-3 font-medium">{{ .Email }}</td>
+                    <td class="px-4 py-3">{{ .Role.Name }}</td>
+                    <td class="px-4 py-3">{{ .CreatedAt.Format "2006-01-02" }}</td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center justify-end gap-3">
+                            <a href="/admin/users/{{ .ID }}/edit" class="text-sm font-semibold text-cyan-200 hover:text-cyan-100">Edit</a>
+                            <form method="post" action="/admin/users/{{ .ID }}/delete" class="flex items-center gap-2">
+                                <label class="flex items-center gap-2 text-xs text-slate-300">
+                                    <input type="checkbox" name="confirm_delete" class="h-4 w-4 rounded border-white/20 bg-slate-900">
+                                    Confirm
+                                </label>
+                                <button type="submit" class="text-sm font-semibold text-red-200 hover:text-red-100">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {{ else }}
+                <tr>
+                    <td colspan="4" class="px-4 py-8 text-center text-slate-400">No users found.</td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+</section>
+{{ template "base_end" . }}
+{{ end }}

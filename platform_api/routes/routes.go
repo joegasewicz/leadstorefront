@@ -67,7 +67,10 @@ func Register(app *gin.Engine, db *gorm.DB) {
 	app.GET(utils.GetVersion("/admin/register"), utils.AdminStatic)
 	app.POST(utils.GetVersion("/admin/register"), user.Post)
 	app.POST(utils.GetVersion("/admin/logout"), utils.AdminStatic)
+	app.GET(utils.GetVersion("/admin/users"), user.Get)
 	app.GET(utils.GetVersion("/admin/users/:id"), user.Get)
+	app.PUT(utils.GetVersion("/admin/users/:id"), user.Put)
+	app.DELETE(utils.GetVersion("/admin/users/:id/delete"), user.Delete)
 
 	app.GET(utils.GetVersion("/admin/storefronts"), storefront.Get)
 	app.GET(utils.GetVersion("/admin/storefronts/create"), storefront.Get)
