@@ -54,11 +54,12 @@ func (articles *Articles) Index(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "articles_index", gin.H{
-		"Title":        "Articles | LeadStorefront",
-		"Country":      country,
-		"Articles":     response.Articles,
-		"ArticlesPath": articlesPath,
-		"Storefront":   storefront,
+		"Title":             "Articles | LeadStorefront",
+		"Country":           country,
+		"Articles":          response.Articles,
+		"ArticlesPath":      articlesPath,
+		"Storefront":        storefront,
+		"UseStorefrontFont": hasStorefront,
 	})
 }
 
@@ -101,11 +102,12 @@ func (articles *Articles) Show(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "article_show", gin.H{
-		"Title":        title,
-		"Country":      country,
-		"Article":      article,
-		"ArticlesPath": articlesPath,
-		"Storefront":   storefront,
+		"Title":             title,
+		"Country":           country,
+		"Article":           article,
+		"ArticlesPath":      articlesPath,
+		"Storefront":        storefront,
+		"UseStorefrontFont": hasStorefront,
 	})
 }
 

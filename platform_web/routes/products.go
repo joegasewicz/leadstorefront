@@ -54,11 +54,12 @@ func (products *Products) Index(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "products_index", gin.H{
-		"Title":        "Products | LeadStorefront",
-		"Country":      countryCode,
-		"Products":     response.Products,
-		"ProductsPath": productsPath,
-		"Storefront":   storefront,
+		"Title":             "Products | LeadStorefront",
+		"Country":           countryCode,
+		"Products":          response.Products,
+		"ProductsPath":      productsPath,
+		"Storefront":        storefront,
+		"UseStorefrontFont": hasStorefront,
 	})
 }
 
@@ -96,11 +97,12 @@ func (products *Products) Show(c *gin.Context) {
 	product := response.Product
 
 	c.HTML(http.StatusOK, "product_show", gin.H{
-		"Title":        product.Name + " | LeadStorefront",
-		"Country":      countryCode,
-		"Product":      product,
-		"ProductsPath": productsPath,
-		"Storefront":   storefront,
+		"Title":             product.Name + " | LeadStorefront",
+		"Country":           countryCode,
+		"Product":           product,
+		"ProductsPath":      productsPath,
+		"Storefront":        storefront,
+		"UseStorefrontFont": hasStorefront,
 	})
 }
 

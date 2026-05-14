@@ -52,13 +52,14 @@ func (storefronts *Storefronts) Get(c *gin.Context) {
 func renderStorefront(c *gin.Context, api *APIClient, status int, country string, storefront models.Storefront) {
 	storefrontPath := storefrontBasePath(c, country, storefront)
 	c.HTML(status, "storefront_show", gin.H{
-		"Title":          storefront.Name + " | LeadStorefront",
-		"Country":        country,
-		"Storefront":     storefront,
-		"StorefrontPath": storefrontPath,
-		"LeadFields":     publicLeadFields(c, api, storefront.ID),
-		"LeadFormAction": c.Request.URL.RequestURI(),
-		"Flash":          middleware.PopFlash(c),
+		"Title":             storefront.Name + " | LeadStorefront",
+		"Country":           country,
+		"Storefront":        storefront,
+		"StorefrontPath":    storefrontPath,
+		"UseStorefrontFont": true,
+		"LeadFields":        publicLeadFields(c, api, storefront.ID),
+		"LeadFormAction":    c.Request.URL.RequestURI(),
+		"Flash":             middleware.PopFlash(c),
 	})
 }
 
