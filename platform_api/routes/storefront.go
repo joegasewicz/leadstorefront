@@ -351,6 +351,7 @@ func (storefront *Storefront) bindJSON(c *gin.Context) (models.Storefront, bool)
 	record.Name = strings.TrimSpace(record.Name)
 	record.Domain = strings.ToLower(strings.TrimSpace(record.Domain))
 	record.GoogleFontFamily = normalizeGoogleFontFamily(record.GoogleFontFamily)
+	record.DesignConfig = models.StorefrontDesignJSON(record.DesignConfig)
 	record.HeroMediaURL = strings.TrimSpace(record.HeroMediaURL)
 	record.HeroMediaType = normalizeHeroMediaType(record.HeroMediaType, record.HeroMediaURL, record.HeroImageURL)
 	if record.Slug == "" {
@@ -397,6 +398,7 @@ func storefrontUpdateMap(storefront models.Storefront) map[string]interface{} {
 		"logo_url":           storefront.LogoURL,
 		"logo_width_px":      storefront.LogoWidthPx,
 		"google_font_family": normalizeGoogleFontFamily(storefront.GoogleFontFamily),
+		"design_config":      models.StorefrontDesignJSON(storefront.DesignConfig),
 		"hero_title":         storefront.HeroTitle,
 		"hero_subtitle":      storefront.HeroSubtitle,
 		"hero_image_url":     storefront.HeroImageURL,

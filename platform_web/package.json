@@ -11,5 +11,9 @@
     "sass": "^1.93.3",
     "typescript": "^5.9.3",
     "vite": "^7.1.12"
+  },
+  "dependencies": {
+    "alpinejs": "^3.15.12",
+    "sortablejs": "^1.15.7"
   }
 }

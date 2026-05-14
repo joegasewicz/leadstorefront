@@ -8,7 +8,8 @@
         </div>
         <a href="/admin/storefronts" class="rounded-md border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">Storefronts</a>
     </div>
-    <form method="post" action="{{ .Action }}" enctype="multipart/form-data" class="grid gap-6">
+    <form method="post" action="{{ .Action }}" enctype="multipart/form-data" class="grid gap-6" x-data="storefrontThemeEditor()" x-init="init()" @submit="updateDesignConfig()">
+        <input type="hidden" name="design_config_json" value="{{ .DesignConfigJSON }}" x-ref="designConfig">
         {{ if .Error }}
         <p class="rounded-md border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">{{ .Error }}</p>
         {{ end }}
@@ -80,50 +81,7 @@
             </div>
         </section>
 
-        <section class="rounded-lg border border-white/10 bg-white/5">
-            <div class="border-b border-white/10 px-4 py-3">
-                <h2 class="text-lg font-semibold text-white">Hero section</h2>
-                <p class="mt-1 text-sm text-slate-400">Main heading and background image or video shown at the top of the storefront.</p>
-            </div>
-            <div class="grid gap-4 p-4 md:grid-cols-2">
-                <label class="block text-sm font-medium text-slate-200" for="hero_title">
-                    Hero H1
-                    <input id="hero_title" name="hero_title" value="{{ .Storefront.HeroTitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-                </label>
-                <label class="block text-sm font-medium text-slate-200" for="hero_subtitle">
-                    Hero H2
-                    <input id="hero_subtitle" name="hero_subtitle" value="{{ .Storefront.HeroSubtitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-                </label>
-                <label class="block text-sm font-medium text-slate-200" for="hero_media_type">
-                    Hero media type
-                    <select id="hero_media_type" name="hero_media_type" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-                        <option value="image" {{ if ne .Storefront.HeroMediaType "video" }}selected{{ end }}>Image</option>
-                        <option value="video" {{ if eq .Storefront.HeroMediaType "video" }}selected{{ end }}>Video</option>
-                    </select>
-                </label>
-                <label class="block text-sm font-medium text-slate-200" for="hero_media_url">
-                    Hero media URL
-                    <input id="hero_media_url" name="hero_media_url" value="{{ if .Storefront.HeroMediaURL }}{{ .Storefront.HeroMediaURL }}{{ else }}{{ .Storefront.HeroImageURL }}{{ end }}" placeholder="https://example.com/hero.jpg or https://example.com/hero.mp4" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-                </label>
-            </div>
-        </section>
-
-        <section class="rounded-lg border border-white/10 bg-white/5">
-            <div class="border-b border-white/10 px-4 py-3">
-                <h2 class="text-lg font-semibold text-white">About section</h2>
-                <p class="mt-1 text-sm text-slate-400">Introductory copy shown below the hero.</p>
-            </div>
-            <div class="grid gap-4 p-4 md:grid-cols-2">
-                <label class="block text-sm font-medium text-slate-200" for="about_title">
-                    About H3
-                    <input id="about_title" name="about_title" value="{{ .Storefront.AboutTitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-                </label>
-                <label class="md:col-span-2 block text-sm font-medium text-slate-200" for="about_body">
-                    About paragraph
-                    <textarea id="about_body" name="about_body" rows="4" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">{{ .Storefront.AboutBody }}</textarea>
-                </label>
-            </div>
-        </section>
+        {{ template "admin_storefront_theme_editor" . }}
 
         <div class="flex justify-end">
             <button type="submit" class="rounded-md bg-cyan-300 px-4 py-2 font-semibold text-slate-950 hover:bg-cyan-200">Create storefront</button>

@@ -1,3 +1,258 @@
 import "./styles.scss";
+import Alpine from "alpinejs";
+import Sortable from "sortablejs";
 
 document.documentElement.classList.add("js-enabled");
+
+type StorefrontThemeColors = {
+  primary: string;
+  accent: string;
+  background: string;
+  text: string;
+  surface: string;
+};
+
+type StorefrontThemeContentColumn = {
+  heading: string;
+  body: string;
+};
+
+type StorefrontThemeSectionOptions = {
+  content_kind?: string;
+  title?: string;
+  description?: string;
+  columns?: StorefrontThemeContentColumn[];
+};
+
+type StorefrontThemeSection = {
+  id: string;
+  name: string;
+  type: string;
+  enabled: boolean;
+  options: StorefrontThemeSectionOptions;
+};
+
+type StorefrontThemeConfig = {
+  colors: StorefrontThemeColors;
+  sections: StorefrontThemeSection[];
+};
+
+declare global {
+  interface Window {
+    Alpine: typeof Alpine;
+  }
+}
+
+const defaultTheme: StorefrontThemeConfig = {
+  colors: {
+    primary: "#67e8f9",
+    accent: "#38bdf8",
+    background: "#020617",
+    text: "#ffffff",
+    surface: "#0f172a"
+  },
+  sections: [
+    { id: "hero", name: "Hero", type: "hero", enabled: true, options: {} },
+    { id: "lead-form", name: "Lead form", type: "content", enabled: true, options: { content_kind: "lead_form" } },
+    { id: "about", name: "About", type: "content", enabled: true, options: { content_kind: "about" } },
+    { id: "products", name: "Products", type: "content", enabled: true, options: { content_kind: "products" } },
+    { id: "articles", name: "Articles", type: "content", enabled: true, options: { content_kind: "articles" } },
+    { id: "footer", name: "Footer", type: "footer", enabled: true, options: {} }
+  ]
+};
+
+function sectionID(name: string, type: string): string {
+  const base = (name || type || "section")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `${base || "section"}-${Date.now().toString(36)}`;
+}
+
+function normalizeSection(section: Partial<StorefrontThemeSection>): StorefrontThemeSection {
+  const type = section.type || "content";
+  const options = { ...(section.options || {}) };
+  if (type === "content") {
+    options.content_kind = options.content_kind || "custom";
+    if (options.content_kind === "custom") {
+      options.title = options.title || section.name || "Content";
+      options.description = options.description || "";
+      options.columns = (options.columns || []).map((column) => ({
+        heading: column.heading || "",
+        body: column.body || ""
+      }));
+    } else {
+      delete options.title;
+      delete options.description;
+      delete options.columns;
+    }
+  }
+  return {
+    id: section.id || sectionID(section.name || type, type),
+    name: section.name || type || "Section",
+    type,
+    enabled: section.enabled ?? true,
+    options: type === "content" ? options : {}
+  };
+}
+
+Alpine.data("storefrontThemeEditor", () => ({
+  colors: { ...defaultTheme.colors },
+  sections: defaultTheme.sections.map((section) => normalizeSection(section)),
+  selectedSectionID: "hero",
+  newSectionName: "",
+  newSectionType: "content",
+  newContentKind: "custom",
+  sortable: null as Sortable | null,
+
+  init() {
+    const input = this.$refs.designConfig as HTMLInputElement | undefined;
+    if (input?.value) {
+      try {
+        const config = JSON.parse(input.value) as Partial<StorefrontThemeConfig>;
+        this.colors = { ...defaultTheme.colors, ...(config.colors || {}) };
+        if (config.sections?.length) {
+          this.sections = config.sections.map((section) => normalizeSection(section));
+        }
+      } catch (_error) {
+        this.colors = { ...defaultTheme.colors };
+      }
+    }
+    this.selectedSectionID = this.sections[0]?.id || "";
+
+    this.$watch("colors", () => this.updateDesignConfig());
+    this.$watch("sections", () => this.updateDesignConfig());
+
+    this.$nextTick(() => {
+      this.bindSortable();
+      this.updateDesignConfig();
+    });
+  },
+
+  bindSortable() {
+    const sectionList = this.$refs.sections as HTMLElement | undefined;
+    if (!sectionList) {
+      return;
+    }
+    this.sortable?.destroy();
+    this.sortable = Sortable.create(sectionList, {
+      animation: 150,
+      handle: ".theme-section-handle",
+      onEnd: () => {
+        const orderedIDs = Array.from(sectionList.querySelectorAll<HTMLElement>("[data-section-id]")).map((element) => element.dataset.sectionId || "");
+        this.sections = orderedIDs
+          .map((id) => this.sections.find((section) => section.id === id))
+          .filter((section): section is StorefrontThemeSection => Boolean(section));
+        if (!this.selectedSection()) {
+          this.selectedSectionID = this.sections[0]?.id || "";
+        }
+        this.updateDesignConfig();
+      }
+    });
+  },
+
+  selectedSection() {
+    return this.sections.find((section) => section.id === this.selectedSectionID) || this.sections[0] || null;
+  },
+
+  selectSection(id: string) {
+    this.selectedSectionID = id;
+  },
+
+  setSectionType(section: StorefrontThemeSection, type: string) {
+    section.type = type || "content";
+    if (section.type !== "content") {
+      section.options = {};
+    } else {
+      section.options = { content_kind: section.options.content_kind || "custom" };
+      this.ensureCustomContent(section);
+    }
+    this.updateDesignConfig();
+  },
+
+  setContentKind(section: StorefrontThemeSection, contentKind: string) {
+    section.options = {
+      ...section.options,
+      content_kind: contentKind || "custom"
+    };
+    this.ensureCustomContent(section);
+    this.updateDesignConfig();
+  },
+
+  ensureCustomContent(section: StorefrontThemeSection) {
+    if (section.type !== "content" || section.options.content_kind !== "custom") {
+      return;
+    }
+    section.options.title = section.options.title || section.name || "Content";
+    section.options.description = section.options.description || "";
+    section.options.columns = section.options.columns || [];
+  },
+
+  addColumn(section: StorefrontThemeSection) {
+    this.ensureCustomContent(section);
+    section.options.columns?.push({ heading: "", body: "" });
+    this.updateDesignConfig();
+  },
+
+  removeColumn(section: StorefrontThemeSection, index: number) {
+    section.options.columns = (section.options.columns || []).filter((_column, columnIndex) => columnIndex !== index);
+    this.updateDesignConfig();
+  },
+
+  addSection() {
+    const type = this.newSectionType || "content";
+    const name = this.newSectionName.trim() || (type === "hero" ? "Hero" : type === "footer" ? "Footer" : "Content");
+    const section = normalizeSection({
+      id: sectionID(name, type),
+      name,
+      type,
+      enabled: true,
+      options: type === "content" ? { content_kind: this.newContentKind || "custom", title: name, description: "", columns: [] } : {}
+    });
+    this.sections.push(section);
+    this.selectedSectionID = section.id;
+    this.newSectionName = "";
+    this.newSectionType = "content";
+    this.newContentKind = "custom";
+    this.$nextTick(() => {
+      this.bindSortable();
+      this.updateDesignConfig();
+    });
+  },
+
+  removeSection(id: string) {
+    if (this.sections.length <= 1) {
+      return;
+    }
+    this.sections = this.sections.filter((section) => section.id !== id);
+    if (this.selectedSectionID === id) {
+      this.selectedSectionID = this.sections[0]?.id || "";
+    }
+    this.$nextTick(() => this.updateDesignConfig());
+  },
+
+  updateDesignConfig() {
+    const input = this.$refs.designConfig as HTMLInputElement | undefined;
+    if (!input) {
+      return;
+    }
+    input.value = JSON.stringify({
+      colors: this.colors,
+      sections: this.sections.map((section) => ({
+        id: section.id,
+        name: section.name,
+        type: section.type,
+        enabled: section.enabled,
+        options: section.type === "content" ? {
+          content_kind: section.options.content_kind || "custom",
+          title: section.options.content_kind === "custom" ? section.options.title || section.name : undefined,
+          description: section.options.content_kind === "custom" ? section.options.description || "" : undefined,
+          columns: section.options.content_kind === "custom" ? section.options.columns || [] : undefined
+        } : {}
+      }))
+    });
+  }
+}));
+
+window.Alpine = Alpine;
+Alpine.start();

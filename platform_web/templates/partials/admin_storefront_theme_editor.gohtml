@@ -1,0 +1,168 @@
+{{ define "admin_storefront_theme_editor" }}
+<section class="rounded-lg border border-white/10 bg-white/5">
+    <div class="border-b border-white/10 px-4 py-3">
+        <h2 class="text-lg font-semibold text-white">Theme design</h2>
+        <p class="mt-1 text-sm text-slate-400">Select a section to edit its content, colors, type, and storefront position.</p>
+    </div>
+    <div class="grid gap-6 p-4">
+        <div class="rounded-md border border-white/10 bg-slate-900 p-4">
+            <h3 class="text-sm font-semibold text-slate-200">Theme colors</h3>
+            <div class="mt-4 grid gap-4 md:grid-cols-3 xl:grid-cols-5">
+                <label class="block text-sm font-medium text-slate-200">
+                    Primary color
+                    <input type="color" x-model="colors.primary" @input="updateDesignConfig()" class="mt-2 h-10 w-full rounded-md border border-white/10 bg-slate-950 p-1 outline-none focus:border-cyan-300">
+                </label>
+                <label class="block text-sm font-medium text-slate-200">
+                    Accent color
+                    <input type="color" x-model="colors.accent" @input="updateDesignConfig()" class="mt-2 h-10 w-full rounded-md border border-white/10 bg-slate-950 p-1 outline-none focus:border-cyan-300">
+                </label>
+                <label class="block text-sm font-medium text-slate-200">
+                    Background
+                    <input type="color" x-model="colors.background" @input="updateDesignConfig()" class="mt-2 h-10 w-full rounded-md border border-white/10 bg-slate-950 p-1 outline-none focus:border-cyan-300">
+                </label>
+                <label class="block text-sm font-medium text-slate-200">
+                    Text
+                    <input type="color" x-model="colors.text" @input="updateDesignConfig()" class="mt-2 h-10 w-full rounded-md border border-white/10 bg-slate-950 p-1 outline-none focus:border-cyan-300">
+                </label>
+                <label class="block text-sm font-medium text-slate-200">
+                    Surface
+                    <input type="color" x-model="colors.surface" @input="updateDesignConfig()" class="mt-2 h-10 w-full rounded-md border border-white/10 bg-slate-950 p-1 outline-none focus:border-cyan-300">
+                </label>
+            </div>
+        </div>
+
+        <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)]">
+            <template x-if="selectedSection()">
+                <div class="grid gap-4 rounded-md border border-white/10 bg-slate-900 p-4">
+                    <h3 class="text-sm font-semibold text-slate-200">Edit section</h3>
+                <div class="grid gap-4">
+                    <label class="block text-sm font-medium text-slate-200">
+                        Section name
+                        <input type="text" x-model="selectedSection().name" @input="ensureCustomContent(selectedSection()); updateDesignConfig()" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
+                    </label>
+                    <label class="flex items-center gap-3 self-end text-sm font-medium text-slate-200">
+                        <input type="checkbox" x-model="selectedSection().enabled" @change="updateDesignConfig()" class="h-4 w-4 rounded border-white/10 bg-slate-950 text-cyan-300">
+                        Show this section
+                    </label>
+                    <label class="block text-sm font-medium text-slate-200">
+                        Section type
+                        <select :value="selectedSection().type" @change="setSectionType(selectedSection(), $event.target.value)" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
+                            <option value="hero">Hero</option>
+                            <option value="content">Content section</option>
+                            <option value="footer">Footer</option>
+                        </select>
+                    </label>
+                    <label x-show="selectedSection().type === 'content'" class="block text-sm font-medium text-slate-200">
+                        Content option
+                        <select :value="selectedSection().options.content_kind" @change="setContentKind(selectedSection(), $event.target.value)" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
+                            <option value="custom">Custom content</option>
+                            <option value="lead_form">Lead form</option>
+                            <option value="about">About</option>
+                            <option value="products">Products</option>
+                            <option value="articles">Articles</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div x-show="selectedSection().type === 'hero'" class="grid gap-4 border-t border-white/10 pt-4">
+                    <label class="block text-sm font-medium text-slate-200" for="hero_title">
+                        Hero H1
+                        <input id="hero_title" name="hero_title" value="{{ .Storefront.HeroTitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
+                    </label>
+                    <label class="block text-sm font-medium text-slate-200" for="hero_subtitle">
+                        Hero H2
+                        <input id="hero_subtitle" name="hero_subtitle" value="{{ .Storefront.HeroSubtitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
+                    </label>
+                    <label class="block text-sm font-medium text-slate-200" for="hero_media_type">
+                        Hero media type
+                        <select id="hero_media_type" name="hero_media_type" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
+                            <option value="image" {{ if ne .Storefront.HeroMediaType "video" }}selected{{ end }}>Image</option>
+                            <option value="video" {{ if eq .Storefront.HeroMediaType "video" }}selected{{ end }}>Video</option>
+                        </select>
+                    </label>
+                    <label class="block text-sm font-medium text-slate-200" for="hero_media_url">
+                        Hero media URL
+                        <input id="hero_media_url" name="hero_media_url" value="{{ if .Storefront.HeroMediaURL }}{{ .Storefront.HeroMediaURL }}{{ else }}{{ .Storefront.HeroImageURL }}{{ end }}" placeholder="https://example.com/hero.jpg or https://example.com/hero.mp4" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
+                    </label>
+                </div>
+
+                <div x-show="selectedSection().type === 'content' && selectedSection().options.content_kind === 'about'" class="grid gap-4 border-t border-white/10 pt-4">
+                    <label class="block text-sm font-medium text-slate-200" for="about_title">
+                        About H3
+                        <input id="about_title" name="about_title" value="{{ .Storefront.AboutTitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
+                    </label>
+                    <label class="block text-sm font-medium text-slate-200" for="about_body">
+                        About paragraph
+                        <textarea id="about_body" name="about_body" rows="4" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">{{ .Storefront.AboutBody }}</textarea>
+                    </label>
+                </div>
+
+                <div x-show="selectedSection().type === 'content' && selectedSection().options.content_kind === 'custom'" class="grid gap-4 border-t border-white/10 pt-4">
+                    <label class="block text-sm font-medium text-slate-200">
+                        Content title
+                        <input type="text" x-model="selectedSection().options.title" @input="updateDesignConfig()" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
+                    </label>
+                    <label class="block text-sm font-medium text-slate-200">
+                        Content description
+                        <textarea :value="selectedSection().options.description || ''" @input="selectedSection().options.description = $event.target.value; updateDesignConfig()" rows="3" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300"></textarea>
+                    </label>
+                    <div class="grid gap-3">
+                        <template x-for="(column, columnIndex) in selectedSection().options.columns || []" :key="columnIndex">
+                            <div class="grid gap-3 rounded-md border border-white/10 bg-slate-950 p-3">
+                                <div class="flex items-center justify-between gap-3">
+                                    <p class="text-sm font-semibold text-slate-200">Card</p>
+                                    <button type="button" @click="removeColumn(selectedSection(), columnIndex)" class="rounded-md border border-red-400/30 px-2 py-1 text-xs font-semibold text-red-200 hover:bg-red-500/10">Remove</button>
+                                </div>
+                                <input type="text" x-model="column.heading" @input="updateDesignConfig()" placeholder="Heading" class="w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
+                                <textarea x-model="column.body" @input="updateDesignConfig()" rows="3" placeholder="Text body" class="w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300"></textarea>
+                            </div>
+                        </template>
+                    </div>
+                    <button type="button" @click="addColumn(selectedSection())" class="justify-self-start rounded-md border border-cyan-300/40 px-3 py-2 text-sm font-semibold text-cyan-200 hover:bg-cyan-300/10">Add card</button>
+                </div>
+
+                <div x-show="selectedSection().type === 'content' && ['lead_form', 'products', 'articles'].includes(selectedSection().options.content_kind)" class="border-t border-white/10 pt-4">
+                    <p class="text-sm leading-6 text-slate-400">This section uses existing storefront data and follows the position you set in the section list.</p>
+                </div>
+                </div>
+            </template>
+
+        <div class="rounded-md border border-white/10 bg-slate-900 p-4">
+            <h3 class="text-sm font-semibold text-slate-200">Sections</h3>
+            <div class="mt-3 grid gap-2" x-ref="sections">
+                <template x-for="section in sections" :key="section.id">
+                    <div class="rounded-md border border-white/10 bg-slate-900" :class="selectedSectionID === section.id ? 'ring-1 ring-cyan-300/70' : ''" :data-section-id="section.id">
+                        <button type="button" @click="selectSection(section.id)" class="flex w-full items-center gap-3 px-3 py-3 text-left">
+                            <span class="theme-section-handle cursor-grab text-slate-500">::</span>
+                            <span class="min-w-0 flex-1 truncate text-sm font-semibold text-white" x-text="section.name"></span>
+                            <span class="text-xs text-slate-500" x-text="section.enabled ? 'On' : 'Off'"></span>
+                        </button>
+                    </div>
+                </template>
+            </div>
+            <div class="mt-4 grid gap-2 rounded-md border border-white/10 bg-slate-900 p-3">
+                <input type="text" x-model="newSectionName" placeholder="Section name" class="rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
+                <div class="grid gap-2 sm:grid-cols-2">
+                    <select x-model="newSectionType" class="rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
+                        <option value="hero">Hero</option>
+                        <option value="content">Content section</option>
+                        <option value="footer">Footer</option>
+                    </select>
+                    <select x-show="newSectionType === 'content'" x-model="newContentKind" class="rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
+                        <option value="custom">Custom content</option>
+                        <option value="lead_form">Lead form</option>
+                        <option value="about">About</option>
+                        <option value="products">Products</option>
+                        <option value="articles">Articles</option>
+                    </select>
+                </div>
+                <div class="grid gap-2 sm:grid-cols-2">
+                    <button type="button" @click="addSection()" class="rounded-md bg-cyan-300 px-3 py-2 text-sm font-semibold text-slate-950">Add section</button>
+                    <button type="button" x-show="selectedSection()" @click="removeSection(selectedSection().id)" class="rounded-md border border-red-400/30 px-3 py-2 text-sm font-semibold text-red-200 hover:bg-red-500/10">Remove selected</button>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</section>
+{{ end }}

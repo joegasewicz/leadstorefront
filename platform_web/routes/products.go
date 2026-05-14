@@ -52,6 +52,7 @@ func (products *Products) Index(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "could not load products")
 		return
 	}
+	design, _, _ := storefrontDesignTemplateData(storefront)
 
 	c.HTML(http.StatusOK, "products_index", gin.H{
 		"Title":             "Products | LeadStorefront",
@@ -59,6 +60,7 @@ func (products *Products) Index(c *gin.Context) {
 		"Products":          response.Products,
 		"ProductsPath":      productsPath,
 		"Storefront":        storefront,
+		"StorefrontDesign":  design,
 		"UseStorefrontFont": hasStorefront,
 	})
 }
@@ -95,6 +97,7 @@ func (products *Products) Show(c *gin.Context) {
 		return
 	}
 	product := response.Product
+	design, _, _ := storefrontDesignTemplateData(storefront)
 
 	c.HTML(http.StatusOK, "product_show", gin.H{
 		"Title":             product.Name + " | LeadStorefront",
@@ -102,6 +105,7 @@ func (products *Products) Show(c *gin.Context) {
 		"Product":           product,
 		"ProductsPath":      productsPath,
 		"Storefront":        storefront,
+		"StorefrontDesign":  design,
 		"UseStorefrontFont": hasStorefront,
 	})
 }

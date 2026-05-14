@@ -1,16 +1,16 @@
 {{ define "articles_index" }}
 {{ template "base_start" . }}
-<section class="bg-slate-950">
+<section class="{{ if .UseStorefrontFont }}storefront-page{{ else }}bg-slate-950{{ end }}">
     <div class="mx-auto max-w-6xl px-6 py-12">
         <div class="max-w-3xl">
-            <p class="text-sm font-semibold uppercase tracking-wide text-cyan-300">{{ .Country }} guides</p>
+            <p class="text-sm font-semibold uppercase tracking-wide {{ if .UseStorefrontFont }}storefront-accent-text{{ else }}text-cyan-300{{ end }}">{{ .Country }} guides</p>
             <h1 class="mt-2 text-4xl font-bold tracking-normal text-white sm:text-5xl">Articles</h1>
             <p class="mt-4 text-lg leading-8 text-slate-300">Buying advice, deal explainers, and practical storefront guides for shoppers comparing value.</p>
         </div>
 
         <div class="mt-10 grid gap-5 md:grid-cols-2">
             {{ range .Articles }}
-            <article class="overflow-hidden rounded-lg border border-white/10 bg-slate-900">
+            <article class="overflow-hidden rounded-lg border {{ if $.UseStorefrontFont }}storefront-card{{ else }}border-white/10 bg-slate-900{{ end }}">
                 {{ if .ImageURL }}
                 <a href="{{ $.ArticlesPath }}/{{ .Slug }}">
                     <img src="{{ .ImageURL }}" alt="" class="h-52 w-full object-cover">
@@ -33,7 +33,7 @@
                 </div>
             </article>
             {{ else }}
-            <div class="rounded-lg border border-white/10 bg-slate-900 p-6 text-slate-300">No published articles yet.</div>
+            <div class="rounded-lg border p-6 {{ if $.UseStorefrontFont }}storefront-card{{ else }}border-white/10 bg-slate-900 text-slate-300{{ end }}">No published articles yet.</div>
             {{ end }}
         </div>
     </div>

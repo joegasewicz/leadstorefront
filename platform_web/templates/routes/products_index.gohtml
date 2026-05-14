@@ -1,16 +1,16 @@
 {{ define "products_index" }}
 {{ template "base_start" . }}
-<section class="bg-slate-950">
+<section class="{{ if .UseStorefrontFont }}storefront-page{{ else }}bg-slate-950{{ end }}">
     <div class="mx-auto max-w-6xl px-6 py-12">
         <div class="max-w-3xl">
-            <p class="text-sm font-semibold uppercase tracking-wide text-cyan-300">{{ .Country }} deals</p>
+            <p class="text-sm font-semibold uppercase tracking-wide {{ if .UseStorefrontFont }}storefront-accent-text{{ else }}text-cyan-300{{ end }}">{{ .Country }} deals</p>
             <h1 class="mt-2 text-4xl font-bold tracking-normal text-white sm:text-5xl">Products</h1>
             <p class="mt-4 text-lg leading-8 text-slate-300">Current storefront offers, affiliate products, and lead-generation pages available for this country.</p>
         </div>
 
         <div class="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {{ range .Products }}
-            <article class="overflow-hidden rounded-lg border border-white/10 bg-slate-900">
+            <article class="overflow-hidden rounded-lg border {{ if $.UseStorefrontFont }}storefront-card{{ else }}border-white/10 bg-slate-900{{ end }}">
                 {{ if .ImageURL }}
                 <a href="{{ $.ProductsPath }}/{{ .Slug }}">
                     <img src="{{ .ImageURL }}" alt="" class="h-52 w-full object-cover">
@@ -24,7 +24,7 @@
                     <h2 class="mt-3 text-xl font-semibold tracking-normal text-white">
                         <a href="{{ $.ProductsPath }}/{{ .Slug }}" class="hover:text-cyan-200">{{ .Name }}</a>
                     </h2>
-                    <p class="mt-3 text-lg font-semibold text-cyan-200">{{ .Currency }} {{ .CurrentPriceCents }}</p>
+                    <p class="mt-3 text-lg font-semibold {{ if $.UseStorefrontFont }}storefront-accent-text{{ else }}text-cyan-200{{ end }}">{{ .Currency }} {{ .CurrentPriceCents }}</p>
                     {{ if .Description }}
                     <p class="mt-3 line-clamp-3 text-sm leading-6 text-slate-300">{{ .Description }}</p>
                     {{ end }}
@@ -32,7 +32,7 @@
                 </div>
             </article>
             {{ else }}
-            <div class="rounded-lg border border-white/10 bg-slate-900 p-6 text-slate-300">No products yet.</div>
+            <div class="rounded-lg border p-6 {{ if $.UseStorefrontFont }}storefront-card{{ else }}border-white/10 bg-slate-900 text-slate-300{{ end }}">No products yet.</div>
             {{ end }}
         </div>
     </div>

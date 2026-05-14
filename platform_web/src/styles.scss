@@ -23,6 +23,35 @@ textarea {
   resize: vertical;
 }
 
+.storefront-page {
+  background: var(--storefront-bg, #020617);
+  color: var(--storefront-text, #fff);
+  min-height: calc(100vh - 68px);
+}
+
+.storefront-card {
+  background: color-mix(in srgb, var(--storefront-surface, #0f172a) 86%, transparent);
+  border-color: color-mix(in srgb, var(--storefront-primary, #67e8f9) 28%, transparent);
+  color: var(--storefront-text, #fff);
+}
+
+.storefront-card:hover {
+  border-color: var(--storefront-primary, #67e8f9);
+}
+
+.storefront-button {
+  background: var(--storefront-primary, #67e8f9);
+  color: #020617;
+}
+
+.storefront-accent-text {
+  color: var(--storefront-accent, #38bdf8);
+}
+
+.storefront-muted-text {
+  color: color-mix(in srgb, var(--storefront-text, #fff) 72%, transparent);
+}
+
 body > header {
   background: rgba(3, 3, 3, 0.82);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);

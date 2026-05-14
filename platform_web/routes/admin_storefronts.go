@@ -113,10 +113,14 @@ func (storefronts *AdminStorefronts) Show(c *gin.Context) {
 		Articles []models.Article `json:"articles"`
 	}
 	_ = storefronts.API.Get(c, "/admin/articles?limit=100", &availableArticleResponse)
+	design, designJSON, designSections := storefrontDesignTemplateData(storefrontResponse.Storefront)
 
 	c.HTML(http.StatusOK, "admin_storefront_show", gin.H{
 		"Title":             storefrontResponse.Storefront.Name,
 		"Storefront":        storefrontResponse.Storefront,
+		"StorefrontDesign":  design,
+		"DesignConfigJSON":  designJSON,
+		"DesignSections":    designSections,
 		"Products":          productResponse.Products,
 		"Articles":          articleResponse.Articles,
 		"AvailableProducts": unassignedProducts(availableProductResponse.Products, productResponse.Products),
@@ -220,6 +224,7 @@ func (storefronts *AdminStorefronts) UpdateContent(c *gin.Context) {
 	}
 	storefront.HeroTitle = strings.TrimSpace(c.PostForm("hero_title"))
 	storefront.GoogleFontFamily = normalizeGoogleFontFamily(c.PostForm("google_font_family"))
+	storefront.DesignConfig = models.StorefrontDesignFromJSONString(c.PostForm("design_config_json"))
 	storefront.HeroSubtitle = strings.TrimSpace(c.PostForm("hero_subtitle"))
 	storefront.HeroImageURL = strings.TrimSpace(c.PostForm("hero_image_url"))
 	storefront.HeroMediaURL = strings.TrimSpace(c.PostForm("hero_media_url"))
@@ -319,18 +324,22 @@ func (storefronts *AdminStorefronts) renderForm(c *gin.Context, status int, titl
 	if storefront.OwnerID != nil {
 		ownerID = *storefront.OwnerID
 	}
+	design, designJSON, designSections := storefrontDesignTemplateData(storefront)
 
 	c.HTML(status, "admin_storefront_form", gin.H{
-		"Title":        title,
-		"Action":       action,
-		"Storefront":   storefront,
-		"Countries":    response.Countries,
-		"Users":        response.Users,
-		"OwnerID":      ownerID,
-		"Error":        message,
-		"IsAdmin":      true,
-		"IsSuper":      isCurrentSuper(c),
-		"IsAdminRoute": true,
+		"Title":            title,
+		"Action":           action,
+		"Storefront":       storefront,
+		"StorefrontDesign": design,
+		"DesignConfigJSON": designJSON,
+		"DesignSections":   designSections,
+		"Countries":        response.Countries,
+		"Users":            response.Users,
+		"OwnerID":          ownerID,
+		"Error":            message,
+		"IsAdmin":          true,
+		"IsSuper":          isCurrentSuper(c),
+		"IsAdminRoute":     true,
 	})
 }
 
@@ -376,6 +385,7 @@ func (storefronts *AdminStorefronts) storefrontFromRequest(c *gin.Context) (mode
 		LogoURL:          strings.TrimSpace(c.PostForm("logo_url")),
 		LogoWidthPx:      logoWidthPx,
 		GoogleFontFamily: normalizeGoogleFontFamily(c.PostForm("google_font_family")),
+		DesignConfig:     models.StorefrontDesignFromJSONString(c.PostForm("design_config_json")),
 		HeroTitle:        strings.TrimSpace(c.PostForm("hero_title")),
 		HeroSubtitle:     strings.TrimSpace(c.PostForm("hero_subtitle")),
 		HeroImageURL:     strings.TrimSpace(c.PostForm("hero_image_url")),
@@ -398,6 +408,7 @@ func storefrontPayload(storefront models.Storefront) map[string]interface{} {
 		"logo_url":           storefront.LogoURL,
 		"logo_width_px":      storefront.LogoWidthPx,
 		"google_font_family": normalizeGoogleFontFamily(storefront.GoogleFontFamily),
+		"design_config":      models.StorefrontDesignJSON(storefront.DesignConfig),
 		"hero_title":         storefront.HeroTitle,
 		"hero_subtitle":      storefront.HeroSubtitle,
 		"hero_image_url":     storefront.HeroImageURL,

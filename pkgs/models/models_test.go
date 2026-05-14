@@ -79,6 +79,7 @@ func TestPublicModelJSONFields(t *testing.T) {
 				LogoURL:          "/logo.png",
 				LogoWidthPx:      180,
 				GoogleFontFamily: "Inter",
+				DesignConfig:     StorefrontDesignToJSON(DefaultStorefrontDesignConfig()),
 				HeroTitle:        "Hero",
 				HeroSubtitle:     "Subtitle",
 				HeroImageURL:     "/hero.png",
@@ -98,6 +99,23 @@ func TestPublicModelJSONFields(t *testing.T) {
 				"logo_url":           "/logo.png",
 				"logo_width_px":      float64(180),
 				"google_font_family": "Inter",
+				"design_config": map[string]interface{}{
+					"colors": map[string]interface{}{
+						"primary":    "#67e8f9",
+						"accent":     "#38bdf8",
+						"background": "#020617",
+						"text":       "#ffffff",
+						"surface":    "#0f172a",
+					},
+					"sections": []interface{}{
+						map[string]interface{}{"id": "hero", "name": "Hero", "type": "hero", "enabled": true, "options": map[string]interface{}{}},
+						map[string]interface{}{"id": "lead-form", "name": "Lead form", "type": "content", "enabled": true, "options": map[string]interface{}{"content_kind": "lead_form"}},
+						map[string]interface{}{"id": "about", "name": "About", "type": "content", "enabled": true, "options": map[string]interface{}{"content_kind": "about"}},
+						map[string]interface{}{"id": "products", "name": "Products", "type": "content", "enabled": true, "options": map[string]interface{}{"content_kind": "products"}},
+						map[string]interface{}{"id": "articles", "name": "Articles", "type": "content", "enabled": true, "options": map[string]interface{}{"content_kind": "articles"}},
+						map[string]interface{}{"id": "footer", "name": "Footer", "type": "footer", "enabled": true, "options": map[string]interface{}{}},
+					},
+				},
 				"hero_title":         "Hero",
 				"hero_subtitle":      "Subtitle",
 				"hero_image_url":     "/hero.png",
@@ -241,4 +259,31 @@ func TestPublicModelJSONFields(t *testing.T) {
 			assert.NotContains(t, actual, "password")
 		})
 	}
+}
+
+func TestStorefrontDesignCustomContentDescriptionRoundTrip(t *testing.T) {
+	config := StorefrontDesignConfig{
+		Colors: DefaultStorefrontDesignConfig().Colors,
+		Sections: []StorefrontDesignSection{
+			{
+				ID:      "custom-content",
+				Name:    "Custom content",
+				Type:    StorefrontSectionContent,
+				Enabled: true,
+				Options: StorefrontDesignSectionOptions{
+					ContentKind: "custom",
+					Title:       "Center title",
+					Description: "This description should be preserved.",
+					Columns: []StorefrontDesignContentColumn{
+						{Heading: "Card heading", Body: "Card body"},
+					},
+				},
+			},
+		},
+	}
+
+	roundTripped := StorefrontDesignFromJSON(StorefrontDesignToJSON(config))
+
+	require.Len(t, roundTripped.Sections, 1)
+	assert.Equal(t, "This description should be preserved.", roundTripped.Sections[0].Options.Description)
 }

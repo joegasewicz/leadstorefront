@@ -51,10 +51,13 @@ func (storefronts *Storefronts) Get(c *gin.Context) {
 
 func renderStorefront(c *gin.Context, api *APIClient, status int, country string, storefront models.Storefront) {
 	storefrontPath := storefrontBasePath(c, country, storefront)
+	design, _, designSections := storefrontDesignTemplateData(storefront)
 	c.HTML(status, "storefront_show", gin.H{
 		"Title":             storefront.Name + " | LeadStorefront",
 		"Country":           country,
 		"Storefront":        storefront,
+		"StorefrontDesign":  design,
+		"DesignSections":    designSections,
 		"StorefrontPath":    storefrontPath,
 		"UseStorefrontFont": true,
 		"LeadFields":        publicLeadFields(c, api, storefront.ID),

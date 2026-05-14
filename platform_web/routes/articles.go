@@ -52,6 +52,7 @@ func (articles *Articles) Index(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "could not load articles")
 		return
 	}
+	design, _, _ := storefrontDesignTemplateData(storefront)
 
 	c.HTML(http.StatusOK, "articles_index", gin.H{
 		"Title":             "Articles | LeadStorefront",
@@ -59,6 +60,7 @@ func (articles *Articles) Index(c *gin.Context) {
 		"Articles":          response.Articles,
 		"ArticlesPath":      articlesPath,
 		"Storefront":        storefront,
+		"StorefrontDesign":  design,
 		"UseStorefrontFont": hasStorefront,
 	})
 }
@@ -100,6 +102,7 @@ func (articles *Articles) Show(c *gin.Context) {
 	if article.MetaTitle != "" {
 		title = article.MetaTitle
 	}
+	design, _, _ := storefrontDesignTemplateData(storefront)
 
 	c.HTML(http.StatusOK, "article_show", gin.H{
 		"Title":             title,
@@ -107,6 +110,7 @@ func (articles *Articles) Show(c *gin.Context) {
 		"Article":           article,
 		"ArticlesPath":      articlesPath,
 		"Storefront":        storefront,
+		"StorefrontDesign":  design,
 		"UseStorefrontFont": hasStorefront,
 	})
 }

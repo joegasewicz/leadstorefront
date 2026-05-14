@@ -1,91 +1,132 @@
 {{ define "storefront_show" }}
 {{ template "base_start" . }}
-{{ if or .Storefront.HeroTitle .Storefront.HeroSubtitle .Storefront.HeroMediaURL .Storefront.HeroImageURL }}
-<section class="relative overflow-hidden">
-    {{ if and .Storefront.HeroMediaURL (eq .Storefront.HeroMediaType "video") }}
-    <video class="absolute inset-0 h-full w-full object-cover opacity-90" autoplay muted loop playsinline preload="metadata">
-        <source src="{{ .Storefront.HeroMediaURL }}">
-    </video>
-    <div class="absolute inset-0 bg-slate-950/45"></div>
-    {{ else if .Storefront.HeroMediaURL }}
-    <img src="{{ .Storefront.HeroMediaURL }}" alt="" class="absolute inset-0 h-full w-full object-cover opacity-90">
-    <div class="absolute inset-0 bg-slate-950/40"></div>
-    {{ else if .Storefront.HeroImageURL }}
-    <img src="{{ .Storefront.HeroImageURL }}" alt="" class="absolute inset-0 h-full w-full object-cover opacity-90">
-    <div class="absolute inset-0 bg-slate-950/40"></div>
-    {{ end }}
-    <div class="relative mx-auto max-w-5xl px-6 py-20">
-        <h1 class="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-white sm:text-5xl">{{ if .Storefront.HeroTitle }}{{ .Storefront.HeroTitle }}{{ else }}{{ .Storefront.Name }}{{ end }}</h1>
-        {{ if .Storefront.HeroSubtitle }}
-        <h2 class="mt-5 max-w-3xl text-2xl font-semibold tracking-normal text-slate-200">{{ .Storefront.HeroSubtitle }}</h2>
+<div class="storefront-page">
+{{ $root := . }}
+{{ range .DesignSections }}
+{{ if .Enabled }}
+{{ if eq .Type "hero" }}
+    {{ if or $root.Storefront.HeroTitle $root.Storefront.HeroSubtitle $root.Storefront.HeroMediaURL $root.Storefront.HeroImageURL }}
+    <section class="relative overflow-hidden">
+        {{ if and $root.Storefront.HeroMediaURL (eq $root.Storefront.HeroMediaType "video") }}
+        <video class="absolute inset-0 h-full w-full object-cover opacity-90" autoplay muted loop playsinline preload="metadata">
+            <source src="{{ $root.Storefront.HeroMediaURL }}">
+        </video>
+        <div class="absolute inset-0 bg-slate-950/45"></div>
+        {{ else if $root.Storefront.HeroMediaURL }}
+        <img src="{{ $root.Storefront.HeroMediaURL }}" alt="" class="absolute inset-0 h-full w-full object-cover opacity-90">
+        <div class="absolute inset-0 bg-slate-950/40"></div>
+        {{ else if $root.Storefront.HeroImageURL }}
+        <img src="{{ $root.Storefront.HeroImageURL }}" alt="" class="absolute inset-0 h-full w-full object-cover opacity-90">
+        <div class="absolute inset-0 bg-slate-950/40"></div>
         {{ end }}
-    </div>
-</section>
-{{ else }}
-<section class="mx-auto max-w-5xl px-6 py-16">
-    <div class="max-w-3xl">
-        <p class="text-sm font-semibold uppercase tracking-wide text-sky-300">{{ .Storefront.Domain }}</p>
-        <h1 class="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">{{ .Storefront.Name }}</h1>
-    </div>
-</section>
-{{ end }}
-
-{{ if or .Storefront.AboutTitle .Storefront.AboutBody .Storefront.Description }}
-<section class="mx-auto max-w-5xl px-6 py-12">
-    <div class="max-w-3xl">
-        {{ if .Storefront.AboutTitle }}
-        <h3 class="text-2xl font-bold tracking-normal text-white">{{ .Storefront.AboutTitle }}</h3>
-        {{ end }}
-        <p class="mt-4 text-lg leading-8 text-slate-300">{{ if .Storefront.AboutBody }}{{ .Storefront.AboutBody }}{{ else }}{{ .Storefront.Description }}{{ end }}</p>
-    </div>
-</section>
-{{ end }}
-
-{{ if .LeadFields }}
-<section id="lead-form" class="mx-auto max-w-5xl px-6 py-12">
-    <div class="rounded-lg border border-white/10 bg-white/5 p-6">
-        <div class="max-w-2xl">
-            <h3 class="text-2xl font-bold tracking-normal text-white">Get in touch</h3>
-            <p class="mt-3 text-sm leading-6 text-slate-300">Send your details and this storefront will follow up.</p>
-            {{ if .Flash }}
-            <p class="mt-4 rounded-md border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">{{ .Flash }}</p>
+        <div class="relative mx-auto max-w-5xl px-6 py-20">
+            <h1 class="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-white sm:text-5xl">{{ if $root.Storefront.HeroTitle }}{{ $root.Storefront.HeroTitle }}{{ else }}{{ $root.Storefront.Name }}{{ end }}</h1>
+            {{ if $root.Storefront.HeroSubtitle }}
+            <h2 class="mt-5 max-w-3xl text-2xl font-semibold tracking-normal text-slate-200">{{ $root.Storefront.HeroSubtitle }}</h2>
             {{ end }}
         </div>
-        <form method="post" action="{{ .LeadFormAction }}#lead-form" class="mt-6 grid gap-4">
-            {{ range .LeadFields }}
-            <div>
-                <label class="block text-sm font-medium text-slate-200" for="lead_{{ .Name }}">{{ .Label }}</label>
-                {{ if eq .Type "textarea" }}
-                <textarea id="lead_{{ .Name }}" name="lead_{{ .Name }}" rows="4" {{ if .IsRequired }}required{{ end }} class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-sky-300"></textarea>
-                {{ else if eq .Type "option" }}
-                <select id="lead_{{ .Name }}" name="lead_{{ .Name }}" {{ if .IsRequired }}required{{ end }} class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-sky-300">
-                    <option value="">Choose one</option>
-                    {{ range .Options }}
-                    <option value="{{ . }}">{{ . }}</option>
+    </section>
+    {{ else }}
+    <section class="mx-auto max-w-5xl px-6 py-16">
+        <div class="max-w-3xl">
+            <p class="text-sm font-semibold uppercase tracking-wide storefront-accent-text">{{ $root.Storefront.Domain }}</p>
+            <h1 class="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">{{ $root.Storefront.Name }}</h1>
+        </div>
+    </section>
+    {{ end }}
+{{ else if and (eq .Type "content") (eq .ContentKind "about") }}
+    {{ if or $root.Storefront.AboutTitle $root.Storefront.AboutBody $root.Storefront.Description }}
+    <section class="mx-auto max-w-5xl px-6 py-12">
+        <div class="max-w-3xl">
+            {{ if $root.Storefront.AboutTitle }}
+            <h3 class="text-2xl font-bold tracking-normal">{{ $root.Storefront.AboutTitle }}</h3>
+            {{ end }}
+            <p class="mt-4 text-lg leading-8 storefront-muted-text">{{ if $root.Storefront.AboutBody }}{{ $root.Storefront.AboutBody }}{{ else }}{{ $root.Storefront.Description }}{{ end }}</p>
+        </div>
+    </section>
+    {{ end }}
+{{ else if and (eq .Type "content") (eq .ContentKind "lead_form") }}
+    {{ if $root.LeadFields }}
+    <section id="lead-form" class="mx-auto max-w-5xl px-6 py-12">
+        <div class="storefront-card rounded-lg border p-6">
+            <div class="max-w-2xl">
+                <h3 class="text-2xl font-bold tracking-normal">Get in touch</h3>
+                <p class="mt-3 text-sm leading-6 storefront-muted-text">Send your details and this storefront will follow up.</p>
+                {{ if $root.Flash }}
+                <p class="mt-4 rounded-md border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">{{ $root.Flash }}</p>
+                {{ end }}
+            </div>
+            <form method="post" action="{{ $root.LeadFormAction }}#lead-form" class="mt-6 grid gap-4">
+                {{ range $root.LeadFields }}
+                <div>
+                    <label class="block text-sm font-medium" for="lead_{{ .Name }}">{{ .Label }}</label>
+                    {{ if eq .Type "textarea" }}
+                    <textarea id="lead_{{ .Name }}" name="lead_{{ .Name }}" rows="4" {{ if .IsRequired }}required{{ end }} class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-sky-300"></textarea>
+                    {{ else if eq .Type "option" }}
+                    <select id="lead_{{ .Name }}" name="lead_{{ .Name }}" {{ if .IsRequired }}required{{ end }} class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-sky-300">
+                        <option value="">Choose one</option>
+                        {{ range .Options }}
+                        <option value="{{ . }}">{{ . }}</option>
+                        {{ end }}
+                    </select>
+                    {{ else }}
+                    <input id="lead_{{ .Name }}" name="lead_{{ .Name }}" type="{{ .Type }}" {{ if .IsRequired }}required{{ end }} class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-sky-300">
                     {{ end }}
-                </select>
-                {{ else }}
-                <input id="lead_{{ .Name }}" name="lead_{{ .Name }}" type="{{ .Type }}" {{ if .IsRequired }}required{{ end }} class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-sky-300">
+                </div>
+                {{ end }}
+                <div>
+                    <button type="submit" class="storefront-button rounded-md px-5 py-2 text-sm font-semibold">Submit</button>
+                </div>
+            </form>
+        </div>
+    </section>
+    {{ end }}
+{{ else if and (eq .Type "content") (eq .ContentKind "products") }}
+    <section class="mx-auto max-w-5xl px-6 py-12">
+        <a class="storefront-card block rounded-lg border p-6" href="{{ $root.StorefrontPath }}/products">
+            <h3 class="text-2xl font-bold tracking-normal">Products</h3>
+            <p class="mt-3 text-sm leading-6 storefront-muted-text">Browse the products featured by this storefront.</p>
+        </a>
+    </section>
+{{ else if and (eq .Type "content") (eq .ContentKind "articles") }}
+    <section class="mx-auto max-w-5xl px-6 py-12">
+        <a class="storefront-card block rounded-lg border p-6" href="{{ $root.StorefrontPath }}/articles">
+            <h3 class="text-2xl font-bold tracking-normal">Articles</h3>
+            <p class="mt-3 text-sm leading-6 storefront-muted-text">Read the latest articles and guides from this storefront.</p>
+        </a>
+    </section>
+{{ else if and (eq .Type "content") (eq .ContentKind "custom") }}
+    <section class="mx-auto max-w-5xl px-6 py-12">
+        <div>
+            <div class="mx-auto max-w-3xl text-center">
+                <h3 class="text-2xl font-bold tracking-normal">{{ if .CustomTitle }}{{ .CustomTitle }}{{ else }}{{ .Name }}{{ end }}</h3>
+                {{ if .Description }}
+                <p class="mt-3 text-base leading-7 storefront-muted-text">{{ .Description }}</p>
+                {{ end }}
+            </div>
+            {{ if .Columns }}
+            <div class="mt-6 grid gap-4 md:grid-cols-3">
+                {{ range .Columns }}
+                <article class="storefront-card rounded-lg border p-5">
+                    {{ if .Heading }}
+                    <h4 class="text-lg font-semibold tracking-normal">{{ .Heading }}</h4>
+                    {{ end }}
+                    {{ if .Body }}
+                    <p class="mt-3 text-sm leading-6 storefront-muted-text">{{ .Body }}</p>
+                    {{ end }}
+                </article>
                 {{ end }}
             </div>
             {{ end }}
-            <div>
-                <button type="submit" class="rounded-md bg-sky-300 px-5 py-2 text-sm font-semibold text-slate-950 hover:bg-sky-200">Submit</button>
-            </div>
-        </form>
-    </div>
-</section>
+        </div>
+    </section>
+{{ else if eq .Type "footer" }}
+    <footer class="mx-auto max-w-5xl px-6 py-10">
+        <div class="border-t border-white/10 pt-6 text-sm storefront-muted-text">{{ if .Name }}{{ .Name }}{{ else }}{{ $root.Storefront.Name }}{{ end }}</div>
+    </footer>
 {{ end }}
-
-<section class="mx-auto grid max-w-5xl gap-6 px-6 py-12 md:grid-cols-2">
-    <a class="rounded-lg border border-white/10 bg-white/5 p-6 hover:border-sky-300/50" href="{{ .StorefrontPath }}/products">
-        <h3 class="text-2xl font-bold tracking-normal text-white">Products</h3>
-        <p class="mt-3 text-sm leading-6 text-slate-300">Browse the products featured by this storefront.</p>
-    </a>
-    <a class="rounded-lg border border-white/10 bg-white/5 p-6 hover:border-sky-300/50" href="{{ .StorefrontPath }}/articles">
-        <h3 class="text-2xl font-bold tracking-normal text-white">Articles</h3>
-        <p class="mt-3 text-sm leading-6 text-slate-300">Read the latest articles and guides from this storefront.</p>
-    </a>
-</section>
+{{ end }}
+{{ end }}
+</div>
 {{ template "base_end" . }}
 {{ end }}
