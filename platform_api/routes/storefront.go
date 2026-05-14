@@ -350,6 +350,7 @@ func (storefront *Storefront) bindJSON(c *gin.Context) (models.Storefront, bool)
 	}
 	record.Name = strings.TrimSpace(record.Name)
 	record.Domain = strings.ToLower(strings.TrimSpace(record.Domain))
+	record.GoogleFontFamily = normalizeGoogleFontFamily(record.GoogleFontFamily)
 	record.HeroMediaURL = strings.TrimSpace(record.HeroMediaURL)
 	record.HeroMediaType = normalizeHeroMediaType(record.HeroMediaType, record.HeroMediaURL, record.HeroImageURL)
 	if record.Slug == "" {
@@ -358,6 +359,17 @@ func (storefront *Storefront) bindJSON(c *gin.Context) (models.Storefront, bool)
 		record.Slug = utils.Slugify(record.Slug)
 	}
 	return record, true
+}
+
+func normalizeGoogleFontFamily(value string) string {
+	value = strings.Join(strings.Fields(strings.TrimSpace(value)), " ")
+	var builder strings.Builder
+	for _, r := range value {
+		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') || r == ' ' || r == '-' || r == '\'' {
+			builder.WriteRune(r)
+		}
+	}
+	return strings.TrimSpace(builder.String())
 }
 
 func normalizeHeroMediaType(value string, mediaURL string, imageURL string) string {
@@ -384,6 +396,7 @@ func storefrontUpdateMap(storefront models.Storefront) map[string]interface{} {
 		"description":        storefront.Description,
 		"logo_url":           storefront.LogoURL,
 		"logo_width_px":      storefront.LogoWidthPx,
+		"google_font_family": normalizeGoogleFontFamily(storefront.GoogleFontFamily),
 		"hero_title":         storefront.HeroTitle,
 		"hero_subtitle":      storefront.HeroSubtitle,
 		"hero_image_url":     storefront.HeroImageURL,

@@ -219,6 +219,7 @@ func (storefronts *AdminStorefronts) UpdateContent(c *gin.Context) {
 		return
 	}
 	storefront.HeroTitle = strings.TrimSpace(c.PostForm("hero_title"))
+	storefront.GoogleFontFamily = normalizeGoogleFontFamily(c.PostForm("google_font_family"))
 	storefront.HeroSubtitle = strings.TrimSpace(c.PostForm("hero_subtitle"))
 	storefront.HeroImageURL = strings.TrimSpace(c.PostForm("hero_image_url"))
 	storefront.HeroMediaURL = strings.TrimSpace(c.PostForm("hero_media_url"))
@@ -374,6 +375,7 @@ func (storefronts *AdminStorefronts) storefrontFromRequest(c *gin.Context) (mode
 		Description:      strings.TrimSpace(c.PostForm("description")),
 		LogoURL:          strings.TrimSpace(c.PostForm("logo_url")),
 		LogoWidthPx:      logoWidthPx,
+		GoogleFontFamily: normalizeGoogleFontFamily(c.PostForm("google_font_family")),
 		HeroTitle:        strings.TrimSpace(c.PostForm("hero_title")),
 		HeroSubtitle:     strings.TrimSpace(c.PostForm("hero_subtitle")),
 		HeroImageURL:     strings.TrimSpace(c.PostForm("hero_image_url")),
@@ -395,6 +397,7 @@ func storefrontPayload(storefront models.Storefront) map[string]interface{} {
 		"description":        storefront.Description,
 		"logo_url":           storefront.LogoURL,
 		"logo_width_px":      storefront.LogoWidthPx,
+		"google_font_family": normalizeGoogleFontFamily(storefront.GoogleFontFamily),
 		"hero_title":         storefront.HeroTitle,
 		"hero_subtitle":      storefront.HeroSubtitle,
 		"hero_image_url":     storefront.HeroImageURL,
@@ -406,6 +409,17 @@ func storefrontPayload(storefront models.Storefront) map[string]interface{} {
 		"primary_country_id": storefront.PrimaryCountryID,
 		"owner_id":           uintPtrPayload(storefront.OwnerID),
 	}
+}
+
+func normalizeGoogleFontFamily(value string) string {
+	value = strings.Join(strings.Fields(strings.TrimSpace(value)), " ")
+	var builder strings.Builder
+	for _, r := range value {
+		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') || r == ' ' || r == '-' || r == '\'' {
+			builder.WriteRune(r)
+		}
+	}
+	return strings.TrimSpace(builder.String())
 }
 
 func heroMediaType(value string, mediaURL string, imageURL string) string {

@@ -50,6 +50,10 @@
             Nav logo width
             <input id="logo_width_px" name="logo_width_px" type="number" min="1" value="{{ if .Storefront.LogoWidthPx }}{{ .Storefront.LogoWidthPx }}{{ else }}305{{ end }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
         </label>
+        <label class="block text-sm font-medium text-slate-200" for="google_font_family">
+            Google font family
+            <input id="google_font_family" name="google_font_family" value="{{ .Storefront.GoogleFontFamily }}" placeholder="Inter" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+        </label>
         <label class="block text-sm font-medium text-slate-200" for="nav_logo">
             Upload nav logo
             <input id="nav_logo" name="nav_logo" type="file" accept=".jpg,.jpeg,.png,.svg,.webp,image/jpeg,image/png,image/svg+xml,image/webp" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white outline-none file:mr-3 file:rounded-md file:border-0 file:bg-cyan-300 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-slate-950 focus:border-cyan-300">
