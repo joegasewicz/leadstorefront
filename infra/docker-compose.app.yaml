@@ -1,6 +1,6 @@
 services:
   api:
-    image: ${API_IMAGE:-josefdigital/platform:platform_api-v0.0.6}
+    image: ${API_IMAGE:-josefdigital/platform:platform_api-v0.0.8}
     restart: always
     env_file:
       - ${APP_ENV_FILE:-.env}
@@ -10,7 +10,7 @@ services:
       - "8001:8001"
 
   web:
-    image: ${WEB_IMAGE:-josefdigital/platform:platform_web-v0.0.7}
+    image: ${WEB_IMAGE:-josefdigital/platform:platform_web-v0.0.8}
     restart: always
     env_file:
       - ${APP_ENV_FILE:-.env}

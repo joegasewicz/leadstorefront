@@ -10,9 +10,12 @@ type Storefront struct {
 	Description      string  `json:"description"`
 	LogoURL          string  `json:"logo_url"`
 	LogoWidthPx      int     `json:"logo_width_px" gorm:"not null;default:305"`
+	GoogleFontFamily string  `json:"google_font_family"`
 	HeroTitle        string  `json:"hero_title"`
 	HeroSubtitle     string  `json:"hero_subtitle"`
 	HeroImageURL     string  `json:"hero_image_url"`
+	HeroMediaURL     string  `json:"hero_media_url"`
+	HeroMediaType    string  `json:"hero_media_type"`
 	AboutTitle       string  `json:"about_title"`
 	AboutBody        string  `json:"about_body"`
 	IsActive         bool    `json:"is_active" gorm:"not null;default:true;index"`

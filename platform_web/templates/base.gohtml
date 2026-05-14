@@ -4,6 +4,14 @@
 <head>
     {{ template "meta-tags" . }}
     <link rel="stylesheet" href="/assets/app.css">
+    {{ if .Storefront.GoogleFontFamily }}
+    <link href="https://fonts.googleapis.com/css2?family={{ urlquery .Storefront.GoogleFontFamily }}:wght@300..800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            font-family: "{{ .Storefront.GoogleFontFamily }}", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+    </style>
+    {{ end }}
 </head>
 <body class="min-h-screen bg-slate-950 text-white antialiased">
     {{ template "navbar" . }}

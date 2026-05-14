@@ -8,83 +8,124 @@
         </div>
         <a href="/admin/storefronts" class="rounded-md border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">Storefronts</a>
     </div>
-    <form method="post" action="{{ .Action }}" enctype="multipart/form-data" class="grid gap-6 rounded-lg border border-white/10 bg-white/5 p-6 md:grid-cols-2">
+    <form method="post" action="{{ .Action }}" enctype="multipart/form-data" class="grid gap-6">
         {{ if .Error }}
-        <p class="md:col-span-2 rounded-md border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">{{ .Error }}</p>
+        <p class="rounded-md border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">{{ .Error }}</p>
         {{ end }}
-        <label class="block text-sm font-medium text-slate-200" for="name">
-            Name
-            <input id="name" name="name" value="{{ .Storefront.Name }}" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-        </label>
-        <label class="block text-sm font-medium text-slate-200" for="domain">
-            Domain
-            <input id="domain" name="domain" value="{{ .Storefront.Domain }}" placeholder="example.com" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-        </label>
-        <label class="block text-sm font-medium text-slate-200" for="primary_country_id">
-            Primary country
-            <select id="primary_country_id" name="primary_country_id" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-                <option value="">Select country</option>
-                {{ range .Countries }}
-                <option value="{{ .ID }}" {{ if eq $.Storefront.PrimaryCountryID .ID }}selected{{ end }}>{{ .Name }}</option>
-                {{ end }}
-            </select>
-        </label>
-        <label class="block text-sm font-medium text-slate-200" for="owner_id">
-            Owner
-            <select id="owner_id" name="owner_id" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-                <option value="">No owner</option>
-                {{ range .Users }}
-                <option value="{{ .ID }}" {{ if eq $.OwnerID .ID }}selected{{ end }}>{{ .Email }}</option>
-                {{ end }}
-            </select>
-        </label>
-        <label class="md:col-span-2 block text-sm font-medium text-slate-200" for="description">
-            Description
-            <textarea id="description" name="description" rows="4" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">{{ .Storefront.Description }}</textarea>
-        </label>
-        <label class="block text-sm font-medium text-slate-200" for="logo_url">
-            Nav logo URL
-            <input id="logo_url" name="logo_url" value="{{ .Storefront.LogoURL }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-        </label>
-        <label class="block text-sm font-medium text-slate-200" for="logo_width_px">
-            Nav logo width
-            <input id="logo_width_px" name="logo_width_px" type="number" min="1" value="{{ if .Storefront.LogoWidthPx }}{{ .Storefront.LogoWidthPx }}{{ else }}305{{ end }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-        </label>
-        <label class="block text-sm font-medium text-slate-200" for="nav_logo">
-            Upload nav logo
-            <input id="nav_logo" name="nav_logo" type="file" accept=".jpg,.jpeg,.png,.svg,.webp,image/jpeg,image/png,image/svg+xml,image/webp" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white outline-none file:mr-3 file:rounded-md file:border-0 file:bg-cyan-300 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-slate-950 focus:border-cyan-300">
-        </label>
-        <div class="md:col-span-2 border-t border-white/10 pt-6">
-            <h2 class="text-lg font-semibold text-white">Hero section</h2>
-        </div>
-        <label class="block text-sm font-medium text-slate-200" for="hero_title">
-            Hero H1
-            <input id="hero_title" name="hero_title" value="{{ .Storefront.HeroTitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-        </label>
-        <label class="block text-sm font-medium text-slate-200" for="hero_subtitle">
-            Hero H2
-            <input id="hero_subtitle" name="hero_subtitle" value="{{ .Storefront.HeroSubtitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-        </label>
-        <label class="md:col-span-2 block text-sm font-medium text-slate-200" for="hero_image_url">
-            Hero background image URL
-            <input id="hero_image_url" name="hero_image_url" value="{{ .Storefront.HeroImageURL }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-        </label>
-        <div class="md:col-span-2 border-t border-white/10 pt-6">
-            <h2 class="text-lg font-semibold text-white">About section</h2>
-        </div>
-        <label class="block text-sm font-medium text-slate-200" for="about_title">
-            About H3
-            <input id="about_title" name="about_title" value="{{ .Storefront.AboutTitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-        </label>
-        <label class="md:col-span-2 block text-sm font-medium text-slate-200" for="about_body">
-            About paragraph
-            <textarea id="about_body" name="about_body" rows="4" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">{{ .Storefront.AboutBody }}</textarea>
-        </label>
-        <label class="mt-8 flex items-center gap-3 text-sm font-medium text-slate-200">
-            <input name="is_active" type="checkbox" {{ if .Storefront.IsActive }}checked{{ end }} class="h-4 w-4 rounded border-white/10 bg-slate-900 text-cyan-300">
-            Active
-        </label>
-        <div class="md:col-span-2 flex justify-end">
+        <section class="rounded-lg border border-white/10 bg-white/5">
+            <div class="border-b border-white/10 px-4 py-3">
+                <h2 class="text-lg font-semibold text-white">Storefront details</h2>
+                <p class="mt-1 text-sm text-slate-400">Identity, ownership, country, and status.</p>
+            </div>
+            <div class="grid gap-4 p-4 md:grid-cols-2">
+                <label class="block text-sm font-medium text-slate-200" for="name">
+                    Name
+                    <input id="name" name="name" value="{{ .Storefront.Name }}" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                </label>
+                <label class="block text-sm font-medium text-slate-200" for="domain">
+                    Domain
+                    <input id="domain" name="domain" value="{{ .Storefront.Domain }}" placeholder="example.com" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                </label>
+                <label class="block text-sm font-medium text-slate-200" for="primary_country_id">
+                    Primary country
+                    <select id="primary_country_id" name="primary_country_id" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                        <option value="">Select country</option>
+                        {{ range .Countries }}
+                        <option value="{{ .ID }}" {{ if eq $.Storefront.PrimaryCountryID .ID }}selected{{ end }}>{{ .Name }}</option>
+                        {{ end }}
+                    </select>
+                </label>
+                <label class="block text-sm font-medium text-slate-200" for="owner_id">
+                    Owner
+                    <select id="owner_id" name="owner_id" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                        <option value="">No owner</option>
+                        {{ range .Users }}
+                        <option value="{{ .ID }}" {{ if eq $.OwnerID .ID }}selected{{ end }}>{{ .Email }}</option>
+                        {{ end }}
+                    </select>
+                </label>
+                <label class="md:col-span-2 block text-sm font-medium text-slate-200" for="description">
+                    Description
+                    <textarea id="description" name="description" rows="4" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">{{ .Storefront.Description }}</textarea>
+                </label>
+                <label class="flex items-center gap-3 text-sm font-medium text-slate-200">
+                    <input name="is_active" type="checkbox" {{ if .Storefront.IsActive }}checked{{ end }} class="h-4 w-4 rounded border-white/10 bg-slate-900 text-cyan-300">
+                    Active
+                </label>
+            </div>
+        </section>
+
+        <section class="rounded-lg border border-white/10 bg-white/5">
+            <div class="border-b border-white/10 px-4 py-3">
+                <h2 class="text-lg font-semibold text-white">Branding</h2>
+                <p class="mt-1 text-sm text-slate-400">Navigation logo and storefront typography.</p>
+            </div>
+            <div class="grid gap-4 p-4 md:grid-cols-2">
+                <label class="block text-sm font-medium text-slate-200" for="logo_url">
+                    Nav logo URL
+                    <input id="logo_url" name="logo_url" value="{{ .Storefront.LogoURL }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                </label>
+                <label class="block text-sm font-medium text-slate-200" for="logo_width_px">
+                    Nav logo width
+                    <input id="logo_width_px" name="logo_width_px" type="number" min="1" value="{{ if .Storefront.LogoWidthPx }}{{ .Storefront.LogoWidthPx }}{{ else }}305{{ end }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                </label>
+                <label class="block text-sm font-medium text-slate-200" for="google_font_family">
+                    Google font family
+                    <input id="google_font_family" name="google_font_family" value="{{ .Storefront.GoogleFontFamily }}" placeholder="Inter" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                </label>
+                <label class="block text-sm font-medium text-slate-200" for="nav_logo">
+                    Upload nav logo
+                    <input id="nav_logo" name="nav_logo" type="file" accept=".jpg,.jpeg,.png,.svg,.webp,image/jpeg,image/png,image/svg+xml,image/webp" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white outline-none file:mr-3 file:rounded-md file:border-0 file:bg-cyan-300 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-slate-950 focus:border-cyan-300">
+                </label>
+            </div>
+        </section>
+
+        <section class="rounded-lg border border-white/10 bg-white/5">
+            <div class="border-b border-white/10 px-4 py-3">
+                <h2 class="text-lg font-semibold text-white">Hero section</h2>
+                <p class="mt-1 text-sm text-slate-400">Main heading and background image or video shown at the top of the storefront.</p>
+            </div>
+            <div class="grid gap-4 p-4 md:grid-cols-2">
+                <label class="block text-sm font-medium text-slate-200" for="hero_title">
+                    Hero H1
+                    <input id="hero_title" name="hero_title" value="{{ .Storefront.HeroTitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                </label>
+                <label class="block text-sm font-medium text-slate-200" for="hero_subtitle">
+                    Hero H2
+                    <input id="hero_subtitle" name="hero_subtitle" value="{{ .Storefront.HeroSubtitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                </label>
+                <label class="block text-sm font-medium text-slate-200" for="hero_media_type">
+                    Hero media type
+                    <select id="hero_media_type" name="hero_media_type" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                        <option value="image" {{ if ne .Storefront.HeroMediaType "video" }}selected{{ end }}>Image</option>
+                        <option value="video" {{ if eq .Storefront.HeroMediaType "video" }}selected{{ end }}>Video</option>
+                    </select>
+                </label>
+                <label class="block text-sm font-medium text-slate-200" for="hero_media_url">
+                    Hero media URL
+                    <input id="hero_media_url" name="hero_media_url" value="{{ if .Storefront.HeroMediaURL }}{{ .Storefront.HeroMediaURL }}{{ else }}{{ .Storefront.HeroImageURL }}{{ end }}" placeholder="https://example.com/hero.jpg or https://example.com/hero.mp4" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                </label>
+            </div>
+        </section>
+
+        <section class="rounded-lg border border-white/10 bg-white/5">
+            <div class="border-b border-white/10 px-4 py-3">
+                <h2 class="text-lg font-semibold text-white">About section</h2>
+                <p class="mt-1 text-sm text-slate-400">Introductory copy shown below the hero.</p>
+            </div>
+            <div class="grid gap-4 p-4 md:grid-cols-2">
+                <label class="block text-sm font-medium text-slate-200" for="about_title">
+                    About H3
+                    <input id="about_title" name="about_title" value="{{ .Storefront.AboutTitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                </label>
+                <label class="md:col-span-2 block text-sm font-medium text-slate-200" for="about_body">
+                    About paragraph
+                    <textarea id="about_body" name="about_body" rows="4" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">{{ .Storefront.AboutBody }}</textarea>
+                </label>
+            </div>
+        </section>
+
+        <div class="flex justify-end">
             <button type="submit" class="rounded-md bg-cyan-300 px-4 py-2 font-semibold text-slate-950 hover:bg-cyan-200">Create storefront</button>
         </div>
     </form>

@@ -219,8 +219,11 @@ func (storefronts *AdminStorefronts) UpdateContent(c *gin.Context) {
 		return
 	}
 	storefront.HeroTitle = strings.TrimSpace(c.PostForm("hero_title"))
+	storefront.GoogleFontFamily = normalizeGoogleFontFamily(c.PostForm("google_font_family"))
 	storefront.HeroSubtitle = strings.TrimSpace(c.PostForm("hero_subtitle"))
 	storefront.HeroImageURL = strings.TrimSpace(c.PostForm("hero_image_url"))
+	storefront.HeroMediaURL = strings.TrimSpace(c.PostForm("hero_media_url"))
+	storefront.HeroMediaType = heroMediaType(c.PostForm("hero_media_type"), storefront.HeroMediaURL, storefront.HeroImageURL)
 	storefront.AboutTitle = strings.TrimSpace(c.PostForm("about_title"))
 	storefront.AboutBody = strings.TrimSpace(c.PostForm("about_body"))
 
@@ -372,9 +375,12 @@ func (storefronts *AdminStorefronts) storefrontFromRequest(c *gin.Context) (mode
 		Description:      strings.TrimSpace(c.PostForm("description")),
 		LogoURL:          strings.TrimSpace(c.PostForm("logo_url")),
 		LogoWidthPx:      logoWidthPx,
+		GoogleFontFamily: normalizeGoogleFontFamily(c.PostForm("google_font_family")),
 		HeroTitle:        strings.TrimSpace(c.PostForm("hero_title")),
 		HeroSubtitle:     strings.TrimSpace(c.PostForm("hero_subtitle")),
 		HeroImageURL:     strings.TrimSpace(c.PostForm("hero_image_url")),
+		HeroMediaURL:     strings.TrimSpace(c.PostForm("hero_media_url")),
+		HeroMediaType:    heroMediaType(c.PostForm("hero_media_type"), c.PostForm("hero_media_url"), c.PostForm("hero_image_url")),
 		AboutTitle:       strings.TrimSpace(c.PostForm("about_title")),
 		AboutBody:        strings.TrimSpace(c.PostForm("about_body")),
 		IsActive:         c.PostForm("is_active") == "on",
@@ -391,15 +397,45 @@ func storefrontPayload(storefront models.Storefront) map[string]interface{} {
 		"description":        storefront.Description,
 		"logo_url":           storefront.LogoURL,
 		"logo_width_px":      storefront.LogoWidthPx,
+		"google_font_family": normalizeGoogleFontFamily(storefront.GoogleFontFamily),
 		"hero_title":         storefront.HeroTitle,
 		"hero_subtitle":      storefront.HeroSubtitle,
 		"hero_image_url":     storefront.HeroImageURL,
+		"hero_media_url":     storefront.HeroMediaURL,
+		"hero_media_type":    heroMediaType(storefront.HeroMediaType, storefront.HeroMediaURL, storefront.HeroImageURL),
 		"about_title":        storefront.AboutTitle,
 		"about_body":         storefront.AboutBody,
 		"is_active":          storefront.IsActive,
 		"primary_country_id": storefront.PrimaryCountryID,
 		"owner_id":           uintPtrPayload(storefront.OwnerID),
 	}
+}
+
+func normalizeGoogleFontFamily(value string) string {
+	value = strings.Join(strings.Fields(strings.TrimSpace(value)), " ")
+	var builder strings.Builder
+	for _, r := range value {
+		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') || r == ' ' || r == '-' || r == '\'' {
+			builder.WriteRune(r)
+		}
+	}
+	return strings.TrimSpace(builder.String())
+}
+
+func heroMediaType(value string, mediaURL string, imageURL string) string {
+	mediaURL = strings.TrimSpace(mediaURL)
+	imageURL = strings.TrimSpace(imageURL)
+	value = strings.ToLower(strings.TrimSpace(value))
+	if mediaURL == "" {
+		if imageURL == "" {
+			return ""
+		}
+		return "image"
+	}
+	if value == "video" {
+		return "video"
+	}
+	return "image"
 }
 
 func unassignedProducts(all []models.Product, assigned []models.Product) []models.Product {
