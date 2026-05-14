@@ -1,8 +1,16 @@
 {{ define "storefront_show" }}
 {{ template "base_start" . }}
-{{ if or .Storefront.HeroTitle .Storefront.HeroSubtitle .Storefront.HeroImageURL }}
+{{ if or .Storefront.HeroTitle .Storefront.HeroSubtitle .Storefront.HeroMediaURL .Storefront.HeroImageURL }}
 <section class="relative overflow-hidden">
-    {{ if .Storefront.HeroImageURL }}
+    {{ if and .Storefront.HeroMediaURL (eq .Storefront.HeroMediaType "video") }}
+    <video class="absolute inset-0 h-full w-full object-cover opacity-90" autoplay muted loop playsinline preload="metadata">
+        <source src="{{ .Storefront.HeroMediaURL }}">
+    </video>
+    <div class="absolute inset-0 bg-slate-950/45"></div>
+    {{ else if .Storefront.HeroMediaURL }}
+    <img src="{{ .Storefront.HeroMediaURL }}" alt="" class="absolute inset-0 h-full w-full object-cover opacity-90">
+    <div class="absolute inset-0 bg-slate-950/40"></div>
+    {{ else if .Storefront.HeroImageURL }}
     <img src="{{ .Storefront.HeroImageURL }}" alt="" class="absolute inset-0 h-full w-full object-cover opacity-90">
     <div class="absolute inset-0 bg-slate-950/40"></div>
     {{ end }}

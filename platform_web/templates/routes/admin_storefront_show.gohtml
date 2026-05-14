@@ -56,9 +56,16 @@
                 Hero H2
                 <input name="hero_subtitle" value="{{ .Storefront.HeroSubtitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
             </label>
-            <label class="md:col-span-2 block text-sm font-medium text-slate-200">
-                Hero background image URL
-                <input name="hero_image_url" value="{{ .Storefront.HeroImageURL }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            <label class="block text-sm font-medium text-slate-200">
+                Hero media type
+                <select name="hero_media_type" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                    <option value="image" {{ if ne .Storefront.HeroMediaType "video" }}selected{{ end }}>Image</option>
+                    <option value="video" {{ if eq .Storefront.HeroMediaType "video" }}selected{{ end }}>Video</option>
+                </select>
+            </label>
+            <label class="block text-sm font-medium text-slate-200">
+                Hero media URL
+                <input name="hero_media_url" value="{{ if .Storefront.HeroMediaURL }}{{ .Storefront.HeroMediaURL }}{{ else }}{{ .Storefront.HeroImageURL }}{{ end }}" placeholder="https://example.com/hero.jpg or https://example.com/hero.mp4" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
             </label>
             <label class="block text-sm font-medium text-slate-200">
                 About H3

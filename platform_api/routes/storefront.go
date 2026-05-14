@@ -350,12 +350,30 @@ func (storefront *Storefront) bindJSON(c *gin.Context) (models.Storefront, bool)
 	}
 	record.Name = strings.TrimSpace(record.Name)
 	record.Domain = strings.ToLower(strings.TrimSpace(record.Domain))
+	record.HeroMediaURL = strings.TrimSpace(record.HeroMediaURL)
+	record.HeroMediaType = normalizeHeroMediaType(record.HeroMediaType, record.HeroMediaURL, record.HeroImageURL)
 	if record.Slug == "" {
 		record.Slug = utils.Slugify(record.Name)
 	} else {
 		record.Slug = utils.Slugify(record.Slug)
 	}
 	return record, true
+}
+
+func normalizeHeroMediaType(value string, mediaURL string, imageURL string) string {
+	value = strings.ToLower(strings.TrimSpace(value))
+	mediaURL = strings.TrimSpace(mediaURL)
+	imageURL = strings.TrimSpace(imageURL)
+	if mediaURL == "" {
+		if imageURL == "" {
+			return ""
+		}
+		return "image"
+	}
+	if value == "video" {
+		return "video"
+	}
+	return "image"
 }
 
 func storefrontUpdateMap(storefront models.Storefront) map[string]interface{} {
@@ -369,6 +387,8 @@ func storefrontUpdateMap(storefront models.Storefront) map[string]interface{} {
 		"hero_title":         storefront.HeroTitle,
 		"hero_subtitle":      storefront.HeroSubtitle,
 		"hero_image_url":     storefront.HeroImageURL,
+		"hero_media_url":     storefront.HeroMediaURL,
+		"hero_media_type":    storefront.HeroMediaType,
 		"about_title":        storefront.AboutTitle,
 		"about_body":         storefront.AboutBody,
 		"is_active":          storefront.IsActive,

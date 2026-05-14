@@ -65,9 +65,16 @@
             Hero H2
             <input id="hero_subtitle" name="hero_subtitle" value="{{ .Storefront.HeroSubtitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
         </label>
-        <label class="md:col-span-2 block text-sm font-medium text-slate-200" for="hero_image_url">
-            Hero background image URL
-            <input id="hero_image_url" name="hero_image_url" value="{{ .Storefront.HeroImageURL }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+        <label class="block text-sm font-medium text-slate-200" for="hero_media_type">
+            Hero media type
+            <select id="hero_media_type" name="hero_media_type" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                <option value="image" {{ if ne .Storefront.HeroMediaType "video" }}selected{{ end }}>Image</option>
+                <option value="video" {{ if eq .Storefront.HeroMediaType "video" }}selected{{ end }}>Video</option>
+            </select>
+        </label>
+        <label class="block text-sm font-medium text-slate-200" for="hero_media_url">
+            Hero media URL
+            <input id="hero_media_url" name="hero_media_url" value="{{ if .Storefront.HeroMediaURL }}{{ .Storefront.HeroMediaURL }}{{ else }}{{ .Storefront.HeroImageURL }}{{ end }}" placeholder="https://example.com/hero.jpg or https://example.com/hero.mp4" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
         </label>
         <div class="md:col-span-2 border-t border-white/10 pt-6">
             <h2 class="text-lg font-semibold text-white">About section</h2>

@@ -13,6 +13,8 @@ type Storefront struct {
 	HeroTitle        string  `json:"hero_title"`
 	HeroSubtitle     string  `json:"hero_subtitle"`
 	HeroImageURL     string  `json:"hero_image_url"`
+	HeroMediaURL     string  `json:"hero_media_url"`
+	HeroMediaType    string  `json:"hero_media_type"`
 	AboutTitle       string  `json:"about_title"`
 	AboutBody        string  `json:"about_body"`
 	IsActive         bool    `json:"is_active" gorm:"not null;default:true;index"`

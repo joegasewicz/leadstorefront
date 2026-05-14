@@ -221,6 +221,8 @@ func (storefronts *AdminStorefronts) UpdateContent(c *gin.Context) {
 	storefront.HeroTitle = strings.TrimSpace(c.PostForm("hero_title"))
 	storefront.HeroSubtitle = strings.TrimSpace(c.PostForm("hero_subtitle"))
 	storefront.HeroImageURL = strings.TrimSpace(c.PostForm("hero_image_url"))
+	storefront.HeroMediaURL = strings.TrimSpace(c.PostForm("hero_media_url"))
+	storefront.HeroMediaType = heroMediaType(c.PostForm("hero_media_type"), storefront.HeroMediaURL, storefront.HeroImageURL)
 	storefront.AboutTitle = strings.TrimSpace(c.PostForm("about_title"))
 	storefront.AboutBody = strings.TrimSpace(c.PostForm("about_body"))
 
@@ -375,6 +377,8 @@ func (storefronts *AdminStorefronts) storefrontFromRequest(c *gin.Context) (mode
 		HeroTitle:        strings.TrimSpace(c.PostForm("hero_title")),
 		HeroSubtitle:     strings.TrimSpace(c.PostForm("hero_subtitle")),
 		HeroImageURL:     strings.TrimSpace(c.PostForm("hero_image_url")),
+		HeroMediaURL:     strings.TrimSpace(c.PostForm("hero_media_url")),
+		HeroMediaType:    heroMediaType(c.PostForm("hero_media_type"), c.PostForm("hero_media_url"), c.PostForm("hero_image_url")),
 		AboutTitle:       strings.TrimSpace(c.PostForm("about_title")),
 		AboutBody:        strings.TrimSpace(c.PostForm("about_body")),
 		IsActive:         c.PostForm("is_active") == "on",
@@ -394,12 +398,30 @@ func storefrontPayload(storefront models.Storefront) map[string]interface{} {
 		"hero_title":         storefront.HeroTitle,
 		"hero_subtitle":      storefront.HeroSubtitle,
 		"hero_image_url":     storefront.HeroImageURL,
+		"hero_media_url":     storefront.HeroMediaURL,
+		"hero_media_type":    heroMediaType(storefront.HeroMediaType, storefront.HeroMediaURL, storefront.HeroImageURL),
 		"about_title":        storefront.AboutTitle,
 		"about_body":         storefront.AboutBody,
 		"is_active":          storefront.IsActive,
 		"primary_country_id": storefront.PrimaryCountryID,
 		"owner_id":           uintPtrPayload(storefront.OwnerID),
 	}
+}
+
+func heroMediaType(value string, mediaURL string, imageURL string) string {
+	mediaURL = strings.TrimSpace(mediaURL)
+	imageURL = strings.TrimSpace(imageURL)
+	value = strings.ToLower(strings.TrimSpace(value))
+	if mediaURL == "" {
+		if imageURL == "" {
+			return ""
+		}
+		return "image"
+	}
+	if value == "video" {
+		return "video"
+	}
+	return "image"
 }
 
 func unassignedProducts(all []models.Product, assigned []models.Product) []models.Product {
