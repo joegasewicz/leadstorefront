@@ -1,10 +1,15 @@
 package main
 
 import (
+	"crypto/sha256"
+	"fmt"
+	"html/template"
 	"leadstorefront/pkgs"
 	"leadstorefront/pkgs/middleware"
 	"leadstorefront/platform_web/routes"
 	"log"
+	"os"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,6 +25,9 @@ func main() {
 		c.Redirect(301, "/uploads/")
 	})
 	app.StaticFS("/uploads", gin.Dir("uploads", true))
+	app.SetFuncMap(template.FuncMap{
+		"asset": versionedAssetPath("platform_web/static/assets"),
+	})
 	app.LoadHTMLFiles(
 		"platform_web/templates/base.gohtml",
 		"platform_web/templates/partials/meta-tags.gohtml",
@@ -57,5 +65,25 @@ func main() {
 	log.Printf("platform_web serving at http://%s%s", cfg.Domain, cfg.Addr)
 	if err := app.Run(cfg.Addr); err != nil {
 		log.Fatal(err)
+	}
+}
+
+func versionedAssetPath(assetDir string) func(string) string {
+	versions := map[string]string{}
+	for _, name := range []string{"app.css", "app.js"} {
+		data, err := os.ReadFile(filepath.Join(assetDir, name))
+		if err != nil {
+			continue
+		}
+		sum := sha256.Sum256(data)
+		versions[name] = fmt.Sprintf("%x", sum[:8])
+	}
+
+	return func(name string) string {
+		path := "/assets/" + filepath.Base(name)
+		if version := versions[filepath.Base(name)]; version != "" {
+			return path + "?v=" + version
+		}
+		return path
 	}
 }

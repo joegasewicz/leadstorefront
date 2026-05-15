@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     {{ template "meta-tags" . }}
-    <link rel="stylesheet" href="/assets/app.css">
+    <link rel="stylesheet" href="{{ asset "app.css" }}">
     {{ if and .UseStorefrontFont .Storefront.GoogleFontFamily }}
     <link href="https://fonts.googleapis.com/css2?family={{ urlquery .Storefront.GoogleFontFamily }}:wght@300..800&display=swap" rel="stylesheet">
     {{ end }}
