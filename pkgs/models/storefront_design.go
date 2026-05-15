@@ -32,6 +32,7 @@ type StorefrontDesignSection struct {
 	Type           string                         `json:"type"`
 	Enabled        bool                           `json:"enabled"`
 	ContainerStyle string                         `json:"container_style,omitempty"`
+	TextAlignments map[string]string              `json:"text_alignments,omitempty"`
 	Options        StorefrontDesignSectionOptions `json:"options"`
 }
 
@@ -181,6 +182,7 @@ func normalizedStorefrontSection(section StorefrontDesignSection) (StorefrontDes
 	section.Name = normalizedSectionName(section.Name, sectionType, contentKind)
 	section.Type = sectionType
 	section.ContainerStyle = normalizedContainerStyle(section.ContainerStyle)
+	section.TextAlignments = normalizedTextAlignments(section.TextAlignments)
 	section.Options = normalizedStorefrontSectionOptions(section.Options, section.Name, sectionType, contentKind)
 	return section, true
 }
@@ -191,6 +193,24 @@ func normalizedContainerStyle(value string) string {
 		return value[:4000]
 	}
 	return value
+}
+
+func normalizedTextAlignments(alignments map[string]string) map[string]string {
+	normalized := map[string]string{}
+	for _, tag := range []string{"h1", "h2", "h3", "h4", "h5", "h6", "p"} {
+		switch strings.ToLower(strings.TrimSpace(alignments[tag])) {
+		case "left":
+			normalized[tag] = "left"
+		case "center":
+			normalized[tag] = "center"
+		case "right":
+			normalized[tag] = "right"
+		}
+	}
+	if len(normalized) == 0 {
+		return nil
+	}
+	return normalized
 }
 
 func normalizedStorefrontSectionOptions(options StorefrontDesignSectionOptions, sectionName string, sectionType string, contentKind string) StorefrontDesignSectionOptions {

@@ -14,6 +14,7 @@ type storefrontDesignSectionView struct {
 	Label          string
 	Enabled        bool
 	ContainerStyle string
+	TextAlignments map[string]string
 	InlineStyle    template.CSS
 	ScopedCSS      template.CSS
 	ContentKind    string
@@ -38,6 +39,7 @@ func storefrontDesignTemplateData(storefront models.Storefront) (models.Storefro
 			Label:          storefrontDesignSectionLabel(section),
 			Enabled:        section.Enabled,
 			ContainerStyle: section.ContainerStyle,
+			TextAlignments: section.TextAlignments,
 			InlineStyle:    inlineStyle,
 			ScopedCSS:      scopedCSS,
 			ContentKind:    section.Options.ContentKind,
@@ -51,13 +53,15 @@ func storefrontDesignTemplateData(storefront models.Storefront) (models.Storefro
 
 func storefrontSectionStyles(section models.StorefrontDesignSection) (template.CSS, template.CSS) {
 	raw := strings.TrimSpace(section.ContainerStyle)
-	if raw == "" {
-		return "", ""
+	var inlineStyle template.CSS
+	var scopedCSS strings.Builder
+	if raw != "" && !strings.Contains(raw, "{") {
+		inlineStyle = template.CSS(raw)
+	} else if raw != "" {
+		scopedCSS.WriteString(scopeStorefrontSectionCSS(section.ID, raw))
 	}
-	if !strings.Contains(raw, "{") {
-		return template.CSS(raw), ""
-	}
-	return "", template.CSS(scopeStorefrontSectionCSS(section.ID, raw))
+	scopedCSS.WriteString(scopeStorefrontAlignmentCSS(section.ID, section.TextAlignments))
+	return inlineStyle, template.CSS(scopedCSS.String())
 }
 
 func scopeStorefrontSectionCSS(sectionID string, raw string) string {
@@ -92,6 +96,28 @@ func scopeStorefrontSectionCSS(sectionID string, raw string) string {
 		builder.WriteString(" { ")
 		builder.WriteString(body)
 		builder.WriteString(" }\n")
+	}
+	return builder.String()
+}
+
+func scopeStorefrontAlignmentCSS(sectionID string, alignments map[string]string) string {
+	sectionID = strings.TrimSpace(sectionID)
+	if sectionID == "" || len(alignments) == 0 {
+		return ""
+	}
+	scope := `[data-storefront-section="` + sectionID + `"]`
+	var builder strings.Builder
+	for _, tag := range []string{"h1", "h2", "h3", "h4", "h5", "h6", "p"} {
+		align := alignments[tag]
+		if align == "" {
+			continue
+		}
+		builder.WriteString(scope)
+		builder.WriteString(" ")
+		builder.WriteString(tag)
+		builder.WriteString(" { text-align: ")
+		builder.WriteString(align)
+		builder.WriteString("; }\n")
 	}
 	return builder.String()
 }

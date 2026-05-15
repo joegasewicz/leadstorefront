@@ -70,11 +70,29 @@
 
                 <div x-show="selectedSection().type === 'hero'" class="grid gap-4 border-t border-white/10 pt-4">
                     <label class="block text-sm font-medium text-slate-200" for="hero_title">
-                        Hero H1
+                        <span class="flex items-center justify-between gap-3">
+                            <span>Hero H1</span>
+                            <span class="inline-flex rounded-md border border-white/10 bg-slate-950 p-1">
+                                <template x-for="option in alignmentOptions" :key="option.value">
+                                    <button type="button" :title="option.label" @click="setTextAlignment(selectedSection(), 'h1', option.value)" :class="textAlignment(selectedSection(), 'h1') === option.value ? 'bg-cyan-300 text-slate-950' : 'text-slate-300 hover:bg-white/10 hover:text-white'" class="grid h-8 w-8 place-items-center rounded">
+                                        <i :data-lucide="option.icon" class="h-4 w-4"></i>
+                                    </button>
+                                </template>
+                            </span>
+                        </span>
                         <input id="hero_title" name="hero_title" value="{{ .Storefront.HeroTitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
                     </label>
                     <label class="block text-sm font-medium text-slate-200" for="hero_subtitle">
-                        Hero H2
+                        <span class="flex items-center justify-between gap-3">
+                            <span>Hero H2</span>
+                            <span class="inline-flex rounded-md border border-white/10 bg-slate-950 p-1">
+                                <template x-for="option in alignmentOptions" :key="option.value">
+                                    <button type="button" :title="option.label" @click="setTextAlignment(selectedSection(), 'h2', option.value)" :class="textAlignment(selectedSection(), 'h2') === option.value ? 'bg-cyan-300 text-slate-950' : 'text-slate-300 hover:bg-white/10 hover:text-white'" class="grid h-8 w-8 place-items-center rounded">
+                                        <i :data-lucide="option.icon" class="h-4 w-4"></i>
+                                    </button>
+                                </template>
+                            </span>
+                        </span>
                         <input id="hero_subtitle" name="hero_subtitle" value="{{ .Storefront.HeroSubtitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
                     </label>
                     <label class="block text-sm font-medium text-slate-200" for="hero_media_type">
@@ -92,22 +110,58 @@
 
                 <div x-show="selectedSection().type === 'content' && selectedSection().options.content_kind === 'about'" class="grid gap-4 border-t border-white/10 pt-4">
                     <label class="block text-sm font-medium text-slate-200" for="about_title">
-                        About H3
+                        <span class="flex items-center justify-between gap-3">
+                            <span>About H3</span>
+                            <span class="inline-flex rounded-md border border-white/10 bg-slate-950 p-1">
+                                <template x-for="option in alignmentOptions" :key="option.value">
+                                    <button type="button" :title="option.label" @click="setTextAlignment(selectedSection(), 'h3', option.value)" :class="textAlignment(selectedSection(), 'h3') === option.value ? 'bg-cyan-300 text-slate-950' : 'text-slate-300 hover:bg-white/10 hover:text-white'" class="grid h-8 w-8 place-items-center rounded">
+                                        <i :data-lucide="option.icon" class="h-4 w-4"></i>
+                                    </button>
+                                </template>
+                            </span>
+                        </span>
                         <input id="about_title" name="about_title" value="{{ .Storefront.AboutTitle }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
                     </label>
                     <label class="block text-sm font-medium text-slate-200" for="about_body">
-                        About paragraph
+                        <span class="flex items-center justify-between gap-3">
+                            <span>About paragraph</span>
+                            <span class="inline-flex rounded-md border border-white/10 bg-slate-950 p-1">
+                                <template x-for="option in alignmentOptions" :key="option.value">
+                                    <button type="button" :title="option.label" @click="setTextAlignment(selectedSection(), 'p', option.value)" :class="textAlignment(selectedSection(), 'p') === option.value ? 'bg-cyan-300 text-slate-950' : 'text-slate-300 hover:bg-white/10 hover:text-white'" class="grid h-8 w-8 place-items-center rounded">
+                                        <i :data-lucide="option.icon" class="h-4 w-4"></i>
+                                    </button>
+                                </template>
+                            </span>
+                        </span>
                         <textarea id="about_body" name="about_body" rows="4" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">{{ .Storefront.AboutBody }}</textarea>
                     </label>
                 </div>
 
                 <div x-show="selectedSection().type === 'content' && selectedSection().options.content_kind === 'custom'" class="grid gap-4 border-t border-white/10 pt-4">
                     <label class="block text-sm font-medium text-slate-200">
-                        Content title
+                        <span class="flex items-center justify-between gap-3">
+                            <span>Content title</span>
+                            <span class="inline-flex rounded-md border border-white/10 bg-slate-950 p-1">
+                                <template x-for="option in alignmentOptions" :key="option.value">
+                                    <button type="button" :title="option.label" @click="setTextAlignment(selectedSection(), 'h3', option.value)" :class="textAlignment(selectedSection(), 'h3') === option.value ? 'bg-cyan-300 text-slate-950' : 'text-slate-300 hover:bg-white/10 hover:text-white'" class="grid h-8 w-8 place-items-center rounded">
+                                        <i :data-lucide="option.icon" class="h-4 w-4"></i>
+                                    </button>
+                                </template>
+                            </span>
+                        </span>
                         <input type="text" x-model="selectedSection().options.title" @input="updateDesignConfig()" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
                     </label>
                     <label class="block text-sm font-medium text-slate-200">
-                        Content description
+                        <span class="flex items-center justify-between gap-3">
+                            <span>Content description</span>
+                            <span class="inline-flex rounded-md border border-white/10 bg-slate-950 p-1">
+                                <template x-for="option in alignmentOptions" :key="option.value">
+                                    <button type="button" :title="option.label" @click="setTextAlignment(selectedSection(), 'p', option.value)" :class="textAlignment(selectedSection(), 'p') === option.value ? 'bg-cyan-300 text-slate-950' : 'text-slate-300 hover:bg-white/10 hover:text-white'" class="grid h-8 w-8 place-items-center rounded">
+                                        <i :data-lucide="option.icon" class="h-4 w-4"></i>
+                                    </button>
+                                </template>
+                            </span>
+                        </span>
                         <textarea :value="selectedSection().options.description || ''" @input="selectedSection().options.description = $event.target.value; updateDesignConfig()" rows="3" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300"></textarea>
                     </label>
                     <div class="grid gap-3">
@@ -117,7 +171,27 @@
                                     <p class="text-sm font-semibold text-slate-200">Card</p>
                                     <button type="button" @click="removeColumn(selectedSection(), columnIndex)" class="rounded-md border border-red-400/30 px-2 py-1 text-xs font-semibold text-red-200 hover:bg-red-500/10">Remove</button>
                                 </div>
+                                <div class="flex items-center justify-between gap-3">
+                                    <span class="text-xs font-semibold uppercase tracking-wide text-slate-400">Heading</span>
+                                    <span class="inline-flex rounded-md border border-white/10 bg-slate-900 p-1">
+                                        <template x-for="option in alignmentOptions" :key="option.value">
+                                            <button type="button" :title="option.label" @click="setTextAlignment(selectedSection(), 'h4', option.value)" :class="textAlignment(selectedSection(), 'h4') === option.value ? 'bg-cyan-300 text-slate-950' : 'text-slate-300 hover:bg-white/10 hover:text-white'" class="grid h-8 w-8 place-items-center rounded">
+                                                <i :data-lucide="option.icon" class="h-4 w-4"></i>
+                                            </button>
+                                        </template>
+                                    </span>
+                                </div>
                                 <input type="text" x-model="column.heading" @input="updateDesignConfig()" placeholder="Heading" class="w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300">
+                                <div class="flex items-center justify-between gap-3">
+                                    <span class="text-xs font-semibold uppercase tracking-wide text-slate-400">Text body</span>
+                                    <span class="inline-flex rounded-md border border-white/10 bg-slate-900 p-1">
+                                        <template x-for="option in alignmentOptions" :key="option.value">
+                                            <button type="button" :title="option.label" @click="setTextAlignment(selectedSection(), 'p', option.value)" :class="textAlignment(selectedSection(), 'p') === option.value ? 'bg-cyan-300 text-slate-950' : 'text-slate-300 hover:bg-white/10 hover:text-white'" class="grid h-8 w-8 place-items-center rounded">
+                                                <i :data-lucide="option.icon" class="h-4 w-4"></i>
+                                            </button>
+                                        </template>
+                                    </span>
+                                </div>
                                 <textarea x-model="column.body" @input="updateDesignConfig()" rows="3" placeholder="Text body" class="w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300"></textarea>
                             </div>
                         </template>

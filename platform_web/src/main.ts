@@ -1,6 +1,7 @@
 import "./styles.scss";
 import Alpine from "alpinejs";
 import Sortable from "sortablejs";
+import { AlignCenter, AlignLeft, AlignRight, createIcons } from "lucide";
 
 document.documentElement.classList.add("js-enabled");
 
@@ -30,6 +31,7 @@ type StorefrontThemeSection = {
   type: string;
   enabled: boolean;
   container_style?: string;
+  text_alignments?: Record<string, string>;
   options: StorefrontThemeSectionOptions;
 };
 
@@ -94,8 +96,19 @@ function normalizeSection(section: Partial<StorefrontThemeSection>): StorefrontT
     type,
     enabled: section.enabled ?? true,
     container_style: section.container_style || "",
+    text_alignments: normalizeTextAlignments(section.text_alignments || {}),
     options: type === "content" ? options : {}
   };
+}
+
+function normalizeTextAlignments(alignments: Record<string, string>): Record<string, string> {
+  const normalized: Record<string, string> = {};
+  ["h1", "h2", "h3", "h4", "h5", "h6", "p"].forEach((element) => {
+    if (["left", "center", "right"].includes(alignments[element])) {
+      normalized[element] = alignments[element];
+    }
+  });
+  return normalized;
 }
 
 Alpine.data("storefrontThemeEditor", () => ({
@@ -105,6 +118,20 @@ Alpine.data("storefrontThemeEditor", () => ({
   newSectionName: "",
   newSectionType: "content",
   newContentKind: "custom",
+  alignmentTargets: [
+    { key: "h1", label: "H1" },
+    { key: "h2", label: "H2" },
+    { key: "h3", label: "H3" },
+    { key: "h4", label: "H4" },
+    { key: "h5", label: "H5" },
+    { key: "h6", label: "H6" },
+    { key: "p", label: "P" }
+  ],
+  alignmentOptions: [
+    { value: "left", icon: "align-left", label: "Align left" },
+    { value: "center", icon: "align-center", label: "Align center" },
+    { value: "right", icon: "align-right", label: "Align right" }
+  ],
   sortable: null as Sortable | null,
 
   init() {
@@ -128,6 +155,7 @@ Alpine.data("storefrontThemeEditor", () => ({
     this.$nextTick(() => {
       this.bindSortable();
       this.updateDesignConfig();
+      this.refreshIcons();
     });
   },
 
@@ -159,6 +187,26 @@ Alpine.data("storefrontThemeEditor", () => ({
 
   selectSection(id: string) {
     this.selectedSectionID = id;
+    this.refreshIcons();
+  },
+
+  refreshIcons() {
+    this.$nextTick(() => createIcons({ icons: { AlignLeft, AlignCenter, AlignRight } }));
+  },
+
+  textAlignment(section: StorefrontThemeSection, element: string) {
+    section.text_alignments = section.text_alignments || {};
+    return section.text_alignments[element] || "";
+  },
+
+  setTextAlignment(section: StorefrontThemeSection, element: string, alignment: string) {
+    section.text_alignments = section.text_alignments || {};
+    if (section.text_alignments[element] === alignment) {
+      delete section.text_alignments[element];
+    } else {
+      section.text_alignments[element] = alignment;
+    }
+    this.updateDesignConfig();
   },
 
   setSectionType(section: StorefrontThemeSection, type: string) {
@@ -210,6 +258,7 @@ Alpine.data("storefrontThemeEditor", () => ({
       type,
       enabled: true,
       container_style: "",
+      text_alignments: {},
       options: type === "content" ? { content_kind: this.newContentKind || "custom", title: name, description: "", columns: [] } : {}
     });
     this.sections.push(section);
@@ -220,6 +269,7 @@ Alpine.data("storefrontThemeEditor", () => ({
     this.$nextTick(() => {
       this.bindSortable();
       this.updateDesignConfig();
+      this.refreshIcons();
     });
   },
 
@@ -247,6 +297,7 @@ Alpine.data("storefrontThemeEditor", () => ({
         type: section.type,
         enabled: section.enabled,
         container_style: section.container_style || "",
+        text_alignments: normalizeTextAlignments(section.text_alignments || {}),
         options: section.type === "content" ? {
           content_kind: section.options.content_kind || "custom",
           title: section.options.content_kind === "custom" ? section.options.title || section.name : undefined,
