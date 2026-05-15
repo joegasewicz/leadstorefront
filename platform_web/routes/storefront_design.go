@@ -2,19 +2,24 @@ package routes
 
 import (
 	"encoding/json"
+	"html/template"
 	"leadstorefront/pkgs/models"
+	"strings"
 )
 
 type storefrontDesignSectionView struct {
-	ID          string
-	Name        string
-	Type        string
-	Label       string
-	Enabled     bool
-	ContentKind string
-	CustomTitle string
-	Description string
-	Columns     []models.StorefrontDesignContentColumn
+	ID             string
+	Name           string
+	Type           string
+	Label          string
+	Enabled        bool
+	ContainerStyle string
+	InlineStyle    template.CSS
+	ScopedCSS      template.CSS
+	ContentKind    string
+	CustomTitle    string
+	Description    string
+	Columns        []models.StorefrontDesignContentColumn
 }
 
 func storefrontDesignTemplateData(storefront models.Storefront) (models.StorefrontDesignConfig, string, []storefrontDesignSectionView) {
@@ -25,19 +30,70 @@ func storefrontDesignTemplateData(storefront models.Storefront) (models.Storefro
 	}
 	sections := make([]storefrontDesignSectionView, 0, len(design.Sections))
 	for _, section := range design.Sections {
+		inlineStyle, scopedCSS := storefrontSectionStyles(section)
 		sections = append(sections, storefrontDesignSectionView{
-			ID:          section.ID,
-			Name:        section.Name,
-			Type:        section.Type,
-			Label:       storefrontDesignSectionLabel(section),
-			Enabled:     section.Enabled,
-			ContentKind: section.Options.ContentKind,
-			CustomTitle: section.Options.Title,
-			Description: section.Options.Description,
-			Columns:     section.Options.Columns,
+			ID:             section.ID,
+			Name:           section.Name,
+			Type:           section.Type,
+			Label:          storefrontDesignSectionLabel(section),
+			Enabled:        section.Enabled,
+			ContainerStyle: section.ContainerStyle,
+			InlineStyle:    inlineStyle,
+			ScopedCSS:      scopedCSS,
+			ContentKind:    section.Options.ContentKind,
+			CustomTitle:    section.Options.Title,
+			Description:    section.Options.Description,
+			Columns:        section.Options.Columns,
 		})
 	}
 	return design, string(encoded), sections
+}
+
+func storefrontSectionStyles(section models.StorefrontDesignSection) (template.CSS, template.CSS) {
+	raw := strings.TrimSpace(section.ContainerStyle)
+	if raw == "" {
+		return "", ""
+	}
+	if !strings.Contains(raw, "{") {
+		return template.CSS(raw), ""
+	}
+	return "", template.CSS(scopeStorefrontSectionCSS(section.ID, raw))
+}
+
+func scopeStorefrontSectionCSS(sectionID string, raw string) string {
+	sectionID = strings.TrimSpace(sectionID)
+	if sectionID == "" {
+		return ""
+	}
+	scope := `[data-storefront-section="` + sectionID + `"]`
+	var builder strings.Builder
+	for _, block := range strings.Split(raw, "}") {
+		block = strings.TrimSpace(block)
+		if block == "" {
+			continue
+		}
+		parts := strings.SplitN(block, "{", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		selectors := make([]string, 0)
+		for _, selector := range strings.Split(parts[0], ",") {
+			selector = strings.TrimSpace(selector)
+			if selector == "" || strings.HasPrefix(selector, "@") {
+				continue
+			}
+			selectors = append(selectors, scope+" "+selector)
+		}
+		body := strings.TrimSpace(parts[1])
+		if len(selectors) == 0 || body == "" {
+			continue
+		}
+		builder.WriteString(strings.Join(selectors, ", "))
+		builder.WriteString(" { ")
+		builder.WriteString(body)
+		builder.WriteString(" }\n")
+	}
+	return builder.String()
 }
 
 func storefrontDesignSectionLabel(section models.StorefrontDesignSection) string {

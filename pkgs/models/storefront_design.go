@@ -27,11 +27,12 @@ type StorefrontDesignColors struct {
 }
 
 type StorefrontDesignSection struct {
-	ID      string                         `json:"id"`
-	Name    string                         `json:"name"`
-	Type    string                         `json:"type"`
-	Enabled bool                           `json:"enabled"`
-	Options StorefrontDesignSectionOptions `json:"options"`
+	ID             string                         `json:"id"`
+	Name           string                         `json:"name"`
+	Type           string                         `json:"type"`
+	Enabled        bool                           `json:"enabled"`
+	ContainerStyle string                         `json:"container_style,omitempty"`
+	Options        StorefrontDesignSectionOptions `json:"options"`
 }
 
 type StorefrontDesignSectionOptions struct {
@@ -179,8 +180,17 @@ func normalizedStorefrontSection(section StorefrontDesignSection) (StorefrontDes
 	section.ID = normalizedSectionID(section.ID, section.Name, sectionType, contentKind)
 	section.Name = normalizedSectionName(section.Name, sectionType, contentKind)
 	section.Type = sectionType
+	section.ContainerStyle = normalizedContainerStyle(section.ContainerStyle)
 	section.Options = normalizedStorefrontSectionOptions(section.Options, section.Name, sectionType, contentKind)
 	return section, true
+}
+
+func normalizedContainerStyle(value string) string {
+	value = strings.TrimSpace(value)
+	if len(value) > 4000 {
+		return value[:4000]
+	}
+	return value
 }
 
 func normalizedStorefrontSectionOptions(options StorefrontDesignSectionOptions, sectionName string, sectionType string, contentKind string) StorefrontDesignSectionOptions {

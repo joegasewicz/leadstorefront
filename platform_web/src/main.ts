@@ -29,6 +29,7 @@ type StorefrontThemeSection = {
   name: string;
   type: string;
   enabled: boolean;
+  container_style?: string;
   options: StorefrontThemeSectionOptions;
 };
 
@@ -92,6 +93,7 @@ function normalizeSection(section: Partial<StorefrontThemeSection>): StorefrontT
     name: section.name || type || "Section",
     type,
     enabled: section.enabled ?? true,
+    container_style: section.container_style || "",
     options: type === "content" ? options : {}
   };
 }
@@ -207,6 +209,7 @@ Alpine.data("storefrontThemeEditor", () => ({
       name,
       type,
       enabled: true,
+      container_style: "",
       options: type === "content" ? { content_kind: this.newContentKind || "custom", title: name, description: "", columns: [] } : {}
     });
     this.sections.push(section);
@@ -243,6 +246,7 @@ Alpine.data("storefrontThemeEditor", () => ({
         name: section.name,
         type: section.type,
         enabled: section.enabled,
+        container_style: section.container_style || "",
         options: section.type === "content" ? {
           content_kind: section.options.content_kind || "custom",
           title: section.options.content_kind === "custom" ? section.options.title || section.name : undefined,

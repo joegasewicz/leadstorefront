@@ -62,6 +62,10 @@
                             <option value="articles">Articles</option>
                         </select>
                     </label>
+                    <label class="block text-sm font-medium text-slate-200">
+                        Section container CSS
+                        <textarea :value="selectedSection().container_style || ''" @input="selectedSection().container_style = $event.target.value; updateDesignConfig()" rows="4" placeholder="padding-top: 6rem; background: #0f172a; or h1 { color: red; }" class="mt-2 w-full rounded-md border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white outline-none focus:border-cyan-300"></textarea>
+                    </label>
                 </div>
 
                 <div x-show="selectedSection().type === 'hero'" class="grid gap-4 border-t border-white/10 pt-4">

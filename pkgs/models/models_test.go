@@ -266,10 +266,11 @@ func TestStorefrontDesignCustomContentDescriptionRoundTrip(t *testing.T) {
 		Colors: DefaultStorefrontDesignConfig().Colors,
 		Sections: []StorefrontDesignSection{
 			{
-				ID:      "custom-content",
-				Name:    "Custom content",
-				Type:    StorefrontSectionContent,
-				Enabled: true,
+				ID:             "custom-content",
+				Name:           "Custom content",
+				Type:           StorefrontSectionContent,
+				Enabled:        true,
+				ContainerStyle: "padding-top: 6rem; background: #0f172a;",
 				Options: StorefrontDesignSectionOptions{
 					ContentKind: "custom",
 					Title:       "Center title",
@@ -285,5 +286,6 @@ func TestStorefrontDesignCustomContentDescriptionRoundTrip(t *testing.T) {
 	roundTripped := StorefrontDesignFromJSON(StorefrontDesignToJSON(config))
 
 	require.Len(t, roundTripped.Sections, 1)
+	assert.Equal(t, "padding-top: 6rem; background: #0f172a;", roundTripped.Sections[0].ContainerStyle)
 	assert.Equal(t, "This description should be preserved.", roundTripped.Sections[0].Options.Description)
 }

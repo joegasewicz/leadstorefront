@@ -6,7 +6,8 @@
 {{ if .Enabled }}
 {{ if eq .Type "hero" }}
     {{ if or $root.Storefront.HeroTitle $root.Storefront.HeroSubtitle $root.Storefront.HeroMediaURL $root.Storefront.HeroImageURL }}
-    <section class="relative overflow-hidden">
+    {{ if .ScopedCSS }}<style>{{ .ScopedCSS }}</style>{{ end }}
+    <section class="relative overflow-hidden" data-storefront-section="{{ .ID }}" style="{{ .InlineStyle }}">
         {{ if and $root.Storefront.HeroMediaURL (eq $root.Storefront.HeroMediaType "video") }}
         <video class="absolute inset-0 h-full w-full object-cover opacity-90" autoplay muted loop playsinline preload="metadata">
             <source src="{{ $root.Storefront.HeroMediaURL }}">
@@ -27,7 +28,8 @@
         </div>
     </section>
     {{ else }}
-    <section class="mx-auto max-w-5xl px-6 py-16">
+    {{ if .ScopedCSS }}<style>{{ .ScopedCSS }}</style>{{ end }}
+    <section class="mx-auto max-w-5xl px-6 py-16" data-storefront-section="{{ .ID }}" style="{{ .InlineStyle }}">
         <div class="max-w-3xl">
             <p class="text-sm font-semibold uppercase tracking-wide storefront-accent-text">{{ $root.Storefront.Domain }}</p>
             <h1 class="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">{{ $root.Storefront.Name }}</h1>
@@ -36,7 +38,8 @@
     {{ end }}
 {{ else if and (eq .Type "content") (eq .ContentKind "about") }}
     {{ if or $root.Storefront.AboutTitle $root.Storefront.AboutBody $root.Storefront.Description }}
-    <section class="mx-auto max-w-5xl px-6 py-12">
+    {{ if .ScopedCSS }}<style>{{ .ScopedCSS }}</style>{{ end }}
+    <section class="mx-auto max-w-5xl px-6 py-12" data-storefront-section="{{ .ID }}" style="{{ .InlineStyle }}">
         <div class="max-w-3xl">
             {{ if $root.Storefront.AboutTitle }}
             <h3 class="text-2xl font-bold tracking-normal">{{ $root.Storefront.AboutTitle }}</h3>
@@ -47,7 +50,8 @@
     {{ end }}
 {{ else if and (eq .Type "content") (eq .ContentKind "lead_form") }}
     {{ if $root.LeadFields }}
-    <section id="lead-form" class="mx-auto max-w-5xl px-6 py-12">
+    {{ if .ScopedCSS }}<style>{{ .ScopedCSS }}</style>{{ end }}
+    <section id="lead-form" class="mx-auto max-w-5xl px-6 py-12" data-storefront-section="{{ .ID }}" style="{{ .InlineStyle }}">
         <div class="storefront-card rounded-lg border p-6">
             <div class="max-w-2xl">
                 <h3 class="text-2xl font-bold tracking-normal">Get in touch</h3>
@@ -82,21 +86,24 @@
     </section>
     {{ end }}
 {{ else if and (eq .Type "content") (eq .ContentKind "products") }}
-    <section class="mx-auto max-w-5xl px-6 py-12">
+    {{ if .ScopedCSS }}<style>{{ .ScopedCSS }}</style>{{ end }}
+    <section class="mx-auto max-w-5xl px-6 py-12" data-storefront-section="{{ .ID }}" style="{{ .InlineStyle }}">
         <a class="storefront-card block rounded-lg border p-6" href="{{ $root.StorefrontPath }}/products">
             <h3 class="text-2xl font-bold tracking-normal">Products</h3>
             <p class="mt-3 text-sm leading-6 storefront-muted-text">Browse the products featured by this storefront.</p>
         </a>
     </section>
 {{ else if and (eq .Type "content") (eq .ContentKind "articles") }}
-    <section class="mx-auto max-w-5xl px-6 py-12">
+    {{ if .ScopedCSS }}<style>{{ .ScopedCSS }}</style>{{ end }}
+    <section class="mx-auto max-w-5xl px-6 py-12" data-storefront-section="{{ .ID }}" style="{{ .InlineStyle }}">
         <a class="storefront-card block rounded-lg border p-6" href="{{ $root.StorefrontPath }}/articles">
             <h3 class="text-2xl font-bold tracking-normal">Articles</h3>
             <p class="mt-3 text-sm leading-6 storefront-muted-text">Read the latest articles and guides from this storefront.</p>
         </a>
     </section>
 {{ else if and (eq .Type "content") (eq .ContentKind "custom") }}
-    <section class="mx-auto max-w-5xl px-6 py-12">
+    {{ if .ScopedCSS }}<style>{{ .ScopedCSS }}</style>{{ end }}
+    <section class="mx-auto max-w-5xl px-6 py-12" data-storefront-section="{{ .ID }}" style="{{ .InlineStyle }}">
         <div>
             <div class="mx-auto max-w-3xl text-center">
                 <h3 class="text-2xl font-bold tracking-normal">{{ if .CustomTitle }}{{ .CustomTitle }}{{ else }}{{ .Name }}{{ end }}</h3>
@@ -121,7 +128,8 @@
         </div>
     </section>
 {{ else if eq .Type "footer" }}
-    <footer class="mx-auto max-w-5xl px-6 py-10">
+    {{ if .ScopedCSS }}<style>{{ .ScopedCSS }}</style>{{ end }}
+    <footer class="mx-auto max-w-5xl px-6 py-10" data-storefront-section="{{ .ID }}" style="{{ .InlineStyle }}">
         <div class="border-t border-white/10 pt-6 text-sm storefront-muted-text">{{ if .Name }}{{ .Name }}{{ else }}{{ $root.Storefront.Name }}{{ end }}</div>
     </footer>
 {{ end }}
