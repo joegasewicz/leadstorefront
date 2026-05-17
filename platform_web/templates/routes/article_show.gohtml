@@ -29,8 +29,8 @@
         <aside class="mt-10 rounded-lg border border-white/10 bg-slate-900 p-5">
             <p class="text-sm font-semibold uppercase tracking-wide text-cyan-300">Related deal</p>
             <h2 class="mt-2 text-xl font-semibold text-white">{{ .Article.Product.Name }}</h2>
-            {{ if .Article.Product.ProductURL }}
-            <a href="{{ .Article.Product.ProductURL }}" class="mt-4 inline-flex rounded-md bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950">View deal</a>
+            {{ if .DealURL }}
+            <a href="{{ .DealURL }}" rel="nofollow sponsored" class="mt-4 inline-flex rounded-md bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950">View deal</a>
             {{ end }}
         </aside>
         {{ end }}

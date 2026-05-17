@@ -53,6 +53,7 @@ func main() {
 		"platform_web/templates/routes/admin_lead_form.gohtml",
 		"platform_web/templates/routes/admin_leads_index.gohtml",
 		"platform_web/templates/routes/admin_lead_show.gohtml",
+		"platform_web/templates/routes/admin_outbound_clicks_index.gohtml",
 		"platform_web/templates/routes/admin_articles_index.gohtml",
 		"platform_web/templates/routes/admin_article_form.gohtml",
 		"platform_web/templates/routes/admin_products_index.gohtml",

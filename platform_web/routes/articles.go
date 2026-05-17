@@ -47,6 +47,7 @@ func (articles *Articles) Index(c *gin.Context) {
 	if hasStorefront {
 		path += "?storefront_id=" + url.QueryEscape(uintToString(storefront.ID))
 		articlesPath = storefrontBasePath(c, country, storefront) + "/articles"
+		captureAttribution(c, storefront.ID)
 	}
 	if err := articles.API.Get(c, path, &response); err != nil {
 		c.String(http.StatusInternalServerError, "could not load articles")
@@ -91,12 +92,17 @@ func (articles *Articles) Show(c *gin.Context) {
 	if hasStorefront {
 		path += "?storefront_id=" + url.QueryEscape(uintToString(storefront.ID))
 		articlesPath = storefrontBasePath(c, country, storefront) + "/articles"
+		captureAttribution(c, storefront.ID)
 	}
 	if err := articles.API.Get(c, path, &response); err != nil {
 		c.String(http.StatusInternalServerError, "could not load article")
 		return
 	}
 	article := response.Article
+	dealURL := ""
+	if article.Product != nil {
+		dealURL = outboundDealURL(c, storefront, country, *article.Product)
+	}
 
 	title := article.Title + " | LeadStorefront"
 	if article.MetaTitle != "" {
@@ -108,6 +114,7 @@ func (articles *Articles) Show(c *gin.Context) {
 		"Title":             title,
 		"Country":           country,
 		"Article":           article,
+		"DealURL":           dealURL,
 		"ArticlesPath":      articlesPath,
 		"Storefront":        storefront,
 		"StorefrontDesign":  design,

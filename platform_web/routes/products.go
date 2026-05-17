@@ -47,6 +47,7 @@ func (products *Products) Index(c *gin.Context) {
 	if hasStorefront {
 		path += "?storefront_id=" + url.QueryEscape(uintToString(storefront.ID))
 		productsPath = storefrontBasePath(c, countryCode, storefront) + "/products"
+		captureAttribution(c, storefront.ID)
 	}
 	if err := products.API.Get(c, path, &response); err != nil {
 		c.String(http.StatusInternalServerError, "could not load products")
@@ -84,25 +85,37 @@ func (products *Products) Show(c *gin.Context) {
 	}
 
 	var response struct {
-		Product models.Product `json:"product"`
+		Product    models.Product    `json:"product"`
+		Storefront models.Storefront `json:"storefront"`
 	}
 	path := "/" + countryCode + "/products/" + url.PathEscape(c.Param("slug"))
 	productsPath := "/" + countryCode + "/products"
 	if hasStorefront {
 		path += "?storefront_id=" + url.QueryEscape(uintToString(storefront.ID))
 		productsPath = storefrontBasePath(c, countryCode, storefront) + "/products"
+		captureAttribution(c, storefront.ID)
 	}
 	if err := products.API.Get(c, path, &response); err != nil {
 		c.String(http.StatusInternalServerError, "could not load product")
 		return
 	}
 	product := response.Product
+	trackingStorefront := storefront
+	if trackingStorefront.ID == 0 && response.Storefront.ID != 0 {
+		trackingStorefront = response.Storefront
+		normalizeStorefrontAssetURLs(&trackingStorefront)
+	}
+	if trackingStorefront.ID != 0 {
+		captureAttribution(c, trackingStorefront.ID)
+	}
 	design, _, _ := storefrontDesignTemplateData(storefront)
+	dealURL := outboundDealURL(c, trackingStorefront, countryCode, product)
 
 	c.HTML(http.StatusOK, "product_show", gin.H{
 		"Title":             product.Name + " | LeadStorefront",
 		"Country":           countryCode,
 		"Product":           product,
+		"DealURL":           dealURL,
 		"ProductsPath":      productsPath,
 		"Storefront":        storefront,
 		"StorefrontDesign":  design,

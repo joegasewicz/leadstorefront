@@ -5,6 +5,76 @@ import { AlignCenter, AlignLeft, AlignRight, createIcons } from "lucide";
 
 document.documentElement.classList.add("js-enabled");
 
+const attributionParameterNames = [
+  "fbclid",
+  "gclid",
+  "msclkid",
+  "ttclid",
+  "li_fat_id",
+  "twclid",
+  "epik",
+  "rdt_cid",
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+  "affid",
+  "aid",
+  "partner_id",
+  "partner",
+  "subid",
+  "sub_id",
+  "clickid",
+  "click_ref",
+  "campaign_id",
+  "ref",
+  "source",
+  "cid",
+  "market",
+  "locale",
+  "currency",
+  "destination",
+  "hotel_id",
+  "offer_id",
+  "checkin",
+  "checkout",
+  "adults",
+  "children"
+];
+
+function persistAttributionLocally() {
+  const params = new URLSearchParams(window.location.search);
+  const captured: Record<string, string> = {};
+  attributionParameterNames.forEach((name) => {
+    const value = params.get(name)?.trim();
+    if (value) {
+      captured[name] = value;
+    }
+  });
+  if (Object.keys(captured).length === 0) {
+    return;
+  }
+  const now = new Date().toISOString();
+  const existingRaw = window.localStorage.getItem("leadstorefront_attribution");
+  let existing: { first_touch?: Record<string, string>; latest_touch?: Record<string, string> } = {};
+  if (existingRaw) {
+    try {
+      existing = JSON.parse(existingRaw);
+    } catch (_error) {
+      existing = {};
+    }
+  }
+  window.localStorage.setItem("leadstorefront_attribution", JSON.stringify({
+    first_touch: existing.first_touch || captured,
+    latest_touch: captured,
+    captured_at: now,
+    landing_path: `${window.location.pathname}${window.location.search}`
+  }));
+}
+
+persistAttributionLocally();
+
 type StorefrontThemeColors = {
   primary: string;
   accent: string;
