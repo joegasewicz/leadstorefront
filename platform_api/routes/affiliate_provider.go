@@ -157,18 +157,10 @@ func (route *AffiliateProvider) bindConnection(c *gin.Context, storefrontID uint
 		return models.StorefrontAffiliateProvider{}, false
 	}
 	request.StorefrontID = storefrontID
-	request.ApprovalStatus = normalizeApprovalStatus(request.ApprovalStatus)
+	request.ApprovalStatus = "registration_required"
+	request.IsActive = false
 	request.DefaultMarket = strings.ToLower(strings.TrimSpace(request.DefaultMarket))
 	return request, true
-}
-
-func normalizeApprovalStatus(value string) string {
-	switch strings.ToLower(strings.TrimSpace(value)) {
-	case "not_connected", "registration_required", "pending_approval", "connected", "tracking_active":
-		return strings.ToLower(strings.TrimSpace(value))
-	default:
-		return "registration_required"
-	}
 }
 
 func connectionUpdateMap(connection models.StorefrontAffiliateProvider) map[string]interface{} {
@@ -178,6 +170,5 @@ func connectionUpdateMap(connection models.StorefrontAffiliateProvider) map[stri
 		"click_ref_format": connection.ClickRefFormat, "tracking_domain": connection.TrackingDomain,
 		"deep_link_base_url": connection.DeepLinkBaseURL, "api_key": connection.APIKey,
 		"default_market": connection.DefaultMarket, "commission_type": connection.CommissionType,
-		"approval_status": connection.ApprovalStatus, "is_active": connection.IsActive,
 	}
 }

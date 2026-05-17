@@ -29,15 +29,6 @@
                 </select>
             </label>
             <label class="block text-sm font-medium text-slate-200">
-                Approval status
-                <select name="approval_status" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
-                    <option value="registration_required">Registration required</option>
-                    <option value="pending_approval">Pending approval</option>
-                    <option value="connected">Connected</option>
-                    <option value="tracking_active">Tracking active</option>
-                </select>
-            </label>
-            <label class="block text-sm font-medium text-slate-200">
                 Default market
                 <input name="default_market" value="{{ .Storefront.PrimaryCountry.Code }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
             </label>
@@ -81,10 +72,6 @@
                 API key
                 <input name="api_key" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
             </label>
-            <label class="mt-7 inline-flex items-center gap-2 text-sm font-medium text-slate-200">
-                <input type="checkbox" name="is_active" class="h-4 w-4 rounded border-white/10 bg-slate-900">
-                Tracking active
-            </label>
             <div class="md:col-span-3">
                 <button type="submit" class="rounded-md bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950">Connect provider</button>
             </div>
@@ -115,8 +102,6 @@
                 <label class="block text-sm font-medium text-slate-200">Deep-link base URL<input name="deep_link_base_url" value="{{ .DeepLinkBaseURL }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"></label>
                 <label class="block text-sm font-medium text-slate-200">Default market<input name="default_market" value="{{ .DefaultMarket }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"></label>
                 <label class="block text-sm font-medium text-slate-200">Commission type<input name="commission_type" value="{{ .CommissionType }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"></label>
-                <label class="block text-sm font-medium text-slate-200">Approval status<select name="approval_status" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"><option value="{{ .ApprovalStatus }}">{{ .ApprovalStatus }}</option><option value="registration_required">Registration required</option><option value="pending_approval">Pending approval</option><option value="connected">Connected</option><option value="tracking_active">Tracking active</option></select></label>
-                <label class="mt-7 inline-flex items-center gap-2 text-sm font-medium text-slate-200"><input type="checkbox" name="is_active" {{ if .IsActive }}checked{{ end }} class="h-4 w-4 rounded border-white/10 bg-slate-900">Tracking active</label>
                 <label class="block text-sm font-medium text-slate-200 md:col-span-3">API key<input name="api_key" value="{{ .APIKey }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"></label>
                 <div class="md:col-span-3"><button type="submit" class="rounded-md bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950">Save provider</button></div>
             </form>

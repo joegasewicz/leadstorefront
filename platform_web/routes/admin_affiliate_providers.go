@@ -124,8 +124,6 @@ func affiliateProviderPayload(c *gin.Context) (map[string]interface{}, error) {
 		"api_key":               strings.TrimSpace(c.PostForm("api_key")),
 		"default_market":        strings.TrimSpace(c.PostForm("default_market")),
 		"commission_type":       strings.TrimSpace(c.PostForm("commission_type")),
-		"approval_status":       strings.TrimSpace(c.PostForm("approval_status")),
-		"is_active":             c.PostForm("is_active") == "on",
 	}, nil
 }
 
