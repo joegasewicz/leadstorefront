@@ -40,10 +40,8 @@
             </div>
 
             <div class="mt-8 flex flex-wrap gap-3">
-                {{ if .Product.AffiliateURL }}
-                <a href="{{ .Product.AffiliateURL }}" class="rounded-md bg-cyan-300 px-5 py-3 font-semibold text-slate-950">View deal</a>
-                {{ else }}
-                <a href="{{ .Product.ProductURL }}" class="rounded-md bg-cyan-300 px-5 py-3 font-semibold text-slate-950">View deal</a>
+                {{ if .DealURL }}
+                <a href="{{ .DealURL }}" rel="nofollow sponsored" class="rounded-md bg-cyan-300 px-5 py-3 font-semibold text-slate-950">View deal</a>
                 {{ end }}
                 <a href="{{ .ProductsPath }}" class="rounded-md border border-white/10 px-5 py-3 font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">Back to products</a>
             </div>

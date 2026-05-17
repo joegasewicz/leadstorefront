@@ -11,6 +11,7 @@ func Register(app *gin.Engine) {
 	home := &Home{API: api}
 	storefronts := &Storefronts{API: api}
 	leads := &Leads{API: api}
+	outboundClicks := &OutboundClicks{API: api}
 	products := &Products{API: api}
 	articles := &Articles{API: api}
 	admin := &Admin{API: api}
@@ -33,6 +34,7 @@ func Register(app *gin.Engine) {
 
 	app.GET("/", home.Redirect)
 	app.GET("/storefronts/:id", storefronts.Get)
+	app.GET("/storefronts/:id/out", outboundClicks.Get)
 	app.POST("/storefronts/:id", leads.Post)
 	app.GET("/storefronts/:id/articles", articles.Get)
 	app.GET("/storefronts/:id/articles/:slug", articles.Get)
@@ -48,6 +50,7 @@ func Register(app *gin.Engine) {
 	app.POST("/:country/register", admin.Post)
 	app.GET("/:country", home.Get)
 	app.GET("/:country/storefronts/:id", storefronts.Get)
+	app.GET("/:country/storefronts/:id/out", outboundClicks.Get)
 	app.POST("/:country/storefronts/:id", leads.Post)
 	app.GET("/:country/storefronts/:id/articles", articles.Get)
 	app.GET("/:country/storefronts/:id/articles/:slug", articles.Get)
@@ -97,6 +100,7 @@ func Register(app *gin.Engine) {
 	protected.POST("/products/:id/delete", adminProducts.Delete)
 	protected.GET("/leads", leads.Get)
 	protected.GET("/leads/:id", leads.Get)
+	protected.GET("/outbound-clicks", outboundClicks.Get)
 
 	superProtected := adminGroup.Group("")
 	superProtected.Use(admin.Auth("super"))

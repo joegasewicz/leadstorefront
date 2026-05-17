@@ -220,3 +220,11 @@ func apiPathID(id string) (string, bool) {
 func uintToString(value uint) string {
 	return strconv.Itoa(int(value))
 }
+
+func uintFromString(value string) uint {
+	parsed, err := strconv.Atoi(value)
+	if err != nil || parsed <= 0 {
+		return 0
+	}
+	return uint(parsed)
+}

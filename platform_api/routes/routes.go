@@ -10,6 +10,7 @@ import (
 func Register(app *gin.Engine, db *gorm.DB) {
 	country := &Country{DB: db}
 	storefront := &Storefront{DB: db}
+	outboundClick := &OutboundClick{DB: db}
 	lead := &Lead{DB: db}
 	product := &Product{DB: db}
 	productCategory := &ProductCategory{DB: db}
@@ -20,6 +21,7 @@ func Register(app *gin.Engine, db *gorm.DB) {
 	app.GET(utils.GetVersion("/health"), health)
 	app.GET(utils.GetVersion("/"), utils.APIRoot)
 	app.GET(utils.GetVersion("/storefronts/:id"), storefront.Get)
+	app.POST(utils.GetVersion("/storefronts/:id/outbound-clicks"), outboundClick.Post)
 	app.GET(utils.GetVersion("/storefronts/:id/lead-form"), lead.Get)
 	app.POST(utils.GetVersion("/storefronts/:id/leads"), lead.Post)
 	app.GET(utils.GetVersion("/storefront-domains/:domain"), storefront.Get)
@@ -88,6 +90,7 @@ func Register(app *gin.Engine, db *gorm.DB) {
 	app.DELETE(utils.GetVersion("/admin/storefronts/:id/delete"), storefront.Delete)
 	app.GET(utils.GetVersion("/admin/leads"), lead.Get)
 	app.GET(utils.GetVersion("/admin/leads/:id"), lead.Get)
+	app.GET(utils.GetVersion("/admin/outbound-clicks"), outboundClick.Get)
 
 	app.GET(utils.GetVersion("/admin/products"), product.Get)
 	app.GET(utils.GetVersion("/admin/products/options"), productCategory.Get)

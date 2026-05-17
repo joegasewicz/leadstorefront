@@ -96,7 +96,23 @@ func (product *Product) getByCountrySlug(c *gin.Context) {
 		utils.WriteRecordError(c, err, "could not load product")
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"product": record})
+	response := gin.H{"product": record}
+	if storefront := product.associatedStorefront(record.ID, strings.TrimSpace(c.Query("storefront_id"))); storefront.ID != 0 {
+		response["storefront"] = storefront
+	}
+	c.JSON(http.StatusOK, response)
+}
+
+func (product *Product) associatedStorefront(productID uint, storefrontID string) models.Storefront {
+	var association models.ProductStorefront
+	query := product.DB.Preload("Storefront").Preload("Storefront.PrimaryCountry").Joins("JOIN storefronts ON storefronts.id = product_storefronts.storefront_id").Where("product_storefronts.product_id = ? AND storefronts.is_active = ?", productID, true)
+	if storefrontID != "" {
+		query = query.Where("product_storefronts.storefront_id = ?", storefrontID)
+	}
+	if err := query.Order("product_storefronts.created_at asc").First(&association).Error; err != nil {
+		return models.Storefront{}
+	}
+	return association.Storefront
 }
 
 func (product *Product) getAdminList(c *gin.Context) {

@@ -30,6 +30,7 @@ func (m *Migrate) Run() error {
 		&models.ArticleStorefront{},
 		&models.LeadFormField{},
 		&models.Lead{},
+		&models.OutboundClick{},
 	); err != nil {
 		return err
 	}

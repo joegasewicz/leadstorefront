@@ -46,6 +46,7 @@ func (storefronts *Storefronts) Get(c *gin.Context) {
 		return
 	}
 
+	captureAttribution(c, storefront.ID)
 	renderStorefront(c, storefronts.API, http.StatusOK, country, storefront)
 }
 
