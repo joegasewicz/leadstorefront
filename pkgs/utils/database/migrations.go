@@ -22,6 +22,8 @@ func (m *Migrate) Run() error {
 		&models.Role{},
 		&models.User{},
 		&models.Storefront{},
+		&models.AffiliateProvider{},
+		&models.StorefrontAffiliateProvider{},
 		&models.ProductCategory{},
 		&models.Product{},
 		&models.ProductStorefront{},

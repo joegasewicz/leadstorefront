@@ -50,6 +50,8 @@ func main() {
 		"platform_web/templates/routes/admin_storefront_show.gohtml",
 		"platform_web/templates/routes/admin_storefront_form.gohtml",
 		"platform_web/templates/routes/admin_storefront_delete.gohtml",
+		"platform_web/templates/routes/admin_affiliate_providers_index.gohtml",
+		"platform_web/templates/routes/admin_storefront_affiliate_providers.gohtml",
 		"platform_web/templates/routes/admin_lead_form.gohtml",
 		"platform_web/templates/routes/admin_leads_index.gohtml",
 		"platform_web/templates/routes/admin_lead_show.gohtml",

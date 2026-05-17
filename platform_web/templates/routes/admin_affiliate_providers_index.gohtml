@@ -1,0 +1,42 @@
+{{ define "admin_affiliate_providers_index" }}
+{{ template "base_start" . }}
+<section class="min-h-[calc(100vh-8rem)] bg-slate-950">
+    <div class="mx-auto max-w-6xl px-6 py-10">
+        <div>
+            <p class="text-sm font-semibold uppercase tracking-wide text-cyan-300">Provider directory</p>
+            <h1 class="mt-2 text-4xl font-bold tracking-normal text-white">Affiliate providers</h1>
+        </div>
+        <div class="mt-8 grid gap-4 md:grid-cols-2">
+            {{ range .Providers }}
+            <article class="rounded-lg border border-white/10 bg-white/5 p-5">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-white">{{ .Name }}</h2>
+                        <p class="mt-2 text-sm leading-6 text-slate-300">{{ .Description }}</p>
+                    </div>
+                    {{ if .DeepLinkSupport }}
+                    <span class="rounded-md border border-emerald-400/30 px-2 py-1 text-xs font-semibold text-emerald-200">Deep links</span>
+                    {{ end }}
+                </div>
+                <dl class="mt-4 grid gap-3 text-sm">
+                    <div>
+                        <dt class="text-slate-400">Tracking format</dt>
+                        <dd class="mt-1 font-mono text-slate-100">{{ .TrackingParameterFormat }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-slate-400">Approval</dt>
+                        <dd class="mt-1 text-slate-100">{{ .ApprovalRequirements }}</dd>
+                    </div>
+                </dl>
+                {{ if .RegistrationURL }}
+                <a href="{{ .RegistrationURL }}" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">Registration</a>
+                {{ end }}
+            </article>
+            {{ else }}
+            <p class="rounded-lg border border-white/10 bg-white/5 p-6 text-slate-400">No affiliate providers are configured.</p>
+            {{ end }}
+        </div>
+    </div>
+</section>
+{{ template "base_end" . }}
+{{ end }}

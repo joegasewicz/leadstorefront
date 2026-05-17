@@ -38,6 +38,69 @@ func Seed(db *gorm.DB) error {
 		}
 	}
 
+	affiliateProviders := []models.AffiliateProvider{
+		{
+			Name:                    "Booking.com",
+			Slug:                    "booking-com",
+			Description:             "Accommodation affiliate program with market-aware AID tracking and deep-link support.",
+			RegistrationURL:         "https://www.booking.com/affiliate-program/v2/index.html",
+			ApprovalRequirements:    "Requires affiliate registration, website/storefront details, tax details, and program approval before tracking is active.",
+			SupportedMarketsJSON:    models.JSONB(`["uk","us","au","za","nz","ca","ie","sg"]`),
+			TrackingParameterFormat: "aid={aid}&label={subid}",
+			APIAvailable:            false,
+			DeepLinkSupport:         true,
+		},
+		{
+			Name:                    "Awin",
+			Slug:                    "awin",
+			Description:             "Affiliate network for retail and travel advertisers with click reference tracking.",
+			RegistrationURL:         "https://www.awin.com/gb/publishers",
+			ApprovalRequirements:    "Requires publisher account approval and advertiser program approval.",
+			SupportedMarketsJSON:    models.JSONB(`["uk","us","au","ca","ie"]`),
+			TrackingParameterFormat: "clickref={clickref}",
+			APIAvailable:            true,
+			DeepLinkSupport:         true,
+		},
+		{
+			Name:                    "CJ Affiliate",
+			Slug:                    "cj-affiliate",
+			Description:             "Affiliate network for commerce advertisers with SID tracking support.",
+			RegistrationURL:         "https://www.cj.com/publishers",
+			ApprovalRequirements:    "Requires publisher signup, profile completion, and advertiser approval.",
+			SupportedMarketsJSON:    models.JSONB(`["uk","us","au","ca","ie","sg"]`),
+			TrackingParameterFormat: "sid={subid}",
+			APIAvailable:            true,
+			DeepLinkSupport:         true,
+		},
+		{
+			Name:                    "Amazon Associates UK",
+			Slug:                    "amazon-associates-uk",
+			Description:             "Retail affiliate program for Amazon UK product links.",
+			RegistrationURL:         "https://affiliate-program.amazon.co.uk/",
+			ApprovalRequirements:    "Requires Associates account approval and qualifying sales within Amazon's review window.",
+			SupportedMarketsJSON:    models.JSONB(`["uk"]`),
+			TrackingParameterFormat: "tag={affiliate_id}&ascsubtag={subid}",
+			APIAvailable:            true,
+			DeepLinkSupport:         true,
+		},
+		{
+			Name:                    "Travelpayouts",
+			Slug:                    "travelpayouts",
+			Description:             "Travel affiliate platform supporting markers for flights, hotels, tours, and travel products.",
+			RegistrationURL:         "https://www.travelpayouts.com/",
+			ApprovalRequirements:    "Requires publisher signup and partner program activation.",
+			SupportedMarketsJSON:    models.JSONB(`["uk","us","au","za","nz","ca","ie","sg"]`),
+			TrackingParameterFormat: "marker={marker}",
+			APIAvailable:            true,
+			DeepLinkSupport:         true,
+		},
+	}
+	for _, provider := range affiliateProviders {
+		if err := db.Where("slug = ?", provider.Slug).FirstOrCreate(&provider).Error; err != nil {
+			return err
+		}
+	}
+
 	var superRole models.Role
 	if err := db.Where("name = ?", "super").First(&superRole).Error; err != nil {
 		return err

@@ -21,6 +21,7 @@ func Register(app *gin.Engine) {
 	adminProducts := &AdminProducts{API: api}
 	adminUsers := &AdminUsers{API: api}
 	adminLeadForms := &AdminLeadForms{API: api}
+	adminAffiliateProviders := &AdminAffiliateProviders{API: api}
 
 	app.GET("/health", health.Get)
 	app.POST("/health", health.Post)
@@ -80,6 +81,9 @@ func Register(app *gin.Engine) {
 	protected.GET("/storefronts/:id/delete", adminStorefronts.Get)
 	protected.POST("/storefronts/:id/delete", adminStorefronts.Delete)
 	protected.GET("/storefronts/:id", adminStorefronts.Get)
+	protected.GET("/storefronts/:id/affiliate-providers", adminAffiliateProviders.Get)
+	protected.POST("/storefronts/:id/affiliate-providers", adminAffiliateProviders.Post)
+	protected.POST("/storefronts/:id/affiliate-providers/:connection_id", adminAffiliateProviders.Post)
 	protected.GET("/storefronts/:id/lead-form", adminLeadForms.Get)
 	protected.POST("/storefronts/:id/lead-form", adminLeadForms.Post)
 	protected.POST("/storefronts/:id/content", adminStorefronts.Post)
@@ -101,6 +105,7 @@ func Register(app *gin.Engine) {
 	protected.GET("/leads", leads.Get)
 	protected.GET("/leads/:id", leads.Get)
 	protected.GET("/outbound-clicks", outboundClicks.Get)
+	protected.GET("/affiliate-providers", adminAffiliateProviders.Get)
 
 	superProtected := adminGroup.Group("")
 	superProtected.Use(admin.Auth("super"))

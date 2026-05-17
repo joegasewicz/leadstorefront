@@ -10,6 +10,7 @@ import (
 func Register(app *gin.Engine, db *gorm.DB) {
 	country := &Country{DB: db}
 	storefront := &Storefront{DB: db}
+	affiliateProvider := &AffiliateProvider{DB: db}
 	outboundClick := &OutboundClick{DB: db}
 	lead := &Lead{DB: db}
 	product := &Product{DB: db}
@@ -78,8 +79,13 @@ func Register(app *gin.Engine, db *gorm.DB) {
 	app.DELETE(utils.GetVersion("/admin/users/:id/delete"), user.Delete)
 
 	app.GET(utils.GetVersion("/admin/storefronts"), storefront.Get)
+	app.GET(utils.GetVersion("/admin/affiliate-providers"), affiliateProvider.Get)
 	app.GET(utils.GetVersion("/admin/storefronts/create"), storefront.Get)
 	app.GET(utils.GetVersion("/admin/storefronts/:id"), storefront.Get)
+	app.GET(utils.GetVersion("/admin/storefronts/:id/affiliate-providers"), affiliateProvider.Get)
+	app.POST(utils.GetVersion("/admin/storefronts/:id/affiliate-providers"), affiliateProvider.Post)
+	app.PUT(utils.GetVersion("/admin/storefronts/:id/affiliate-providers/:connection_id"), affiliateProvider.Put)
+	app.DELETE(utils.GetVersion("/admin/storefronts/:id/affiliate-providers/:connection_id/delete"), affiliateProvider.Delete)
 	app.GET(utils.GetVersion("/admin/storefronts/:id/lead-form"), lead.Get)
 	app.PUT(utils.GetVersion("/admin/storefronts/:id/lead-form"), lead.Put)
 	app.POST(utils.GetVersion("/admin/storefronts/create"), storefront.Post)

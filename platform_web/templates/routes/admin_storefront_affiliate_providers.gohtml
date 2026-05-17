@@ -1,0 +1,130 @@
+{{ define "admin_storefront_affiliate_providers" }}
+{{ template "base_start" . }}
+<section class="mx-auto max-w-6xl px-6 py-10">
+    <div class="mb-8 flex items-start justify-between gap-4">
+        <div>
+            <a href="/admin/storefronts/{{ .Storefront.ID }}" class="text-sm font-semibold text-cyan-300 hover:text-cyan-200">Storefront</a>
+            <h1 class="mt-3 text-3xl font-bold tracking-normal text-white">Affiliate providers</h1>
+            <p class="mt-2 text-sm text-slate-300">{{ .Storefront.Name }} · {{ .Storefront.Domain }}</p>
+        </div>
+        <a href="/admin/affiliate-providers" class="rounded-md border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">Directory</a>
+    </div>
+
+    {{ if .Flash }}
+    <p class="mb-6 rounded-md border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">{{ .Flash }}</p>
+    {{ end }}
+
+    <section class="mb-8 rounded-lg border border-white/10 bg-white/5">
+        <div class="border-b border-white/10 px-4 py-3">
+            <h2 class="text-lg font-semibold text-white">Connect provider</h2>
+        </div>
+        <form method="post" action="/admin/storefronts/{{ .Storefront.ID }}/affiliate-providers" class="grid gap-4 p-4 md:grid-cols-3">
+            <label class="block text-sm font-medium text-slate-200">
+                Provider
+                <select name="affiliate_provider_id" required class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                    <option value="">Select provider</option>
+                    {{ range .UnconnectedProviders }}
+                    <option value="{{ .ID }}">{{ .Name }}</option>
+                    {{ end }}
+                </select>
+            </label>
+            <label class="block text-sm font-medium text-slate-200">
+                Approval status
+                <select name="approval_status" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+                    <option value="registration_required">Registration required</option>
+                    <option value="pending_approval">Pending approval</option>
+                    <option value="connected">Connected</option>
+                    <option value="tracking_active">Tracking active</option>
+                </select>
+            </label>
+            <label class="block text-sm font-medium text-slate-200">
+                Default market
+                <input name="default_market" value="{{ .Storefront.PrimaryCountry.Code }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </label>
+            <label class="block text-sm font-medium text-slate-200">
+                Affiliate ID
+                <input name="affiliate_id" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </label>
+            <label class="block text-sm font-medium text-slate-200">
+                Partner ID
+                <input name="partner_id" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </label>
+            <label class="block text-sm font-medium text-slate-200">
+                AID
+                <input name="aid" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </label>
+            <label class="block text-sm font-medium text-slate-200">
+                CID
+                <input name="cid" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </label>
+            <label class="block text-sm font-medium text-slate-200">
+                Sub ID format
+                <input name="sub_id_format" placeholder="{market}_{campaign}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </label>
+            <label class="block text-sm font-medium text-slate-200">
+                Click reference format
+                <input name="click_ref_format" placeholder="{click_id}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </label>
+            <label class="block text-sm font-medium text-slate-200">
+                Tracking domain
+                <input name="tracking_domain" placeholder="https://partner.example" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </label>
+            <label class="block text-sm font-medium text-slate-200">
+                Deep-link base URL
+                <input name="deep_link_base_url" placeholder="https://partner.example/deeplink" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </label>
+            <label class="block text-sm font-medium text-slate-200">
+                Commission type
+                <input name="commission_type" placeholder="CPA" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </label>
+            <label class="block text-sm font-medium text-slate-200 md:col-span-2">
+                API key
+                <input name="api_key" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300">
+            </label>
+            <label class="mt-7 inline-flex items-center gap-2 text-sm font-medium text-slate-200">
+                <input type="checkbox" name="is_active" class="h-4 w-4 rounded border-white/10 bg-slate-900">
+                Tracking active
+            </label>
+            <div class="md:col-span-3">
+                <button type="submit" class="rounded-md bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950">Connect provider</button>
+            </div>
+        </form>
+    </section>
+
+    <div class="grid gap-5">
+        {{ range .Connections }}
+        <section class="rounded-lg border border-white/10 bg-white/5">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
+                <div>
+                    <h2 class="text-lg font-semibold text-white">{{ .AffiliateProvider.Name }}</h2>
+                    <p class="mt-1 text-sm text-slate-400">{{ .ApprovalStatus }} · {{ if .IsActive }}tracking active{{ else }}inactive{{ end }}</p>
+                </div>
+                {{ if .AffiliateProvider.RegistrationURL }}
+                <a href="{{ .AffiliateProvider.RegistrationURL }}" target="_blank" rel="noopener noreferrer" class="rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-300 hover:text-cyan-200">Registration</a>
+                {{ end }}
+            </div>
+            <form method="post" action="/admin/storefronts/{{ $.Storefront.ID }}/affiliate-providers/{{ .ID }}" class="grid gap-4 p-4 md:grid-cols-3">
+                <input type="hidden" name="affiliate_provider_id" value="{{ .AffiliateProviderID }}">
+                <label class="block text-sm font-medium text-slate-200">Affiliate ID<input name="affiliate_id" value="{{ .AffiliateID }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"></label>
+                <label class="block text-sm font-medium text-slate-200">Partner ID<input name="partner_id" value="{{ .PartnerID }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"></label>
+                <label class="block text-sm font-medium text-slate-200">AID<input name="aid" value="{{ .AID }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"></label>
+                <label class="block text-sm font-medium text-slate-200">CID<input name="cid" value="{{ .CID }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"></label>
+                <label class="block text-sm font-medium text-slate-200">Sub ID format<input name="sub_id_format" value="{{ .SubIDFormat }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"></label>
+                <label class="block text-sm font-medium text-slate-200">Click ref format<input name="click_ref_format" value="{{ .ClickRefFormat }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"></label>
+                <label class="block text-sm font-medium text-slate-200">Tracking domain<input name="tracking_domain" value="{{ .TrackingDomain }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"></label>
+                <label class="block text-sm font-medium text-slate-200">Deep-link base URL<input name="deep_link_base_url" value="{{ .DeepLinkBaseURL }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"></label>
+                <label class="block text-sm font-medium text-slate-200">Default market<input name="default_market" value="{{ .DefaultMarket }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"></label>
+                <label class="block text-sm font-medium text-slate-200">Commission type<input name="commission_type" value="{{ .CommissionType }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"></label>
+                <label class="block text-sm font-medium text-slate-200">Approval status<select name="approval_status" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"><option value="{{ .ApprovalStatus }}">{{ .ApprovalStatus }}</option><option value="registration_required">Registration required</option><option value="pending_approval">Pending approval</option><option value="connected">Connected</option><option value="tracking_active">Tracking active</option></select></label>
+                <label class="mt-7 inline-flex items-center gap-2 text-sm font-medium text-slate-200"><input type="checkbox" name="is_active" {{ if .IsActive }}checked{{ end }} class="h-4 w-4 rounded border-white/10 bg-slate-900">Tracking active</label>
+                <label class="block text-sm font-medium text-slate-200 md:col-span-3">API key<input name="api_key" value="{{ .APIKey }}" class="mt-2 w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-white outline-none focus:border-cyan-300"></label>
+                <div class="md:col-span-3"><button type="submit" class="rounded-md bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950">Save provider</button></div>
+            </form>
+        </section>
+        {{ else }}
+        <p class="rounded-lg border border-white/10 bg-white/5 p-6 text-center text-sm text-slate-400">No providers connected to this storefront yet.</p>
+        {{ end }}
+    </div>
+</section>
+{{ template "base_end" . }}
+{{ end }}
